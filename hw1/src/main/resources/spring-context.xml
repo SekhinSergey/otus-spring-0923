@@ -5,11 +5,10 @@
         http://www.springframework.org/schema/beans/spring-beans.xsd">
     <bean id="resourceReader" class="ru.otus.spring.util.CsvResourceReader" />
     <bean id="surveyDao" class="ru.otus.spring.dao.SurveyDaoImpl">
-        <constructor-arg name="resourceReader" ref="resourceReader"/>
-        <constructor-arg name="resourceName" value="russia-survey.csv"/>
+        <constructor-arg index="0" ref="resourceReader"/>
+        <constructor-arg index="1" value="russia-survey.csv"/>
     </bean>
     <bean id="surveyService" class="ru.otus.spring.service.SurveyServiceImpl">
-        <constructor-arg name="surveyDao" ref="surveyDao"/>
+        <constructor-arg index="0" ref="surveyDao"/>
     </bean>
-
 </beans>
