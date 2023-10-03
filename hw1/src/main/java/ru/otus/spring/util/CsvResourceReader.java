@@ -13,7 +13,8 @@ public class CsvResourceReader implements ResourceReader {
 
     public List<List<String>> readResource(String fileName) throws CsvReadException {
         List<List<String>> csvList = new ArrayList<>();
-        try (BufferedReader br = new BufferedReader(new InputStreamReader(new ClassPathResource(fileName).getInputStream()))) {
+        try (BufferedReader br = new BufferedReader(new InputStreamReader(
+                new ClassPathResource(fileName).getInputStream()))) {
             String line;
             while ((line = br.readLine()) != null) {
                 String[] values = line.split(",");

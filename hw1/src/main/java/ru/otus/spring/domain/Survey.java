@@ -6,9 +6,9 @@ import lombok.ToString;
 @Builder
 @ToString
 public class Survey {
-    private String question;
+    private Question question;
 
-    private String badAnswer;
+    private Answer badAnswer;
 
-    private String goodAnswer;
+    private Answer goodAnswer;
 }
