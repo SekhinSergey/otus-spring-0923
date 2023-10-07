@@ -1,4 +1,4 @@
-name: hw-pipeline
+name: homework-pipeline
 
 on:
   pull_request:
