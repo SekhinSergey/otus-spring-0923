@@ -1,10 +1,16 @@
 package ru.otus.spring.domain;
 
-import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.ToString;
 
+@Builder
 @ToString
-@AllArgsConstructor
 public class Question {
-    private String question;
+    private String text;
+
+    private Answer studentAnswer;
+
+    private Answer goodAnswer;
+
+    private Answer isRight;
 }

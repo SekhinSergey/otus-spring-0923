@@ -4,13 +4,13 @@
        xsi:schemaLocation="http://www.springframework.org/schema/beans
         http://www.springframework.org/schema/beans/spring-beans.xsd">
     <bean id="resourceReader" class="ru.otus.spring.util.CsvResourceReader"/>
-    <bean id="printer" class="ru.otus.spring.out.SystemPrinter"/>
-    <bean id="surveyDao" class="ru.otus.spring.dao.SurveyDaoImpl">
-        <constructor-arg index="0" ref="resourceReader"/>
-        <constructor-arg index="1" value="russia-survey.csv"/>
+    <bean id="printer" class="ru.otus.spring.out.ConsolePrinter"/>
+    <bean id="questionDao" class="ru.otus.spring.dao.CsvQuestionDao">
+        <constructor-arg index="0" value="russia-question.csv"/>
+        <constructor-arg index="1" ref="resourceReader"/>
     </bean>
-    <bean id="surveyService" class="ru.otus.spring.service.SurveyServiceImpl">
-        <constructor-arg index="0" ref="surveyDao"/>
+    <bean id="questionService" class="ru.otus.spring.service.QuestionServiceImpl">
+        <constructor-arg index="0" ref="questionDao"/>
         <constructor-arg index="1" ref="printer"/>
     </bean>
 </beans>

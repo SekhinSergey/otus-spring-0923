@@ -1,10 +1,24 @@
 package ru.otus.spring.domain;
 
-import lombok.AllArgsConstructor;
-import lombok.ToString;
+import lombok.EqualsAndHashCode;
 
-@ToString
-@AllArgsConstructor
+@EqualsAndHashCode
 public class Answer {
-    private String answer;
+
+    private String text;
+
+    private Boolean isRight;
+
+    public Answer(String text) {
+        this.text = text;
+    }
+
+    public Answer(boolean isRight) {
+        this.isRight = isRight;
+    }
+
+    @Override
+    public String toString() {
+        return text == null ? isRight.toString() : text;
+    }
 }
