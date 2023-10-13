@@ -3,5 +3,13 @@
        xmlns="http://www.springframework.org/schema/beans"
        xsi:schemaLocation="http://www.springframework.org/schema/beans
         http://www.springframework.org/schema/beans/spring-beans.xsd">
-    <bean id="resourceReader" class="ru.otus.spring.util.CsvResourceReader"/>
+    <bean id="questionDaoEmptyResult" class="ru.otus.spring.dao.CsvQuestionDao">
+        <constructor-arg index="0" value="empty.csv"/>
+    </bean>
+    <bean id="questionDaoErrorResult" class="ru.otus.spring.dao.CsvQuestionDao">
+        <constructor-arg index="0" value="incorrect.csv"/>
+    </bean>
+    <bean id="questionDaoGoodResult" class="ru.otus.spring.dao.CsvQuestionDao">
+        <constructor-arg index="0" value="good.csv"/>
+    </bean>
 </beans>

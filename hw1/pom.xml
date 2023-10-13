@@ -16,6 +16,7 @@
         <lombok.version>1.18.30</lombok.version>
         <junit.jupiter.version>5.9.2</junit.jupiter.version>
         <apache.commons.lang3.version>3.13.0</apache.commons.lang3.version>
+        <spring.test.version>6.0.12</spring.test.version>
         <checkstyle-plugin.version>3.2.2</checkstyle-plugin.version>
         <checkstyle.version>10.11.0</checkstyle.version>
         <checkstyle.config.url>https://raw.githubusercontent.com/OtusTeam/Spring/master/checkstyle.xml</checkstyle.config.url>
@@ -43,6 +44,12 @@
             <groupId>org.apache.commons</groupId>
             <artifactId>commons-lang3</artifactId>
             <version>${apache.commons.lang3.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.springframework</groupId>
+            <artifactId>spring-test</artifactId>
+            <version>${spring.test.version}</version>
+            <scope>test</scope>
         </dependency>
     </dependencies>
 

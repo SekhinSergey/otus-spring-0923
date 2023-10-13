@@ -3,11 +3,9 @@
        xmlns="http://www.springframework.org/schema/beans"
        xsi:schemaLocation="http://www.springframework.org/schema/beans
         http://www.springframework.org/schema/beans/spring-beans.xsd">
-    <bean id="resourceReader" class="ru.otus.spring.util.CsvResourceReader"/>
     <bean id="printer" class="ru.otus.spring.out.ConsolePrinter"/>
     <bean id="questionDao" class="ru.otus.spring.dao.CsvQuestionDao">
         <constructor-arg index="0" value="russia-question.csv"/>
-        <constructor-arg index="1" ref="resourceReader"/>
     </bean>
     <bean id="questionService" class="ru.otus.spring.service.QuestionServiceImpl">
         <constructor-arg index="0" ref="questionDao"/>
