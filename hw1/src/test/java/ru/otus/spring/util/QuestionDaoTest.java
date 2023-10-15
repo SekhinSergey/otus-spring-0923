@@ -46,7 +46,7 @@ class QuestionDaoTest {
 
     @Test
     void assertReturnOneQuestionByNoDelimiterCsv() {
-        assertEquals("Column 1 not found in CSV",
+        assertEquals("Column with index 1 not found in CSV",
                 assertThrows(CsvReadException.class, () -> questionDaoErrorResult.getAll()).getMessage());
     }
 

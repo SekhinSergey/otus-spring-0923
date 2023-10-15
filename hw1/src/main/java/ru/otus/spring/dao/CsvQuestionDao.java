@@ -42,10 +42,10 @@ public class CsvQuestionDao implements QuestionDao {
     private static List<Question> buildQuestions(List<List<String>> csvList) {
         List<Question> questions = new ArrayList<>();
         for (List<String> list : csvList) {
-            int columnCount = 0;
+            int columnIndex = 0;
             try {
-                Answer studentAnswer = new Answer(list.get(++columnCount));
-                Answer goodAnswer = new Answer(list.get(++columnCount));
+                Answer studentAnswer = new Answer(list.get(++columnIndex));
+                Answer goodAnswer = new Answer(list.get(++columnIndex));
                 Question question = Question.builder()
                         .text(list.get(0))
                         .studentAnswer(studentAnswer)
@@ -54,7 +54,7 @@ public class CsvQuestionDao implements QuestionDao {
                         .build();
                 questions.add(question);
             } catch (Exception exception) {
-                throw new CsvReadException("Column " + columnCount + " not found in CSV");
+                throw new CsvReadException("Column with index " + columnIndex + " not found in CSV");
             }
         }
         return questions;
