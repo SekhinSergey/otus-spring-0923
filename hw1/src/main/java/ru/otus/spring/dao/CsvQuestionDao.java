@@ -45,12 +45,11 @@ public class CsvQuestionDao implements QuestionDao {
             int columnIndex = 0;
             try {
                 Answer studentAnswer = new Answer(list.get(++columnIndex));
-                Answer goodAnswer = new Answer(list.get(++columnIndex));
+                Answer rightAnswer = new Answer(list.get(++columnIndex));
+                Answer result = new Answer(studentAnswer.equals(rightAnswer));
                 Question question = Question.builder()
                         .text(list.get(0))
-                        .studentAnswer(studentAnswer)
-                        .goodAnswer(goodAnswer)
-                        .isRight(new Answer(studentAnswer.equals(goodAnswer)))
+                        .answers(Arrays.asList(studentAnswer, rightAnswer, result))
                         .build();
                 questions.add(question);
             } catch (Exception exception) {

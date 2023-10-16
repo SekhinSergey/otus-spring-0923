@@ -2,17 +2,21 @@ package ru.otus.spring.domain;
 
 import lombok.Builder;
 import lombok.EqualsAndHashCode;
-import lombok.ToString;
+
+import java.util.List;
 
 @Builder
-@ToString
 @EqualsAndHashCode
 public class Question {
     private String text;
 
-    private Answer studentAnswer;
+    private List<Answer> answers;
 
-    private Answer goodAnswer;
-
-    private Answer isRight;
+    @Override
+    public String toString() {
+        return "Question: " + text + "\n"
+                + "Student answer: " + answers.get(0) + "\n"
+                + "Right answer: " + answers.get(1) + "\n"
+                + "Result: " + answers.get(2) + "\n";
+    }
 }

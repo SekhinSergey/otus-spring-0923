@@ -1,4 +1,4 @@
-package ru.otus.spring.util;
+package ru.otus.spring.dao;
 
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -6,11 +6,11 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
-import ru.otus.spring.dao.QuestionDao;
 import ru.otus.spring.domain.Answer;
 import ru.otus.spring.domain.Question;
 import ru.otus.spring.exception.CsvReadException;
 
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 
@@ -54,9 +54,7 @@ class QuestionDaoTest {
     void assertReturnListByGoodCsv() {
         Question question = Question.builder()
                 .text("1")
-                .studentAnswer(new Answer("2"))
-                .goodAnswer(new Answer("3"))
-                .isRight(new Answer(false))
+                .answers(Arrays.asList(new Answer("2"), new Answer("3"), new Answer(false)))
                 .build();
         assertDoesNotThrowAndReturnResult(questionDaoGoodResult, Collections.singletonList(question));
     }
