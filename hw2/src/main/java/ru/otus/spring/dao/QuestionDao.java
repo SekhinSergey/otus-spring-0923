@@ -6,5 +6,6 @@ import ru.otus.spring.exception.CsvReadException;
 import java.util.List;
 
 public interface QuestionDao {
+
     List<Question> getAll() throws CsvReadException;
 }

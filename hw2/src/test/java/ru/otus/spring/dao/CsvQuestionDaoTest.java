@@ -15,21 +15,10 @@ import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.when;
+import static ru.otus.spring.utils.TestConstants.*;
 
 @ExtendWith(MockitoExtension.class)
 class CsvQuestionDaoTest {
-
-    private static final String NULL_CSV_PATH_MESSAGE = "CSV parsing stopped with an error: Path must not be null";
-
-    private static final String INVALID_CSV_PATH = "1.csv";
-
-    private static final String EMPTY_CSV_PATH = "empty.csv";
-
-    private static final String INCORRECT_CSV_PATH = "incorrect.csv";
-
-    private static final String COLUMN_INDEX_OUT_OF_BOUNDS_ERROR_MESSAGE = "Column with index 1 not found in CSV";
-
-    private static final String GOOD_CSV_PATH = "good.csv";
 
     @Mock
     private AppProps appProps;

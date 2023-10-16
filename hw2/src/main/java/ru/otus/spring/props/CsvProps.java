@@ -11,7 +11,6 @@ public class CsvProps implements AppProps {
     @Value("${question.source}")
     private String csvResourcePath;
 
-    @Override
     public String getProperty() {
         return csvResourcePath;
     }
