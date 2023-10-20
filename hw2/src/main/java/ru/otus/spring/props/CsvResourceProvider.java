@@ -6,12 +6,12 @@ import org.springframework.stereotype.Component;
 
 @Component
 @PropertySource("classpath:csv.properties")
-public class CsvProps implements AppProps {
+public class CsvResourceProvider implements ResourceProvider {
 
     @Value("${question.source}")
     private String csvResourcePath;
 
-    public String getProperty() {
+    public String getResourceName() {
         return csvResourcePath;
     }
 }

@@ -5,7 +5,7 @@ import org.springframework.core.io.ClassPathResource;
 import org.springframework.stereotype.Repository;
 import ru.otus.spring.domain.Question;
 import ru.otus.spring.exception.CsvReadException;
-import ru.otus.spring.props.AppProps;
+import ru.otus.spring.props.ResourceProvider;
 
 import java.io.BufferedReader;
 import java.io.InputStreamReader;
@@ -17,7 +17,7 @@ import java.util.List;
 @RequiredArgsConstructor
 public class CsvQuestionDao implements QuestionDao {
 
-    private final AppProps appProps;
+    private final ResourceProvider resourceProvider;
 
     public List<Question> getAll() throws CsvReadException {
         List<List<String>> csvList = readResource();
@@ -27,7 +27,7 @@ public class CsvQuestionDao implements QuestionDao {
     public List<List<String>> readResource() throws CsvReadException {
         List<List<String>> csvList = new ArrayList<>();
         try (BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(
-                new ClassPathResource(appProps.getProperty()).getInputStream()))) {
+                new ClassPathResource(resourceProvider.getResourceName()).getInputStream()))) {
             String line;
             while ((line = bufferedReader.readLine()) != null) {
                 String[] values = line.split(",");

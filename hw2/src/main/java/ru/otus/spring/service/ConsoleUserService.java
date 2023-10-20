@@ -3,9 +3,7 @@ package ru.otus.spring.service;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import ru.otus.spring.domain.User;
-import ru.otus.spring.out.Printer;
-
-import java.util.Scanner;
+import ru.otus.spring.out.IOService;
 
 @Service
 @RequiredArgsConstructor
@@ -15,15 +13,14 @@ public class ConsoleUserService implements UserService {
 
     private static final String FIRST_NAME_REQUEST = "What is your first name?";
 
-    private final Printer printer;
+    private final IOService ioService;
 
     public User getUser() {
-        Scanner scanner = new Scanner(System.in);
         User user = new User();
-        printer.print(SURNAME_REQUEST);
-        user.setSurname(scanner.nextLine());
-        printer.print(FIRST_NAME_REQUEST);
-        user.setFirstName(scanner.nextLine());
+        ioService.printLn(SURNAME_REQUEST);
+        user.setSurname(ioService.readLine());
+        ioService.printLn(FIRST_NAME_REQUEST);
+        user.setFirstName(ioService.readLine());
         return user;
     }
 }

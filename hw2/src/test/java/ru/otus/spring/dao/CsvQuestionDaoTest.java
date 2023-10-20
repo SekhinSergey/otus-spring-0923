@@ -8,7 +8,7 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import ru.otus.spring.domain.Question;
 import ru.otus.spring.exception.CsvReadException;
-import ru.otus.spring.props.AppProps;
+import ru.otus.spring.props.ResourceProvider;
 
 import java.util.Collections;
 import java.util.List;
@@ -21,14 +21,14 @@ import static ru.otus.spring.utils.TestConstants.*;
 class CsvQuestionDaoTest {
 
     @Mock
-    private AppProps appProps;
+    private ResourceProvider resourceProvider;
 
     @InjectMocks
     private CsvQuestionDao csvQuestionDao;
 
     @Test
     void assertNotNullTestBeans() {
-        assertNotNull(appProps);
+        assertNotNull(resourceProvider);
         assertNotNull(csvQuestionDao);
     }
 
@@ -40,13 +40,13 @@ class CsvQuestionDaoTest {
 
     @Test
     void assertReturnEmptyQuestionListByEmptyCsvPath() {
-        when(appProps.getProperty()).then(invocationOnMock -> StringUtils.EMPTY);
+        when(resourceProvider.getResourceName()).then(invocationOnMock -> StringUtils.EMPTY);
         assertDoesNotThrowAndReturnResult(Collections.emptyList());
     }
 
     @Test
     void assertReturnOneQuestionByInvalidCsvPath() {
-        when(appProps.getProperty()).then(invocationOnMock -> INVALID_CSV_PATH);
+        when(resourceProvider.getResourceName()).then(invocationOnMock -> INVALID_CSV_PATH);
         assertEquals("CSV parsing stopped with an error: class path resource ["
                         + INVALID_CSV_PATH
                         + "] cannot be opened because it does not exist",
@@ -55,20 +55,20 @@ class CsvQuestionDaoTest {
 
     @Test
     void assertReturnEmptyQuestionListByEmptyCsv() {
-        when(appProps.getProperty()).then(invocationOnMock -> EMPTY_CSV_PATH);
+        when(resourceProvider.getResourceName()).then(invocationOnMock -> EMPTY_CSV_PATH);
         assertDoesNotThrowAndReturnResult(Collections.emptyList());
     }
 
     @Test
     void assertReturnOneQuestionByNoDelimiterCsv() {
-        when(appProps.getProperty()).then(invocationOnMock -> INCORRECT_CSV_PATH);
+        when(resourceProvider.getResourceName()).then(invocationOnMock -> INCORRECT_CSV_PATH);
         assertEquals(COLUMN_INDEX_OUT_OF_BOUNDS_ERROR_MESSAGE,
                 assertThrows(CsvReadException.class, () -> csvQuestionDao.getAll()).getMessage());
     }
 
     @Test
     void assertReturnListByGoodCsv() {
-        when(appProps.getProperty()).then(invocationOnMock -> GOOD_CSV_PATH);
+        when(resourceProvider.getResourceName()).then(invocationOnMock -> GOOD_CSV_PATH);
         Question question = Question.builder()
                 .text("1")
                 .rightAnswer("2")
