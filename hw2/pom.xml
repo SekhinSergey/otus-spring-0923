@@ -18,6 +18,7 @@
         <apache.commons.lang3.version>3.13.0</apache.commons.lang3.version>
         <spring.test.version>6.0.12</spring.test.version>
         <mockito.junit.jupiter>5.6.0</mockito.junit.jupiter>
+        <junit.jupiter.params>5.10.0</junit.jupiter.params>
         <checkstyle-plugin.version>3.2.2</checkstyle-plugin.version>
         <checkstyle.version>10.11.0</checkstyle.version>
         <checkstyle.config.url>https://raw.githubusercontent.com/OtusTeam/Spring/master/checkstyle.xml</checkstyle.config.url>
@@ -56,6 +57,12 @@
             <groupId>org.mockito</groupId>
             <artifactId>mockito-junit-jupiter</artifactId>
             <version>${mockito.junit.jupiter}</version>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.junit.jupiter</groupId>
+            <artifactId>junit-jupiter-params</artifactId>
+            <version>${junit.jupiter.params}</version>
             <scope>test</scope>
         </dependency>
     </dependencies>

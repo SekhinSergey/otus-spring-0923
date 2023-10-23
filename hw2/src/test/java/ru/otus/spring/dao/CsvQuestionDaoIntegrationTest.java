@@ -1,12 +1,14 @@
 package ru.otus.spring.dao;
 
+import org.apache.commons.lang3.StringUtils;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Qualifier;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.CsvFileSource;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.context.annotation.PropertySource;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
-import ru.otus.spring.config.*;
 import ru.otus.spring.domain.Question;
 import ru.otus.spring.exception.CsvReadException;
 import ru.otus.spring.props.ResourceProvider;
@@ -18,48 +20,12 @@ import static org.junit.jupiter.api.Assertions.*;
 import static ru.otus.spring.utils.TestConstants.*;
 
 @ExtendWith(SpringExtension.class)
-@ContextConfiguration(classes = {
-        NullCsvResourceProvider.class,
-        EmptyCsvPathResourceProvider.class,
-        InvalidCsvPathResourceProvider.class,
-        EmptyCsvResourceProvider.class,
-        IncorrectCsvResourceProvider.class,
-        GoodCsvResourceProvider.class})
+@PropertySource("/csv-test.properties")
+@ContextConfiguration(classes = CsvQuestionDaoIntegrationTest.class)
 class CsvQuestionDaoIntegrationTest {
 
-    @Autowired
-    @Qualifier("nullCsvResourceProvider")
-    private ResourceProvider nullCsvResourceProvider;
-
-    @Autowired
-    @Qualifier("emptyCsvPathResourceProvider")
-    private ResourceProvider emptyCsvPathResourceProvider;
-
-    @Autowired
-    @Qualifier("invalidCsvPathResourceProvider")
-    private ResourceProvider invalidCsvPathResourceProvider;
-
-    @Autowired
-    @Qualifier("emptyCsvResourceProvider")
-    private ResourceProvider emptyCsvResourceProvider;
-
-    @Autowired
-    @Qualifier("incorrectCsvResourceProvider")
-    private ResourceProvider incorrectCsvResourceProvider;
-
-    @Autowired
-    @Qualifier("goodCsvResourceProvider")
-    private ResourceProvider goodCsvResourceProvider;
-
-    @Test
-    void assertNotNullTestBeans() {
-        assertNotNull(nullCsvResourceProvider);
-        assertNotNull(emptyCsvPathResourceProvider);
-        assertNotNull(invalidCsvPathResourceProvider);
-        assertNotNull(emptyCsvResourceProvider);
-        assertNotNull(incorrectCsvResourceProvider);
-        assertNotNull(goodCsvResourceProvider);
-    }
+    @Value("${question-good.source}")
+    private String goodCsvResourcePath;
 
     @Test
     void assertReturnOneQuestionByNullCsvReader() {
@@ -70,45 +36,37 @@ class CsvQuestionDaoIntegrationTest {
 
     @Test
     void assertReturnOneQuestionByNullCsvPath() {
-        QuestionDao questionDao = new CsvQuestionDao(nullCsvResourceProvider);
+        ResourceProvider resourceProvider = () -> null;
+        QuestionDao questionDao = new CsvQuestionDao(resourceProvider);
         assertEquals(NULL_CSV_PATH_MESSAGE,
                 assertThrows(CsvReadException.class, questionDao::getAll).getMessage());
     }
 
     @Test
     void assertReturnEmptyQuestionListByEmptyCsvPath() {
-        QuestionDao questionDao = new CsvQuestionDao(emptyCsvPathResourceProvider);
+        ResourceProvider resourceProvider = () -> StringUtils.EMPTY;
+        QuestionDao questionDao = new CsvQuestionDao(resourceProvider);
         assertDoesNotThrowAndReturnResult(questionDao, Collections.emptyList());
     }
 
     @Test
     void assertReturnOneQuestionByInvalidCsvPath() {
-        QuestionDao questionDao = new CsvQuestionDao(invalidCsvPathResourceProvider);
+        ResourceProvider resourceProvider = () -> INVALID_CSV_PATH;
+        QuestionDao questionDao = new CsvQuestionDao(resourceProvider);
         assertEquals("CSV parsing stopped with an error: class path resource ["
                         + INVALID_CSV_PATH
                         + "] cannot be opened because it does not exist",
                 assertThrows(CsvReadException.class, questionDao::getAll).getMessage());
     }
 
-    @Test
-    void assertReturnEmptyQuestionListByEmptyCsv() {
-        QuestionDao questionDao = new CsvQuestionDao(emptyCsvResourceProvider);
-        assertDoesNotThrowAndReturnResult(questionDao, Collections.emptyList());
-    }
-
-    @Test
-    void assertReturnOneQuestionByNoDelimiterCsv() {
-        QuestionDao questionDao = new CsvQuestionDao(incorrectCsvResourceProvider);
-        assertEquals(COLUMN_INDEX_OUT_OF_BOUNDS_ERROR_MESSAGE,
-                assertThrows(CsvReadException.class, questionDao::getAll).getMessage());
-    }
-
-    @Test
-    void assertReturnListByGoodCsv() {
-        QuestionDao questionDao = new CsvQuestionDao(goodCsvResourceProvider);
+    @ParameterizedTest
+    @CsvFileSource(resources = "/" + GOOD_CSV_PATH)
+    void assertReturnListByGoodCsv(String firstElement, String secondElement) {
+        ResourceProvider resourceProvider = () -> goodCsvResourcePath;
+        QuestionDao questionDao = new CsvQuestionDao(resourceProvider);
         Question question = Question.builder()
-                .text("1")
-                .rightAnswer("2")
+                .text(firstElement)
+                .rightAnswer(secondElement)
                 .build();
         assertDoesNotThrowAndReturnResult(questionDao, Collections.singletonList(question));
     }

@@ -20,4 +20,12 @@ public class ConsoleIOService implements IOService {
         Scanner scanner = new Scanner(System.in);
         return scanner.nextLine();
     }
+
+    public void printConfirmationRequest() {
+        printLn("Enter \"Yes\" or \"No\"?");
+    }
+
+    public boolean isOngoing() {
+        return readLine().equals("Yes");
+    }
 }

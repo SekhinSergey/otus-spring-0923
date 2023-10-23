@@ -4,6 +4,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import ru.otus.spring.dao.QuestionDao;
 import ru.otus.spring.domain.Question;
+import ru.otus.spring.domain.TestResult;
 import ru.otus.spring.domain.User;
 import ru.otus.spring.exception.CsvReadException;
 import ru.otus.spring.out.IOService;
@@ -20,13 +21,13 @@ public class TestServiceImpl implements TestService {
 
     private final QuestionDao questionDao;
 
-    private final StudentTestResultService studentTestResultService;
+    private final ResultService resultService;
 
     public void printTest() throws CsvReadException {
         User user = userService.getUser();
         prepareTest();
-        int rightAnswerCount = testStudents();
-        studentTestResultService.printResult(user, rightAnswerCount);
+        TestResult testResult = testStudents(user);
+        resultService.printResult(testResult);
     }
 
     private void prepareTest() {
@@ -36,8 +37,9 @@ public class TestServiceImpl implements TestService {
         ioService.skipPrintLn();
     }
 
-    private int testStudents() {
+    private TestResult testStudents(User user) {
         int rightAnswerCount = 0;
+        TestResult testResult = new TestResult(user);
         for (Question question : questionDao.getAll()) {
             String questionText = question.getText();
             ioService.printLn(questionText);
@@ -45,8 +47,11 @@ public class TestServiceImpl implements TestService {
             String rightAnswer = question.getRightAnswer();
             if (rightAnswer.equals(studentAnswer)) {
                 rightAnswerCount++;
+            } else {
+                testResult.getUnansweredQuestions().add(question);
             }
         }
-        return rightAnswerCount;
+        testResult.setRightAnswerCount(rightAnswerCount);
+        return testResult;
     }
 }

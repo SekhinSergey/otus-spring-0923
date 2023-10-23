@@ -3,6 +3,8 @@ package ru.otus.spring.dao;
 import org.apache.commons.lang3.StringUtils;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.CsvFileSource;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
@@ -66,12 +68,13 @@ class CsvQuestionDaoTest {
                 assertThrows(CsvReadException.class, () -> csvQuestionDao.getAll()).getMessage());
     }
 
-    @Test
-    void assertReturnListByGoodCsv() {
+    @ParameterizedTest
+    @CsvFileSource(resources = "/" + GOOD_CSV_PATH)
+    void assertReturnListByGoodCsv(String firstElement, String secondElement) {
         when(resourceProvider.getResourceName()).then(invocationOnMock -> GOOD_CSV_PATH);
         Question question = Question.builder()
-                .text("1")
-                .rightAnswer("2")
+                .text(firstElement)
+                .rightAnswer(secondElement)
                 .build();
         assertDoesNotThrowAndReturnResult(Collections.singletonList(question));
     }
