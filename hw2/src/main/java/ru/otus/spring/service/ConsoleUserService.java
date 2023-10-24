@@ -3,7 +3,7 @@ package ru.otus.spring.service;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import ru.otus.spring.domain.User;
-import ru.otus.spring.out.IOService;
+import ru.otus.spring.io.IOService;
 
 @Service
 @RequiredArgsConstructor

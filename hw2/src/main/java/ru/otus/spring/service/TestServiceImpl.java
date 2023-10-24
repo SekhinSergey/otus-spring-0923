@@ -7,7 +7,7 @@ import ru.otus.spring.domain.Question;
 import ru.otus.spring.domain.TestResult;
 import ru.otus.spring.domain.User;
 import ru.otus.spring.exception.CsvReadException;
-import ru.otus.spring.out.IOService;
+import ru.otus.spring.io.IOService;
 
 @Service
 @RequiredArgsConstructor

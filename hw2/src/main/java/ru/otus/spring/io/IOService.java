@@ -1,4 +1,4 @@
-package ru.otus.spring.out;
+package ru.otus.spring.io;
 
 public interface IOService {
 
