@@ -19,12 +19,12 @@ public class CsvQuestionDao implements QuestionDao {
 
     private final ResourceProvider resourceProvider;
 
-    public List<Question> getAll() throws CsvReadException {
+    public List<Question> getAll() {
         List<List<String>> csvList = readResource();
         return buildQuestions(csvList);
     }
 
-    public List<List<String>> readResource() throws CsvReadException {
+    public List<List<String>> readResource() {
         List<List<String>> csvList = new ArrayList<>();
         try (BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(
                 new ClassPathResource(resourceProvider.getResourceName()).getInputStream()))) {

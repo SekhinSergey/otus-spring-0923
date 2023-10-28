@@ -7,7 +7,7 @@ import ru.otus.spring.io.IOService;
 
 @Service
 @RequiredArgsConstructor
-public class ConsoleUserService implements UserService {
+public class UserServiceImpl implements UserService {
 
     private static final String SURNAME_REQUEST = "What is your surname?";
 

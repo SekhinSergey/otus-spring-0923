@@ -6,7 +6,6 @@ import ru.otus.spring.dao.QuestionDao;
 import ru.otus.spring.domain.Question;
 import ru.otus.spring.domain.TestResult;
 import ru.otus.spring.domain.User;
-import ru.otus.spring.exception.CsvReadException;
 import ru.otus.spring.io.IOService;
 
 @Service
@@ -15,19 +14,21 @@ public class TestServiceImpl implements TestService {
 
     private static final String TEST_TITLE = "Testing students";
 
-    private final UserService userService;
-
     private final IOService ioService;
 
     private final QuestionDao questionDao;
 
-    private final ResultService resultService;
-
-    public void printTest() throws CsvReadException {
-        User user = userService.getUser();
+    public TestResult testStudent(User user) {
         prepareTest();
-        TestResult testResult = testStudents(user);
-        resultService.printResult(testResult);
+        int rightAnswerCount = 0;
+        TestResult testResult = new TestResult(user);
+        for (Question question : questionDao.getAll()) {
+            ask(question);
+            String studentAnswer = ioService.readLine();
+            rightAnswerCount = checkTheAnswer(rightAnswerCount, testResult, question, studentAnswer);
+        }
+        testResult.setRightAnswerCount(rightAnswerCount);
+        return testResult;
     }
 
     private void prepareTest() {
@@ -37,21 +38,21 @@ public class TestServiceImpl implements TestService {
         ioService.skipPrintLn();
     }
 
-    private TestResult testStudents(User user) {
-        int rightAnswerCount = 0;
-        TestResult testResult = new TestResult(user);
-        for (Question question : questionDao.getAll()) {
-            String questionText = question.getText();
-            ioService.printLn(questionText);
-            String studentAnswer = ioService.readLine();
-            String rightAnswer = question.getRightAnswer();
-            if (rightAnswer.equals(studentAnswer)) {
-                rightAnswerCount++;
-            } else {
-                testResult.getUnansweredQuestions().add(question);
-            }
+    private void ask(Question question) {
+        String questionText = question.getText();
+        ioService.printLn(questionText);
+    }
+
+    private static int checkTheAnswer(int rightAnswerCount,
+                                      TestResult testResult,
+                                      Question question,
+                                      String studentAnswer) {
+        String rightAnswer = question.getRightAnswer();
+        if (rightAnswer.equals(studentAnswer)) {
+            rightAnswerCount++;
+        } else {
+            testResult.getUnansweredQuestions().add(question);
         }
-        testResult.setRightAnswerCount(rightAnswerCount);
-        return testResult;
+        return rightAnswerCount;
     }
 }

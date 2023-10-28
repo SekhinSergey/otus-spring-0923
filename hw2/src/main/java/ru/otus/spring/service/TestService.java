@@ -1,8 +1,9 @@
 package ru.otus.spring.service;
 
-import ru.otus.spring.exception.CsvReadException;
+import ru.otus.spring.domain.TestResult;
+import ru.otus.spring.domain.User;
 
 public interface TestService {
 
-    void printTest() throws CsvReadException;
+    TestResult testStudent(User user);
 }
