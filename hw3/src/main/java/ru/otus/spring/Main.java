@@ -1,13 +1,16 @@
 package ru.otus.spring;
 
-import org.springframework.context.annotation.AnnotationConfigApplicationContext;
-import org.springframework.context.annotation.ComponentScan;
+import org.springframework.boot.SpringApplication;
+import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.context.ApplicationContext;
 import ru.otus.spring.exception.CsvReadException;
 import ru.otus.spring.service.TestRunnerService;
 
-@ComponentScan
+@SpringBootApplication
 public class Main {
     public static void main(String[] args) throws CsvReadException {
-        new AnnotationConfigApplicationContext(Main.class).getBean(TestRunnerService.class).run();
+        // Please, select profile before running
+        ApplicationContext context = SpringApplication.run(Main.class, args);
+        context.getBean(TestRunnerService.class).run();
     }
 }

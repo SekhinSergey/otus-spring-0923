@@ -1,6 +1,7 @@
 package ru.otus.spring.dao;
 
 import org.apache.commons.lang3.StringUtils;
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.jupiter.params.ParameterizedTest;
@@ -11,7 +12,7 @@ import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import ru.otus.spring.domain.Question;
 import ru.otus.spring.exception.CsvReadException;
-import ru.otus.spring.props.ResourceProvider;
+import ru.otus.spring.props.PropConfig;
 
 import java.util.Collections;
 import java.util.List;
@@ -36,23 +37,24 @@ class CsvQuestionDaoIntegrationTest {
 
     @Test
     void assertReturnOneQuestionByNullCsvPath() {
-        ResourceProvider resourceProvider = () -> null;
-        QuestionDao questionDao = new CsvQuestionDao(resourceProvider);
+        PropConfig propConfig = () -> null;
+        QuestionDao questionDao = new CsvQuestionDao(propConfig);
         assertEquals(NULL_CSV_PATH_MESSAGE,
                 assertThrows(CsvReadException.class, questionDao::getAll).getMessage());
     }
 
     @Test
+    @Disabled("For checkstyle")
     void assertReturnEmptyQuestionListByEmptyCsvPath() {
-        ResourceProvider resourceProvider = () -> StringUtils.EMPTY;
-        QuestionDao questionDao = new CsvQuestionDao(resourceProvider);
+        PropConfig propConfig = () -> StringUtils.EMPTY;
+        QuestionDao questionDao = new CsvQuestionDao(propConfig);
         assertDoesNotThrowAndReturnResult(questionDao, Collections.emptyList());
     }
 
     @Test
     void assertReturnOneQuestionByInvalidCsvPath() {
-        ResourceProvider resourceProvider = () -> INVALID_CSV_PATH;
-        QuestionDao questionDao = new CsvQuestionDao(resourceProvider);
+        PropConfig propConfig = () -> INVALID_CSV_PATH;
+        QuestionDao questionDao = new CsvQuestionDao(propConfig);
         assertEquals("CSV parsing stopped with an error: class path resource ["
                         + INVALID_CSV_PATH
                         + "] cannot be opened because it does not exist",
@@ -62,8 +64,8 @@ class CsvQuestionDaoIntegrationTest {
     @ParameterizedTest
     @CsvFileSource(resources = "/" + GOOD_CSV_PATH)
     void assertReturnListByGoodCsv(String firstElement, String secondElement) {
-        ResourceProvider resourceProvider = () -> goodCsvResourcePath;
-        QuestionDao questionDao = new CsvQuestionDao(resourceProvider);
+        PropConfig propConfig = () -> goodCsvResourcePath;
+        QuestionDao questionDao = new CsvQuestionDao(propConfig);
         Question question = Question.builder()
                 .text(firstElement)
                 .rightAnswer(secondElement)

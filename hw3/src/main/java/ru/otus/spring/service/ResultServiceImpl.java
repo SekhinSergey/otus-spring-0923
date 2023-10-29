@@ -3,47 +3,58 @@ package ru.otus.spring.service;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import ru.otus.spring.domain.TestResult;
-import ru.otus.spring.io.IOService;
-import ru.otus.spring.io.InteractiveService;
+import ru.otus.spring.io.LocalizedIOService;
+import ru.otus.spring.io.LocalizedResultIOService;
 
 @Service
 @RequiredArgsConstructor
 public class ResultServiceImpl implements ResultService {
 
-    private static final String STUDENT_CORRECT_ANSWERS_NUMBER_MESSAGE = "Number of correct answers by student ";
+    private static final String RESULT = "ResultService.result.message";
 
-    private static final String UNANSWERED_QUESTIONS_REQUEST_MESSAGE = "Do you want to see unanswered questions?";
+    private static final String UNANSWERED_QUESTIONS_REQUEST_MESSAGE
+            = "ResultService.unanswered.questions.request.message";
 
-    private static final String RIGHT_ANSWER_REQUEST_MESSAGE = "Do you want to see right answer?";
+    private static final String RIGHT_ANSWER_REQUEST_MESSAGE = "ResultService.right.answer.request.message";
 
+    private final LocalizedIOService localizedIoService;
 
-    private final IOService ioService;
-
-    private final InteractiveService interactiveService;
+    private final LocalizedResultIOService localizedResultIOService;
 
     public void printResult(TestResult testResult) {
         printBaseTestResults(testResult);
-        printDetailedTestResults(testResult);
+        if (!isSuccess(testResult)) {
+            printDetailedTestResults(testResult);
+        }
     }
 
     private void printBaseTestResults(TestResult testResult) {
-        ioService.printLn(STUDENT_CORRECT_ANSWERS_NUMBER_MESSAGE +
-                testResult.getUser().getFullName() + ": " +
-                testResult.getRightAnswerCount());
+        localizedIoService.formattedLocalizedPrintLn(RESULT, testResult.getUser().getFullName());
+        int rightAnswerCount = testResult.getRightAnswerCount();
+        localizedIoService.printLn(rightAnswerCount);
+        if (isSuccess(testResult)) {
+            localizedResultIOService.congratulatoryMessagePrintLn();
+        } else if (rightAnswerCount < localizedResultIOService.getMinResult()) {
+            localizedResultIOService.failureMessagePrintLn();
+        }
     }
 
     private void printDetailedTestResults(TestResult testResult) {
-        ioService.printLn(UNANSWERED_QUESTIONS_REQUEST_MESSAGE);
-        interactiveService.printConfirmationRequest();
-        if (interactiveService.isOngoing()) {
+        localizedIoService.localizedPrintLn(UNANSWERED_QUESTIONS_REQUEST_MESSAGE);
+        localizedIoService.confirmationRequestPrintLn();
+        if (localizedIoService.isOngoing()) {
             testResult.getUnansweredQuestions().forEach(question -> {
-                ioService.printLn(question.getText());
-                ioService.printLn(RIGHT_ANSWER_REQUEST_MESSAGE);
-                interactiveService.printConfirmationRequest();
-                if (interactiveService.isOngoing()) {
-                    ioService.printLn(question.getRightAnswer());
+                localizedIoService.printLn(question.getText());
+                localizedIoService.localizedPrintLn(RIGHT_ANSWER_REQUEST_MESSAGE);
+                localizedIoService.confirmationRequestPrintLn();
+                if (localizedIoService.isOngoing()) {
+                    localizedIoService.printLn(question.getRightAnswer());
                 }
             });
         }
+    }
+
+    private static boolean isSuccess(TestResult testResult) {
+        return testResult.getUnansweredQuestions().isEmpty();
     }
 }

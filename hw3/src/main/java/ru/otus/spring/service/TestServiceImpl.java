@@ -6,15 +6,15 @@ import ru.otus.spring.dao.QuestionDao;
 import ru.otus.spring.domain.Question;
 import ru.otus.spring.domain.TestResult;
 import ru.otus.spring.domain.User;
-import ru.otus.spring.io.IOService;
+import ru.otus.spring.io.LocalizedIOService;
 
 @Service
 @RequiredArgsConstructor
 public class TestServiceImpl implements TestService {
 
-    private static final String TEST_TITLE = "Testing students";
+    private static final String TITLE = "TestService.title";
 
-    private final IOService ioService;
+    private final LocalizedIOService localizedIoService;
 
     private final QuestionDao questionDao;
 
@@ -24,7 +24,7 @@ public class TestServiceImpl implements TestService {
         TestResult testResult = new TestResult(user);
         for (Question question : questionDao.getAll()) {
             ask(question);
-            String studentAnswer = ioService.readLine();
+            String studentAnswer = localizedIoService.readLine();
             rightAnswerCount = checkTheAnswer(rightAnswerCount, testResult, question, studentAnswer);
         }
         testResult.setRightAnswerCount(rightAnswerCount);
@@ -32,15 +32,15 @@ public class TestServiceImpl implements TestService {
     }
 
     private void prepareTest() {
-        ioService.skipPrintLn();
-        ioService.skipPrintLn();
-        ioService.printLn(TEST_TITLE);
-        ioService.skipPrintLn();
+        localizedIoService.skipPrintLn();
+        localizedIoService.skipPrintLn();
+        localizedIoService.localizedPrintLn(TITLE);
+        localizedIoService.skipPrintLn();
     }
 
     private void ask(Question question) {
         String questionText = question.getText();
-        ioService.printLn(questionText);
+        localizedIoService.printLn(questionText);
     }
 
     private static int checkTheAnswer(int rightAnswerCount,

@@ -1,0 +1,4 @@
+test:
+  csv-resource-path: questions-ru.csv
+lang:
+  locale: ru_RU
