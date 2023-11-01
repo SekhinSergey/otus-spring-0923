@@ -8,6 +8,8 @@ import ru.otus.spring.domain.TestResult;
 import ru.otus.spring.domain.User;
 import ru.otus.spring.io.LocalizedIOService;
 
+import static ru.otus.spring.domain.TestResult.checkTheAnswer;
+
 @Service
 @RequiredArgsConstructor
 public class TestServiceImpl implements TestService {
@@ -41,18 +43,5 @@ public class TestServiceImpl implements TestService {
     private void ask(Question question) {
         String questionText = question.getText();
         localizedIoService.printLn(questionText);
-    }
-
-    private static int checkTheAnswer(int rightAnswerCount,
-                                      TestResult testResult,
-                                      Question question,
-                                      String studentAnswer) {
-        String rightAnswer = question.getRightAnswer();
-        if (rightAnswer.equals(studentAnswer)) {
-            rightAnswerCount++;
-        } else {
-            testResult.getUnansweredQuestions().add(question);
-        }
-        return rightAnswerCount;
     }
 }

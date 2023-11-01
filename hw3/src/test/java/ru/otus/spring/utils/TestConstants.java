@@ -7,8 +7,8 @@ public class TestConstants {
     public static final String NULL_CSV_PATH_MESSAGE = NULL_CSV_BASE_MESSAGE + "Path must not be null";
 
     public static final String NULL_CSV_READER_MESSAGE = NULL_CSV_BASE_MESSAGE
-            + "Cannot invoke \"ru.otus.spring.props.PropConfig.getProperty()\" "
-            + "because \"this.csvFilePathPropConfig\" is null";
+            + "Cannot invoke \"ru.otus.spring.props.TestFileNameProvider.getTestFileName()\" " +
+            "because \"this.testFileNameProvider\" is null";
 
     public static final String INVALID_CSV_PATH = "1.csv";
 

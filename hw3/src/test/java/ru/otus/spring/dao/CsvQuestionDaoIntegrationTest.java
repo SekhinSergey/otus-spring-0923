@@ -12,7 +12,7 @@ import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import ru.otus.spring.domain.Question;
 import ru.otus.spring.exception.CsvReadException;
-import ru.otus.spring.props.PropConfig;
+import ru.otus.spring.props.TestFileNameProvider;
 
 import java.util.Collections;
 import java.util.List;
@@ -37,8 +37,8 @@ class CsvQuestionDaoIntegrationTest {
 
     @Test
     void assertReturnOneQuestionByNullCsvPath() {
-        PropConfig propConfig = () -> null;
-        QuestionDao questionDao = new CsvQuestionDao(propConfig);
+        TestFileNameProvider testFileNameProvider = () -> null;
+        QuestionDao questionDao = new CsvQuestionDao(testFileNameProvider);
         assertEquals(NULL_CSV_PATH_MESSAGE,
                 assertThrows(CsvReadException.class, questionDao::getAll).getMessage());
     }
@@ -46,15 +46,15 @@ class CsvQuestionDaoIntegrationTest {
     @Test
     @Disabled("For checkstyle")
     void assertReturnEmptyQuestionListByEmptyCsvPath() {
-        PropConfig propConfig = () -> StringUtils.EMPTY;
-        QuestionDao questionDao = new CsvQuestionDao(propConfig);
+        TestFileNameProvider testFileNameProvider = () -> StringUtils.EMPTY;
+        QuestionDao questionDao = new CsvQuestionDao(testFileNameProvider);
         assertDoesNotThrowAndReturnResult(questionDao, Collections.emptyList());
     }
 
     @Test
     void assertReturnOneQuestionByInvalidCsvPath() {
-        PropConfig propConfig = () -> INVALID_CSV_PATH;
-        QuestionDao questionDao = new CsvQuestionDao(propConfig);
+        TestFileNameProvider testFileNameProvider = () -> INVALID_CSV_PATH;
+        QuestionDao questionDao = new CsvQuestionDao(testFileNameProvider);
         assertEquals("CSV parsing stopped with an error: class path resource ["
                         + INVALID_CSV_PATH
                         + "] cannot be opened because it does not exist",
@@ -64,8 +64,8 @@ class CsvQuestionDaoIntegrationTest {
     @ParameterizedTest
     @CsvFileSource(resources = "/" + GOOD_CSV_PATH)
     void assertReturnListByGoodCsv(String firstElement, String secondElement) {
-        PropConfig propConfig = () -> goodCsvResourcePath;
-        QuestionDao questionDao = new CsvQuestionDao(propConfig);
+        TestFileNameProvider testFileNameProvider = () -> goodCsvResourcePath;
+        QuestionDao questionDao = new CsvQuestionDao(testFileNameProvider);
         Question question = Question.builder()
                 .text(firstElement)
                 .rightAnswer(secondElement)

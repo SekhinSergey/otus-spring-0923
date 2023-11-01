@@ -4,13 +4,17 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import ru.otus.spring.domain.TestResult;
 import ru.otus.spring.io.LocalizedIOService;
-import ru.otus.spring.io.LocalizedResultIOService;
+import ru.otus.spring.props.TestConfig;
 
 @Service
 @RequiredArgsConstructor
 public class ResultServiceImpl implements ResultService {
 
     private static final String RESULT = "ResultService.result.message";
+
+    private static final String CONGRATULATORY_MESSAGE = "LocalizedResultIOService.congratulatory.message";
+
+    private static final String FAILURE_MESSAGE = "LocalizedResultIOService.failure.message";
 
     private static final String UNANSWERED_QUESTIONS_REQUEST_MESSAGE
             = "ResultService.unanswered.questions.request.message";
@@ -19,7 +23,7 @@ public class ResultServiceImpl implements ResultService {
 
     private final LocalizedIOService localizedIoService;
 
-    private final LocalizedResultIOService localizedResultIOService;
+    private final TestConfig testConfig;
 
     public void printResult(TestResult testResult) {
         printBaseTestResults(testResult);
@@ -33,9 +37,9 @@ public class ResultServiceImpl implements ResultService {
         int rightAnswerCount = testResult.getRightAnswerCount();
         localizedIoService.printLn(rightAnswerCount);
         if (isSuccess(testResult)) {
-            localizedResultIOService.congratulatoryMessagePrintLn();
-        } else if (rightAnswerCount < localizedResultIOService.getMinResult()) {
-            localizedResultIOService.failureMessagePrintLn();
+            localizedIoService.localizedPrintLn(CONGRATULATORY_MESSAGE);
+        } else if (rightAnswerCount < testConfig.getMinResult()) {
+            localizedIoService.localizedPrintLn(FAILURE_MESSAGE);
         }
     }
 

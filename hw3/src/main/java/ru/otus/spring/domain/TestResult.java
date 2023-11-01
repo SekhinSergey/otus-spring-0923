@@ -20,4 +20,17 @@ public class TestResult {
         this.user = user;
         unansweredQuestions = new ArrayList<>();
     }
+
+    public static int checkTheAnswer(int rightAnswerCount,
+                                      TestResult testResult,
+                                      Question question,
+                                      String studentAnswer) {
+        String rightAnswer = question.getRightAnswer();
+        if (rightAnswer.equals(studentAnswer)) {
+            rightAnswerCount++;
+        } else {
+            testResult.getUnansweredQuestions().add(question);
+        }
+        return rightAnswerCount;
+    }
 }

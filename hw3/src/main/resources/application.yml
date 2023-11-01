@@ -4,3 +4,5 @@ spring:
   messages:
     baseName: messages
     encoding: UTF-8
+test:
+  minResult: 3
