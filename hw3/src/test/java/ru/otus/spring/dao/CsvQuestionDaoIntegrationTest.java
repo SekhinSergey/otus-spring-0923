@@ -3,13 +3,12 @@ package ru.otus.spring.dao;
 import org.apache.commons.lang3.StringUtils;
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.CsvFileSource;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.context.annotation.PropertySource;
-import org.springframework.test.context.ContextConfiguration;
-import org.springframework.test.context.junit.jupiter.SpringExtension;
+import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.test.context.ActiveProfiles;
+import org.springframework.test.context.TestPropertySource;
 import ru.otus.spring.domain.Question;
 import ru.otus.spring.exception.CsvReadException;
 import ru.otus.spring.props.TestFileNameProvider;
@@ -20,9 +19,9 @@ import java.util.List;
 import static org.junit.jupiter.api.Assertions.*;
 import static ru.otus.spring.utils.TestConstants.*;
 
-@ExtendWith(SpringExtension.class)
-@PropertySource("/csv-test.properties")
-@ContextConfiguration(classes = CsvQuestionDaoIntegrationTest.class)
+@SpringBootTest
+@ActiveProfiles("test")
+@TestPropertySource(locations = "/csv-test.properties")
 class CsvQuestionDaoIntegrationTest {
 
     @Value("${question-good.source}")
