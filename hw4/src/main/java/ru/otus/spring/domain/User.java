@@ -1,11 +1,13 @@
 package ru.otus.spring.domain;
 
+import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.ToString;
 
 @Setter
 @ToString
+@EqualsAndHashCode
 @NoArgsConstructor
 public class User {
 

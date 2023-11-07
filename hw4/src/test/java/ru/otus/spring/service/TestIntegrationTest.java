@@ -27,12 +27,10 @@ import static ru.otus.spring.utils.TestConstants.*;
 
 @Getter
 @SpringBootTest
-@ContextConfiguration(classes = TestServiceIntegrationTest.TestServiceTestConfiguration.class)
-class TestServiceIntegrationTest {
+@ContextConfiguration(classes = TestIntegrationTest.TestServiceTestConfiguration.class)
+class TestIntegrationTest {
 
-    private static final String FIRST_NAME = "Sergey";
-
-    private static final String SURNAME = "Sekhin";
+    private static final String NAME = "Name";
 
     private static final String BAD_ANSWER = "1";
 
@@ -61,57 +59,72 @@ class TestServiceIntegrationTest {
     private LocalizedIOService localizedIoService;
 
     @Autowired
+    private UserService userService;
+
+    @Autowired
     private QuestionDao questionDao;
 
     @Autowired
     private TestService testService;
 
+    @Autowired
+    private ResultService resultService;
+
     @ParameterizedTest
     @CsvFileSource(resources = "/" + GOOD_CSV_PATH)
     void assertFailedTestResult(String firstElement, String secondElement) {
-        User user = prepareUser();
+        User user = testUser();
 
         TestResult testResult = testService.testStudent(user);
-
-        assertEquals(user, testResult.getUser());
-
         int rightAnswerCount = testResult.getRightAnswerCount();
         assertEquals(ZERO_RIGHT_ANSWER, rightAnswerCount);
-
-        Question question = prepareQuestion(firstElement, secondElement);
+        Question question = buildTestQuestion(firstElement, secondElement);
         List<Question> unansweredQuestions = testResult.getUnansweredQuestions();
         assertEquals(Collections.singletonList(question), unansweredQuestions);
 
+        when(testConfig.getMinResult()).thenReturn(3);
+        when(localizedIoService.isOngoing()).thenReturn(true);
+        assertTrue(isPrintResultSuccessful(testResult));
     }
 
     @Test
     void assertGoodTestResult() {
-        User user = prepareUser();
+        User user = testUser();
+
         when(localizedIoService.readLine()).thenReturn(RIGHT_ANSWER);
-
         TestResult testResult = testService.testStudent(user);
-
         assertEquals(user, testResult.getUser());
-
         int rightAnswerCount = testResult.getRightAnswerCount();
         assertEquals(ONE_RIGHT_ANSWER, rightAnswerCount);
-
         List<Question> unansweredQuestions = testResult.getUnansweredQuestions();
         assertEquals(Collections.emptyList(), unansweredQuestions);
 
+        assertTrue(isPrintResultSuccessful(testResult));
     }
 
-    private User prepareUser() {
-        User user = new User();
-        user.setFirstName(FIRST_NAME);
-        user.setSurname(SURNAME);
+    private User testUser() {
+        when(localizedIoService.readLine()).thenReturn(NAME);
+        User user = userService.getUser();
+        assertEquals(buildTestUser(), user);
         return user;
     }
 
-    private Question prepareQuestion(String firstElement, String secondElement) {
+    private User buildTestUser() {
+        User user = new User();
+        user.setFirstName(NAME);
+        user.setSurname(NAME);
+        return user;
+    }
+
+    private Question buildTestQuestion(String firstElement, String secondElement) {
         return Question.builder()
                 .text(firstElement)
                 .rightAnswer(secondElement)
                 .build();
+    }
+
+    private boolean isPrintResultSuccessful(TestResult testResult) {
+        resultService.printResult(testResult);
+        return true;
     }
 }

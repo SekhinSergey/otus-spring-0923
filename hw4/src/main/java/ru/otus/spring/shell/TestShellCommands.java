@@ -1,14 +1,17 @@
-package ru.otus.spring.service;
+package ru.otus.spring.shell;
 
 import lombok.RequiredArgsConstructor;
-import org.springframework.boot.CommandLineRunner;
-import org.springframework.stereotype.Component;
+import org.springframework.shell.standard.ShellComponent;
+import org.springframework.shell.standard.ShellMethod;
 import ru.otus.spring.domain.TestResult;
 import ru.otus.spring.domain.User;
+import ru.otus.spring.service.ResultService;
+import ru.otus.spring.service.TestService;
+import ru.otus.spring.service.UserService;
 
-@Component
+@ShellComponent
 @RequiredArgsConstructor
-public class TestCommandLineRunner implements CommandLineRunner {
+public class TestShellCommands {
 
     private final UserService userService;
 
@@ -16,7 +19,8 @@ public class TestCommandLineRunner implements CommandLineRunner {
 
     private final ResultService resultService;
 
-    public void run(String... args) {
+    @ShellMethod(value = "Test running command", key = {"r", "run"})
+    public void run() {
         User user = userService.getUser();
         TestResult testResult = testService.testStudent(user);
         resultService.printResult(testResult);

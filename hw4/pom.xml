@@ -19,6 +19,7 @@
         <maven.compiler.target>17</maven.compiler.target>
         <maven.compiler.source>17</maven.compiler.source>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+        <spring.shell.starter.version>3.1.4</spring.shell.starter.version>
         <lombok.version>1.18.30</lombok.version>
         <apache.commons.lang3.version>3.13.0</apache.commons.lang3.version>
         <checkstyle-plugin.version>3.2.2</checkstyle-plugin.version>
@@ -34,6 +35,11 @@
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-test</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.springframework.shell</groupId>
+            <artifactId>spring-shell-starter</artifactId>
+            <version>${spring.shell.starter.version}</version>
         </dependency>
         <dependency>
             <groupId>org.projectlombok</groupId>
