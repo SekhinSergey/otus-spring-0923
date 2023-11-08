@@ -32,13 +32,13 @@ class TestIntegrationTest {
 
     private static final String NAME = "Name";
 
-    private static final String BAD_ANSWER = "1";
-
     private static final String RIGHT_ANSWER = "2";
 
     private static final int ZERO_RIGHT_ANSWER = 0;
 
     private static final int ONE_RIGHT_ANSWER = 1;
+
+    private static final int MIN_RESULT = 3;
 
     @TestConfiguration
     static class TestTestConfiguration implements TestFileNameProvider {
@@ -82,8 +82,8 @@ class TestIntegrationTest {
         List<Question> unansweredQuestions = testResult.getUnansweredQuestions();
         assertEquals(Collections.singletonList(question), unansweredQuestions);
 
-        when(testConfig.getMinResult()).thenReturn(3);
-        when(localizedIoService.isOngoing()).thenReturn(true);
+        when(testConfig.getMinResult()).thenReturn(MIN_RESULT);
+        when(localizedIoService.isOngoing()).thenReturn(Boolean.TRUE);
         assertTrue(isPrintResultSuccessful(testResult));
     }
 
