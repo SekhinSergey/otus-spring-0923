@@ -27,7 +27,7 @@ import static ru.otus.spring.utils.TestConstants.*;
 
 @Getter
 @SpringBootTest
-@ContextConfiguration(classes = TestIntegrationTest.TestServiceTestConfiguration.class)
+@ContextConfiguration(classes = TestIntegrationTest.TestTestConfiguration.class)
 class TestIntegrationTest {
 
     private static final String NAME = "Name";
@@ -41,7 +41,7 @@ class TestIntegrationTest {
     private static final int ONE_RIGHT_ANSWER = 1;
 
     @TestConfiguration
-    static class TestServiceTestConfiguration implements TestFileNameProvider {
+    static class TestTestConfiguration implements TestFileNameProvider {
 
         @Override
         public String getTestFileName() {
