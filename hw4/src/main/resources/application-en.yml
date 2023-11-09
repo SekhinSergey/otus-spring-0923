@@ -1,0 +1,3 @@
+test:
+  csv-resource-path: questions-en.csv
+  locale: en_US
