@@ -1,0 +1,10 @@
+spring:
+  profiles:
+    active: default
+  messages:
+    baseName: messages
+    encoding: UTF-8
+test:
+  minResult: 3
+  csv-resource-path: questions-ru.csv
+  locale: ru_RU
