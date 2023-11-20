@@ -7,6 +7,7 @@ import org.springframework.jdbc.core.ResultSetExtractor;
 import org.springframework.jdbc.core.RowMapper;
 import org.springframework.jdbc.core.namedparam.MapSqlParameterSource;
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcOperations;
+import org.springframework.jdbc.core.namedparam.SqlParameterSourceUtils;
 import org.springframework.jdbc.support.GeneratedKeyHolder;
 import org.springframework.stereotype.Repository;
 import ru.otus.spring.exception.EntityNotFoundException;
@@ -46,6 +47,7 @@ public class BookRepositoryJdbc implements BookRepository {
 
     private final GenreRepository genreRepository;
 
+    @Override
     public Optional<Book> findByTitle(String title) {
         Optional<Book> book = getBooksByTitleWithoutGenresAndAuthorFullName(title);
         return fillAndReturn(book);
@@ -63,6 +65,7 @@ public class BookRepositoryJdbc implements BookRepository {
         return book;
     }
 
+    @Override
     public Optional<Book> findById(long id) {
         Optional<Book> book = getBooksByIdWithoutGenresAndAuthorFullName(id);
         if (book.isEmpty()) {
@@ -128,6 +131,7 @@ public class BookRepositoryJdbc implements BookRepository {
 
     }
 
+    @Override
     @SuppressWarnings("null")
     public List<Book> findAll() {
         var books = getAllBooksWithoutGenres();
@@ -170,10 +174,12 @@ public class BookRepositoryJdbc implements BookRepository {
         });
     }
 
+    @Override
     public Book save(Book book) {
-        return book.getId() == 0 ? insert(book) : update(book);
+        return book.getId() == null ? insert(book) : update(book);
     }
 
+    @Override
     public void deleteById(long id) {
         Map<String, Object> params = Collections.singletonMap("id", id);
         namedParameterJdbcOperations.update("delete from books where id = :id", params);
@@ -214,14 +220,16 @@ public class BookRepositoryJdbc implements BookRepository {
     }
 
     private void batchInsertGenresRelationsFor(Book book) {
+        List<Map<String, Long>> batchMapList = new ArrayList<>();
         book.getGenres().forEach(genre -> {
-            MapSqlParameterSource params = new MapSqlParameterSource();
-            params.addValue(BOOK_ID, book.getId());
-            params.addValue("genre_id", genre.getId());
-            namedParameterJdbcOperations.update(
-                    "insert into books_genres (book_id, genre_id) values (:book_id, :genre_id)",
-                    params);
+            Map<String, Long> batchMap = new HashMap<>();
+            batchMap.put(BOOK_ID, book.getId());
+            batchMap.put("genre_id", genre.getId());
+            batchMapList.add(batchMap);
         });
+        namedParameterJdbcOperations.batchUpdate(
+                "insert into books_genres (book_id, genre_id) values (:book_id, :genre_id)",
+                SqlParameterSourceUtils.createBatch(batchMapList));
     }
 
     private void removeGenresRelationsFor(long bookId) {
@@ -280,6 +288,7 @@ public class BookRepositoryJdbc implements BookRepository {
         }
     }
 
+    @Override
     public int countByAuthorId(long authorId) {
         return findAll().stream()
                 .filter(book -> authorId == book.getAuthor().getId())
@@ -287,6 +296,7 @@ public class BookRepositoryJdbc implements BookRepository {
                 .size();
     }
 
+    @Override
     public int countByAuthorFullName(String authorFullName) {
         return findAll().stream()
                 .filter(book -> authorFullName.equals(book.getAuthor().getFullName()))
@@ -294,6 +304,7 @@ public class BookRepositoryJdbc implements BookRepository {
                 .size();
     }
 
+    @Override
     public int countByGenreId(long genreId) {
         return findAll().stream()
                 .mapToInt(book -> (int) book.getGenres().stream()
@@ -302,6 +313,7 @@ public class BookRepositoryJdbc implements BookRepository {
                 .sum();
     }
 
+    @Override
     public int countByGenreName(String genreName) {
         return findAll().stream()
                 .mapToInt(book -> (int) book.getGenres().stream()

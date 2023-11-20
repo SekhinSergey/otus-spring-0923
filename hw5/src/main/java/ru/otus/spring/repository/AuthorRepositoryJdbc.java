@@ -26,10 +26,12 @@ public class AuthorRepositoryJdbc implements AuthorRepository {
 
     private final NamedParameterJdbcOperations namedParameterJdbcOperations;
 
+    @Override
     public List<Author> findAll() {
         return namedParameterJdbcOperations.query("select id, full_name from authors", new AuthorRowMapper());
     }
 
+    @Override
     public Optional<Author> findById(long id) {
         Map<String, Object> params = Collections.singletonMap("id", id);
         return Optional.ofNullable(namedParameterJdbcOperations.queryForObject(
@@ -37,6 +39,7 @@ public class AuthorRepositoryJdbc implements AuthorRepository {
         ));
     }
 
+    @Override
     public Optional<Author> findByFullName(String fullName) {
         Map<String, Object> params = Collections.singletonMap(FULL_NAME, fullName);
         return Optional.ofNullable(namedParameterJdbcOperations.queryForObject(
@@ -44,6 +47,7 @@ public class AuthorRepositoryJdbc implements AuthorRepository {
         ));
     }
 
+    @Override
     public Author insert(Author author) {
         MapSqlParameterSource params = new MapSqlParameterSource();
         params.addValue(FULL_NAME, author.getFullName());

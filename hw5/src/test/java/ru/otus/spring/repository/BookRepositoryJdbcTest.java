@@ -67,7 +67,7 @@ class BookRepositoryJdbcTest {
     @Test
     void shouldSaveNewBook() {
         var expectedBook = new Book(
-                0,
+                null,
                 "BookTitle_10500",
                 dbAuthors.get(0),
                 List.of(dbGenres.get(0), dbGenres.get(2)));
@@ -153,7 +153,7 @@ class BookRepositoryJdbcTest {
         return IntStream.range(1, 4)
                 .boxed()
                 .map(id -> new Book(
-                        id,
+                        (long) id,
                         "BookTitle_" + id,
                         dbAuthors.get(id - 1),
                         dbGenres.subList((id - 1) * 2, (id - 1) * 2 + 2)

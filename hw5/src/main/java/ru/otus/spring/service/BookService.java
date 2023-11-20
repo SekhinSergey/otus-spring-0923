@@ -7,7 +7,7 @@ import java.util.Optional;
 
 public interface BookService {
 
-    Optional<Book> findById(long id);
+    Optional<Book> findById(Long id);
 
     Optional<Book> findByTitle(String title);
 
@@ -15,9 +15,9 @@ public interface BookService {
 
     Book insert(String title, long authorId, List<Long> genresIds);
 
-    Book update(long id, String title, long authorId, List<Long> genresIds);
+    Book update(Long id, String title, long authorId, List<Long> genresIds);
 
-    void deleteById(long id);
+    void deleteById(Long id);
 
     int countByAuthorId(long authorId);
 
