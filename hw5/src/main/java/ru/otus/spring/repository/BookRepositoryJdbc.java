@@ -47,18 +47,9 @@ public class BookRepositoryJdbc implements BookRepository {
     private final GenreRepository genreRepository;
 
     @Override
-    @SuppressWarnings("all")
     public Optional<Book> findByTitle(String title) {
-        Optional<Book> bookByTitle = getBookByTitle(title);
-        if (isNull(bookByTitle.get().getId())) {
-            return Optional.empty();
-        }
-        return bookByTitle;
-    }
-
-    private Optional<Book> getBookByTitle(String title) {
         Map<String, Object> params = Collections.singletonMap(TITLE, title);
-        List<Optional<Book>> books = namedParameterJdbcOperations.query(
+        return namedParameterJdbcOperations.query(
                 "select " +
                         "b.id, " +
                         "b.title, " +
@@ -72,25 +63,12 @@ public class BookRepositoryJdbc implements BookRepository {
                         "where b.title = :title",
                 params,
                 new BookResultSetExtractor());
-        if (isNull(books) || books.isEmpty() || books.get(0).isEmpty()) {
-            throw new EntityNotFoundException("Book with title %s not found".formatted(title));
-        }
-        return books.get(0);
     }
 
     @Override
-    @SuppressWarnings("all")
     public Optional<Book> findById(long id) {
-        Optional<Book> bookById = getBookById(id);
-        if (isNull(bookById.get().getId())) {
-            return Optional.empty();
-        }
-        return bookById;
-    }
-
-    private Optional<Book> getBookById(long id) {
         Map<String, Object> params = Collections.singletonMap("id", id);
-        List<Optional<Book>> books = namedParameterJdbcOperations.query(
+        return namedParameterJdbcOperations.query(
                 "select " +
                         "b.id, " +
                         "b.title, " +
@@ -104,10 +82,6 @@ public class BookRepositoryJdbc implements BookRepository {
                         "where b.id = :id",
                 params,
                 new BookResultSetExtractor());
-        if (isNull(books) || books.isEmpty() || books.get(0).isEmpty()) {
-            throw new EntityNotFoundException("Book with id %s not found".formatted(id));
-        }
-        return books.get(0);
     }
 
     @SuppressWarnings("all")
@@ -234,9 +208,9 @@ public class BookRepositoryJdbc implements BookRepository {
         namedParameterJdbcOperations.update("delete from books_genres where book_id = :book_id", params);
     }
 
-    private static class BookResultSetExtractor implements ResultSetExtractor<List<Optional<Book>>> {
+    private static class BookResultSetExtractor implements ResultSetExtractor<Optional<Book>> {
 
-        public List<Optional<Book>> extractData(ResultSet rs) throws SQLException, DataAccessException {
+        public Optional<Book> extractData(ResultSet rs) throws SQLException, DataAccessException {
             Book book = new Book();
             while (rs.next()) {
                 long id = rs.getLong("id");
@@ -255,7 +229,7 @@ public class BookRepositoryJdbc implements BookRepository {
                 }
                 book.getGenres().add(genre);
             }
-            return Collections.singletonList(Optional.of(book));
+            return isNull(book.getId()) ? Optional.empty() : Optional.of(book);
         }
     }
 
