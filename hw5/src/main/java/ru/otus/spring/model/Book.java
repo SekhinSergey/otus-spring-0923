@@ -3,6 +3,7 @@ package ru.otus.spring.model;
 import lombok.AllArgsConstructor;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import java.util.List;
@@ -10,6 +11,7 @@ import java.util.List;
 @Getter
 @Setter
 @EqualsAndHashCode
+@NoArgsConstructor
 @AllArgsConstructor
 public class Book {
 

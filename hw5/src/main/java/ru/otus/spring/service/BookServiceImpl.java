@@ -9,7 +9,9 @@ import ru.otus.spring.repository.AuthorRepository;
 import ru.otus.spring.repository.BookRepository;
 import ru.otus.spring.repository.GenreRepository;
 
-import java.util.*;
+import java.util.List;
+import java.util.Map;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 import static java.util.Objects.isNull;

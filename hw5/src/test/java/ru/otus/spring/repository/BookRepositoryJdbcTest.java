@@ -17,7 +17,7 @@ import java.util.stream.IntStream;
 import static org.assertj.core.api.Assertions.assertThat;
 
 @JdbcTest
-@Import({BookRepositoryJdbc.class, GenreRepositoryJdbc.class, AuthorRepositoryJdbc.class})
+@Import({BookRepositoryJdbc.class, GenreRepositoryJdbc.class})
 class BookRepositoryJdbcTest {
 
     private List<Author> dbAuthors;
