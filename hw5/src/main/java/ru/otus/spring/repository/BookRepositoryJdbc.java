@@ -27,7 +27,6 @@ import java.util.Set;
 import java.util.stream.Collectors;
 
 import static java.util.Objects.isNull;
-import static org.springframework.util.CollectionUtils.isEmpty;
 import static ru.otus.spring.model.Genre.buildGenreMap;
 import static ru.otus.spring.repository.BookRepositoryJdbc.BookGenreRelation.buildRelationMap;
 
@@ -54,7 +53,7 @@ public class BookRepositoryJdbc implements BookRepository {
         if (isNull(bookByTitle.get().getId())) {
             return Optional.empty();
         }
-        return fillGenresByIds(bookByTitle);
+        return bookByTitle;
     }
 
     private Optional<Book> getBookByTitle(String title) {
@@ -66,6 +65,7 @@ public class BookRepositoryJdbc implements BookRepository {
                         "b.author_id, " +
                         "a.full_name, " +
                         "bg.genre_id, " +
+                        "(select g.name from genres g where g.id = bg.genre_id) as genre_name " +
                         "from books b " +
                             "join authors a on a.id = b.author_id " +
                             "join books_genres bg on bg.book_id = b.id " +
@@ -85,7 +85,7 @@ public class BookRepositoryJdbc implements BookRepository {
         if (isNull(bookById.get().getId())) {
             return Optional.empty();
         }
-        return fillGenresByIds(bookById);
+        return bookById;
     }
 
     private Optional<Book> getBookById(long id) {
@@ -97,6 +97,7 @@ public class BookRepositoryJdbc implements BookRepository {
                         "b.author_id, " +
                         "a.full_name, " +
                         "bg.genre_id, " +
+                        "(select g.name from genres g where g.id = bg.genre_id) as genre_name " +
                         "from books b " +
                             "join authors a on a.id = b.author_id " +
                             "join books_genres bg on bg.book_id = b.id " +
@@ -107,34 +108,6 @@ public class BookRepositoryJdbc implements BookRepository {
             throw new EntityNotFoundException("Book with id %s not found".formatted(id));
         }
         return books.get(0);
-    }
-
-    @SuppressWarnings("all")
-    // При попытке заджойнить ещё и жанры сразу получал так же две записи, но с одинаковыми жанрами
-    // Поэтому решил сделать так
-    private Optional<Book> fillGenresByIds(Optional<Book> book) {
-        List<Genre> genreWithoutNameList = book.get().getGenres();
-        List<Long> genreIds = genreWithoutNameList.stream()
-                .map(Genre::getId)
-                .toList();
-        List<Genre> genresByIds = genreRepository.findAllByIds(genreIds);
-        if (isEmpty(genresByIds)) {
-            throw new EntityNotFoundException("Genres with ids %s not found".formatted(genresByIds));
-        }
-        Map<Long, Genre> genreMapById = genresByIds.stream()
-                .collect(Collectors.toMap(Genre::getId, genre -> genre, (a, b) -> b));
-        List<Genre> finalGenresByIds = new ArrayList<>();
-        genreWithoutNameList.stream()
-                .mapToLong(Genre::getId)
-                .forEach(genreWithoutNameId -> {
-                    Genre genre = genreMapById.get(genreWithoutNameId);
-                    if (isNull(genre)) {
-                        throw new EntityNotFoundException("Genre with id %d not found".formatted(genreWithoutNameId));
-                    }
-                    finalGenresByIds.add(genre);
-        });
-        book.get().setGenres(finalGenresByIds);
-        return book;
     }
 
     @SuppressWarnings("all")
@@ -272,7 +245,8 @@ public class BookRepositoryJdbc implements BookRepository {
                 String fullName = rs.getString("full_name");
                 Author author = new Author(authorId, fullName);
                 long genreId = rs.getLong(GENRE_ID);
-                Genre genre = new Genre(genreId, null);
+                String genreName = rs.getString("genre_name");
+                Genre genre = new Genre(genreId, genreName);
                 if (isNull(book.getId())) {
                     book.setId(id);
                     book.setTitle(title);
