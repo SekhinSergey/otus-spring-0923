@@ -34,17 +34,31 @@ public class AuthorRepositoryJdbc implements AuthorRepository {
     @Override
     public Optional<Author> findById(long id) {
         Map<String, Object> params = Collections.singletonMap("id", id);
-        return Optional.ofNullable(namedParameterJdbcOperations.queryForObject(
-                "select id, full_name from authors where id = :id", params, new AuthorRowMapper()
-        ));
+        Author author;
+        try {
+            author = namedParameterJdbcOperations.queryForObject(
+                    "select id, full_name from authors where id = :id",
+                    params, new
+                            AuthorRowMapper());
+        } catch (Exception exception) {
+            return Optional.empty();
+        }
+        return Optional.ofNullable(author);
     }
 
     @Override
     public Optional<Author> findByFullName(String fullName) {
         Map<String, Object> params = Collections.singletonMap(FULL_NAME, fullName);
-        return Optional.ofNullable(namedParameterJdbcOperations.queryForObject(
-                "select id, full_name from authors where full_name = :full_name", params, new AuthorRowMapper()
-        ));
+        Author author;
+        try {
+            author = namedParameterJdbcOperations.queryForObject(
+                    "select id, full_name from authors where full_name = :full_name",
+                    params,
+                    new AuthorRowMapper());
+        } catch (Exception exception) {
+            return Optional.empty();
+        }
+        return Optional.ofNullable(author);
     }
 
     @Override

@@ -56,10 +56,11 @@ public class BookRepositoryJdbc implements BookRepository {
                         "b.author_id, " +
                         "a.full_name, " +
                         "bg.genre_id, " +
-                        "(select g.name from genres g where g.id = bg.genre_id) as genre_name " +
+                        "g.name as genre_name " +
                         "from books b " +
                             "join authors a on a.id = b.author_id " +
                             "join books_genres bg on bg.book_id = b.id " +
+                            "join genres g on g.id = bg.genre_id " +
                         "where b.title = :title",
                 params,
                 new BookResultSetExtractor());
@@ -75,10 +76,11 @@ public class BookRepositoryJdbc implements BookRepository {
                         "b.author_id, " +
                         "a.full_name, " +
                         "bg.genre_id, " +
-                        "(select g.name from genres g where g.id = bg.genre_id) as genre_name " +
+                        "g.name as genre_name " +
                         "from books b " +
                             "join authors a on a.id = b.author_id " +
                             "join books_genres bg on bg.book_id = b.id " +
+                            "join genres g on g.id = bg.genre_id " +
                         "where b.id = :id",
                 params,
                 new BookResultSetExtractor());

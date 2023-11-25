@@ -7,6 +7,7 @@ import ru.otus.spring.converter.AuthorConverter;
 import ru.otus.spring.model.Author;
 import ru.otus.spring.service.AuthorService;
 
+import java.util.List;
 import java.util.stream.Collectors;
 
 @ShellComponent
@@ -19,7 +20,11 @@ public class AuthorCommands {
 
     @ShellMethod(value = "Find all authors", key = "aa")
     public String findAllAuthors() {
-        return authorService.findAll().stream()
+        List<Author> authors = authorService.findAll();
+        if (authors.isEmpty()) {
+            return "No authors found";
+        }
+        return authors.stream()
                 .map(authorConverter::authorToString)
                 .collect(Collectors.joining("," + System.lineSeparator()));
     }

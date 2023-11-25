@@ -10,11 +10,9 @@ import ru.otus.spring.repository.BookRepository;
 import ru.otus.spring.repository.GenreRepository;
 
 import java.util.List;
-import java.util.Map;
 import java.util.Optional;
-import java.util.stream.Collectors;
+import java.util.Set;
 
-import static java.util.Objects.isNull;
 import static org.springframework.util.CollectionUtils.isEmpty;
 
 @Service
@@ -39,14 +37,14 @@ public class BookServiceImpl implements BookService {
         return bookRepository.findAll();
     }
 
-    public Book insert(String title, long authorId, List<Long> genresIds) {
+    public Book insert(String title, long authorId, Set<Long> genresIds) {
         return save(null, title, authorId, genresIds);
     }
 
-    public Book update(Long id, String title, long authorId, List<Long> genresIds) {
-        if (isNull(id)) {
-            throw new EntityNotFoundException("There cannot be a book with nullable id in the database");
-        }
+    @SuppressWarnings("all")
+    public Book update(Long id, String title, long authorId, Set<Long> genresIds) {
+        bookRepository.findById(id).orElseThrow(() ->
+                new EntityNotFoundException("Book with id %d not found".formatted(id)));
         return save(id, title, authorId, genresIds);
     }
 
@@ -70,7 +68,7 @@ public class BookServiceImpl implements BookService {
         return bookRepository.countByGenreName(genreName);
     }
 
-    private Book save(Long id, String title, long authorId, List<Long> genresIds) {
+    private Book save(Long id, String title, long authorId, Set<Long> genresIds) {
         var author = authorRepository.findById(authorId)
                 .orElseThrow(() -> new EntityNotFoundException("Author with id %d not found".formatted(authorId)));
         List<Genre> genres = getGenres(genresIds);
@@ -78,22 +76,17 @@ public class BookServiceImpl implements BookService {
         return bookRepository.save(book);
     }
 
-    private List<Genre> getGenres(List<Long> genresIds) {
+    private List<Genre> getGenres(Set<Long> genresIds) {
         if (genresIds.isEmpty()) {
-            throw new EntityNotFoundException("Genre list is empty");
+            throw new EntityNotFoundException("Requested genre list is empty");
         }
         var genres = genreRepository.findAllByIds(genresIds);
         if (isEmpty(genres)) {
             throw new EntityNotFoundException("Genres with ids %s not found".formatted(genresIds));
+        } else if (genresIds.size() != genres.size()) {
+            throw new EntityNotFoundException(
+                    "The number of requested genres does not match the number in the database");
         }
-        Map<Long, Genre> genreMapById = genres.stream()
-                .collect(Collectors.toMap(Genre::getId, genre -> genre, (a, b) -> b));
-        genresIds.forEach(genreId -> {
-            Genre genre = genreMapById.get(genreId);
-            if (isNull(genre)) {
-                throw new EntityNotFoundException("Genre with id %d not found".formatted(genreId));
-            }
-        });
         return genres;
     }
 }

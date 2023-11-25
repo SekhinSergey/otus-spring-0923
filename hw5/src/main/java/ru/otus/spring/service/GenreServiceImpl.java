@@ -7,6 +7,7 @@ import ru.otus.spring.repository.GenreRepository;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 
 @Service
 @RequiredArgsConstructor
@@ -18,7 +19,7 @@ public class GenreServiceImpl implements GenreService {
         return genreRepository.findAll();
     }
 
-    public List<Genre> findAllByIds(List<Long> ids) {
+    public List<Genre> findAllByIds(Set<Long> ids) {
         return genreRepository.findAllByIds(ids);
     }
 

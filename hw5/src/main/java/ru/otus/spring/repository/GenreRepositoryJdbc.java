@@ -16,6 +16,7 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.Set;
 
 import static java.util.Objects.isNull;
 
@@ -29,7 +30,7 @@ public class GenreRepositoryJdbc implements GenreRepository {
         return namedParameterJdbcOperations.query("select id, name from genres", new GenreRowMapper());
     }
 
-    public List<Genre> findAllByIds(List<Long> ids) {
+    public List<Genre> findAllByIds(Set<Long> ids) {
         SqlParameterSource parameters = new MapSqlParameterSource("ids", ids);
         return namedParameterJdbcOperations.query(
                 "select id, name from genres where id in (:ids)",
@@ -39,9 +40,14 @@ public class GenreRepositoryJdbc implements GenreRepository {
 
     public Optional<Genre> findByName(String name) {
         Map<String, Object> params = Collections.singletonMap("name", name);
-        return Optional.ofNullable(namedParameterJdbcOperations.queryForObject(
-                "select id, name from genres where name = :name", params, new GenreRowMapper())
-        );
+        Genre genre;
+        try {
+            genre = namedParameterJdbcOperations.queryForObject(
+                    "select id, name from genres where name = :name", params, new GenreRowMapper());
+        } catch (Exception exception) {
+            return Optional.empty();
+        }
+        return Optional.ofNullable(genre);
     }
 
     public Genre insert(Genre genre) {

@@ -19,14 +19,13 @@ public class AuthorServiceImpl implements AuthorService {
     }
 
     public Author findById(long id) {
-        return authorRepository.findById(id)
-                .orElseThrow(() -> new EntityNotFoundException("Author with id %d not found".formatted(id)));
+        return authorRepository.findById(id).orElseThrow(() ->
+                new EntityNotFoundException("Author with id %d not found".formatted(id)));
     }
 
     public Author findByFullName(String fullName) {
-        return authorRepository.findByFullName(fullName)
-                .orElseThrow(() -> new EntityNotFoundException(
-                        "Author with full name %s not found".formatted(fullName)));
+        return authorRepository.findByFullName(fullName).orElseThrow(() ->
+                new EntityNotFoundException("Author with full name %s not found".formatted(fullName)));
     }
 
     public Author insert(Author author) {
