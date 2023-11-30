@@ -2,8 +2,6 @@ name: homework-pipeline
 
 on:
   pull_request:
-    branches:
-      - 'hw**'
 
 jobs:
   build-app:
@@ -17,6 +15,7 @@ jobs:
         uses: actions/setup-java@v3
         with:
           java-version: '17'
+          distribution: 'temurin'
 
       - name: maven-action
         run: |
