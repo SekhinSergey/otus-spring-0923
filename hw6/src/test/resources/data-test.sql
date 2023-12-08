@@ -12,3 +12,6 @@ merge into books_genres(book_id, genre_id) key(book_id, genre_id)
 values (1, 1),   (1, 2),
        (2, 3),   (2, 4),
        (3, 5),   (3, 6);
+
+merge into comments(id, text, book_id) key(id)
+values (1, 'Good', 1), (2, 'Bad', 2), (3, 'I want to read', 3);

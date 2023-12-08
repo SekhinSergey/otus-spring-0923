@@ -13,6 +13,7 @@ import ru.otus.spring.model.Genre;
 
 import java.util.List;
 import java.util.stream.IntStream;
+import java.util.stream.LongStream;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
