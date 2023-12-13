@@ -12,8 +12,16 @@ import jakarta.persistence.ManyToOne;
 import jakarta.persistence.NamedAttributeNode;
 import jakarta.persistence.NamedEntityGraph;
 import jakarta.persistence.Table;
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 
+@Getter
+@Setter
 @Entity
+@NoArgsConstructor
+@AllArgsConstructor
 @Table(name = "comments")
 @NamedEntityGraph(name = "comment-entity-graph", attributeNodes = @NamedAttributeNode("book"))
 public class Comment {
@@ -28,4 +36,21 @@ public class Comment {
     @JoinColumn(name = "book_id")
     @ManyToOne(targetEntity = Book.class, fetch = FetchType.LAZY, cascade = CascadeType.ALL)
     private Book book;
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) {
+            return true;
+        }
+        Comment comment = (Comment) o;
+        if (o == null || getClass() != o.getClass() || id != comment.id || !text.equals(comment.text)) {
+            return false;
+        }
+        return book.equals(comment.book);
+    }
+
+    @Override
+    public int hashCode() {
+        return (int) (id ^ (id >>> 32));
+    }
 }

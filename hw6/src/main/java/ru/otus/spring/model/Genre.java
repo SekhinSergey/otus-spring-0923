@@ -33,4 +33,21 @@ public class Genre {
     public static Map<Long, Genre> buildGenreMap(List<Genre> genres) {
         return genres.stream().collect(Collectors.toMap(Genre::getId, genre -> genre, (a, b) -> b));
     }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) {
+            return true;
+        }
+        Genre genre = (Genre) o;
+        if (o == null || getClass() != o.getClass() || id != genre.id) {
+            return false;
+        }
+        return name.equals(genre.name);
+    }
+
+    @Override
+    public int hashCode() {
+        return (int) (id ^ (id >>> 32));
+    }
 }

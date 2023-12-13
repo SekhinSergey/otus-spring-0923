@@ -29,6 +29,8 @@ public class AuthorServiceImpl implements AuthorService {
     }
 
     public Author insert(Author author) {
-        return authorRepository.insert(author);
+        return authorRepository.insert(author).orElseThrow(() -> new EntityNotFoundException(
+                "An error occurred when trying to insert the author with full name %S"
+                        .formatted(author.getFullName())));
     }
 }

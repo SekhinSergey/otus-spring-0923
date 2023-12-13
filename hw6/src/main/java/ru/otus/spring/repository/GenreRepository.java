@@ -14,5 +14,5 @@ public interface GenreRepository {
 
     Optional<Genre> findByName(String name);
 
-    Genre insert(Genre genre);
+    Optional<Genre> insert(Genre genre);
 }

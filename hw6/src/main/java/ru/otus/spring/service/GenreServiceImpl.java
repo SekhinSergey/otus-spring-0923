@@ -27,7 +27,7 @@ public class GenreServiceImpl implements GenreService {
         return genreRepository.findByName(name);
     }
 
-    public Genre insert(Genre genre) {
+    public Optional<Genre> insert(Genre genre) {
         return genreRepository.insert(genre);
     }
 }

@@ -49,7 +49,10 @@ public class GenreCommands {
     }
 
     @ShellMethod(value = "Insert and get genre", key = "gins")
-    public Genre insert(Genre genre) {
-        return genreService.insert(genre);
+    public String insert(Genre genre) {
+        return genreService.insert(genre)
+                .map(genreConverter::genreToString)
+                .orElse("An error occurred when trying to insert the genre with name %s"
+                        .formatted(genre.getName()));
     }
 }

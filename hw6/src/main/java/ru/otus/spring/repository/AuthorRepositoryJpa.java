@@ -32,19 +32,21 @@ public class AuthorRepositoryJpa implements AuthorRepository {
     @Override
     public Optional<Author> findByFullName(String fullName) {
         TypedQuery<Author> query = entityManager.createQuery(
-                "select a from Author a where a.fullName = :fullName",
-                Author.class);
+                "select a from Author a where a.fullName = :fullName", Author.class);
         query.setParameter("fullName", fullName);
         return getOptionalAuthor(query.getSingleResult());
     }
 
-    private static Optional<Author> getOptionalAuthor(Author author) {
-        return isNull(author) ? Optional.empty() : Optional.of(author);
+    @Override
+    public Optional<Author> insert(Author author) {
+        if (author.getId() == 0) {
+            entityManager.persist(author);
+            return findByFullName(author.getFullName());
+        }
+        return getOptionalAuthor(entityManager.merge(author));
     }
 
-    @Override
-    public Author insert(Author author) {
-        entityManager.persist(author);
-        return author;
+    private static Optional<Author> getOptionalAuthor(Author author) {
+        return isNull(author) ? Optional.empty() : Optional.of(author);
     }
 }

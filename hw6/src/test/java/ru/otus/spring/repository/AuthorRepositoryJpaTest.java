@@ -8,6 +8,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 import org.springframework.boot.test.autoconfigure.orm.jpa.TestEntityManager;
 import org.springframework.context.annotation.Import;
+import org.springframework.test.annotation.DirtiesContext;
 import ru.otus.spring.model.Author;
 
 import java.util.List;
@@ -65,8 +66,24 @@ class AuthorRepositoryJpaTest {
     }
 
     @Test
-    void shouldSaveAuthor() {
-        authorRepositoryJpa.insert(new Author(0, "Author_4"));
+    void shouldPersistExpectedAuthor() {
+        shouldSaveExpectedAuthor(0);
+    }
+
+    @Test
+    @DirtiesContext(methodMode = DirtiesContext.MethodMode.BEFORE_METHOD)
+    void shouldMergeExpectedAuthor() {
+        shouldSaveExpectedAuthor(4);
+    }
+
+    void shouldSaveExpectedAuthor(long id) {
+        var actualAuthor = authorRepositoryJpa.insert(new Author(id, "Author_4"));
+        var expectedAuthor = testEntityManager.find(Author.class, 4);
+        assertThat(actualAuthor)
+                .isPresent()
+                .get()
+                .usingRecursiveComparison()
+                .isEqualTo(expectedAuthor);
     }
 
     private static List<Author> getDbAuthors() {

@@ -31,18 +31,16 @@ public class AuthorCommands {
 
     @ShellMethod(value = "Find author by id", key = "abyid")
     public String findAuthorById(long id) {
-        Author author = authorService.findById(id);
-        return authorConverter.authorToString(author);
+        return authorConverter.authorToString(authorService.findById(id));
     }
 
     @ShellMethod(value = "Find author by full name", key = "abyf")
     public String findAuthorByFullName(String fullName) {
-        Author author = authorService.findByFullName(fullName);
-        return authorConverter.authorToString(author);
+        return authorConverter.authorToString(authorService.findByFullName(fullName));
     }
 
     @ShellMethod(value = "Insert and get author", key = "ains")
-    public Author insert(Author author) {
-        return authorService.insert(author);
+    public String insert(Author author) {
+        return authorConverter.authorToString(authorService.insert(author));
     }
 }
