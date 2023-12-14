@@ -18,8 +18,8 @@ create table if not exists books (
 );
 
 create table if not exists books_genres (
-    book_id bigint references books(id) on delete cascade,
-    genre_id bigint references genres(id) on delete cascade,
+    book_id bigint references books (id) on delete cascade,
+    genre_id bigint references genres (id) on delete cascade,
     primary key (book_id, genre_id)
 );
 
