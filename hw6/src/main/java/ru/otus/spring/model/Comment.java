@@ -34,7 +34,7 @@ public class Comment {
     private String text;
 
     @JoinColumn(name = "book_id")
-    @ManyToOne(targetEntity = Book.class, fetch = FetchType.LAZY, cascade = CascadeType.ALL)
+    @ManyToOne(targetEntity = Book.class, fetch = FetchType.LAZY, cascade = CascadeType.MERGE)
     private Book book;
 
     @Override

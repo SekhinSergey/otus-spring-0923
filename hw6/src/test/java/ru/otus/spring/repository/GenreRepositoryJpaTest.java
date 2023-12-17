@@ -13,9 +13,9 @@ import ru.otus.spring.model.Genre;
 
 import java.util.HashSet;
 import java.util.List;
-import java.util.stream.IntStream;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static ru.otus.spring.repository.TestBookUtils.getDbGenres;
 
 @DataJpaTest
 @Import(GenreRepositoryJpa.class)
@@ -42,7 +42,7 @@ class GenreRepositoryJpaTest {
     }
 
     @ParameterizedTest
-    @MethodSource("getDbGenres")
+    @MethodSource("ru.otus.spring.repository.TestBookUtils#getDbGenres")
     void shouldFindExpectedGenreById(Genre dbGenre) {
         long id = dbGenre.getId();
         HashSet<Long> ids = new HashSet<>();
@@ -53,7 +53,7 @@ class GenreRepositoryJpaTest {
     }
 
     @ParameterizedTest
-    @MethodSource("getDbGenres")
+    @MethodSource("ru.otus.spring.repository.TestBookUtils#getDbGenres")
     void shouldFindExpectedGenreByName(Genre dbGenre) {
         var actualGenre = genreRepositoryJpa.findByName(dbGenre.getName());
         var expectedGenre = testEntityManager.find(Genre.class, dbGenre.getId());
@@ -67,15 +67,15 @@ class GenreRepositoryJpaTest {
     @Test
     @DirtiesContext(methodMode = DirtiesContext.MethodMode.BEFORE_METHOD)
     void shouldPersistExpectedGenre() {
-        shouldSaveExpectedGenre(0);
+        shouldInsertExpectedGenre(0);
     }
 
     @Test
     void shouldMergeExpectedGenre() {
-        shouldSaveExpectedGenre(7);
+        shouldInsertExpectedGenre(7);
     }
 
-    void shouldSaveExpectedGenre(long id) {
+    void shouldInsertExpectedGenre(long id) {
         var actualGenre = genreRepositoryJpa.insert(new Genre(id, "Genre_7"));
         var expectedGenre = testEntityManager.find(Genre.class, 7);
         assertThat(actualGenre)
@@ -83,12 +83,5 @@ class GenreRepositoryJpaTest {
                 .get()
                 .usingRecursiveComparison()
                 .isEqualTo(expectedGenre);
-    }
-
-    private static List<Genre> getDbGenres() {
-        return IntStream.range(1, 7)
-                .boxed()
-                .map(id -> new Genre((long) id, "Genre_" + id))
-                .toList();
     }
 }

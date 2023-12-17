@@ -12,9 +12,9 @@ import org.springframework.test.annotation.DirtiesContext;
 import ru.otus.spring.model.Author;
 
 import java.util.List;
-import java.util.stream.IntStream;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static ru.otus.spring.repository.TestBookUtils.getDbAuthors;
 
 @DataJpaTest
 @Import(AuthorRepositoryJpa.class)
@@ -41,7 +41,7 @@ class AuthorRepositoryJpaTest {
     }
 
     @ParameterizedTest
-    @MethodSource("getDbAuthors")
+    @MethodSource("ru.otus.spring.repository.TestBookUtils#getDbAuthors")
     void shouldFindExpectedAuthorById(Author dbAuthor) {
         long id = dbAuthor.getId();
         var actualAuthor = authorRepositoryJpa.findById(id);
@@ -54,7 +54,7 @@ class AuthorRepositoryJpaTest {
     }
 
     @ParameterizedTest
-    @MethodSource("getDbAuthors")
+    @MethodSource("ru.otus.spring.repository.TestBookUtils#getDbAuthors")
     void shouldFindExpectedAuthorByFullName(Author dbAuthor) {
         var actualAuthor = authorRepositoryJpa.findByFullName(dbAuthor.getFullName());
         var expectedAuthor = testEntityManager.find(Author.class, dbAuthor.getId());
@@ -67,16 +67,16 @@ class AuthorRepositoryJpaTest {
 
     @Test
     void shouldPersistExpectedAuthor() {
-        shouldSaveExpectedAuthor(0);
+        shouldInsertExpectedAuthor(0);
     }
 
     @Test
     @DirtiesContext(methodMode = DirtiesContext.MethodMode.BEFORE_METHOD)
     void shouldMergeExpectedAuthor() {
-        shouldSaveExpectedAuthor(4);
+        shouldInsertExpectedAuthor(4);
     }
 
-    void shouldSaveExpectedAuthor(long id) {
+    void shouldInsertExpectedAuthor(long id) {
         var actualAuthor = authorRepositoryJpa.insert(new Author(id, "Author_4"));
         var expectedAuthor = testEntityManager.find(Author.class, 4);
         assertThat(actualAuthor)
@@ -84,12 +84,5 @@ class AuthorRepositoryJpaTest {
                 .get()
                 .usingRecursiveComparison()
                 .isEqualTo(expectedAuthor);
-    }
-
-    private static List<Author> getDbAuthors() {
-        return IntStream.range(1, 4)
-                .boxed()
-                .map(id -> new Author((long) id, "Author_" + id))
-                .toList();
     }
 }

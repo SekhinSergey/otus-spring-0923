@@ -42,14 +42,14 @@ public class GenreCommands {
     }
 
     @ShellMethod(value = "Find genre by name", key = "agbyn")
-    public String findByName(String name) {
+    public String findGenreByName(String name) {
         return genreService.findByName(name)
                 .map(genreConverter::genreToString)
                 .orElse("Genre with name %s not found".formatted(name));
     }
 
     @ShellMethod(value = "Insert and get genre", key = "gins")
-    public String insert(Genre genre) {
+    public String insertGenre(Genre genre) {
         return genreService.insert(genre)
                 .map(genreConverter::genreToString)
                 .orElse("An error occurred when trying to insert the genre with name %s"

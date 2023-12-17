@@ -13,9 +13,11 @@ public interface BookRepository {
 
     List<Book> findAll();
 
-    Book save(Book book);
+    Optional<Book> save(Book book);
 
     void deleteById(long id);
+
+    void deleteByTitle(String title);
 
     int countByAuthorId(long authorId);
 

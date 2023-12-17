@@ -20,6 +20,8 @@ public interface BookService {
 
     void deleteById(Long id);
 
+    void deleteByTitle(String title);
+
     int countByAuthorId(long authorId);
 
     int countByAuthorFullName(String authorFullName);

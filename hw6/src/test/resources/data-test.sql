@@ -16,5 +16,5 @@ values (1, 1),   (1, 2),
        (3, 5),   (3, 6);
 
 merge into comments(id, text, book_id) key(id)
-values (1, 'Good', 1), (2, 'Bad', 2), (3, 'I want to read', 3);
+values (1, 'Comment_1', 1), (2, 'Comment_2', 2), (3, 'Comment_3', 3);
 ALTER TABLE comments ALTER COLUMN id RESTART WITH 4;

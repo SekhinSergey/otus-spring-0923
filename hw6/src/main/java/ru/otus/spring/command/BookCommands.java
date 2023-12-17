@@ -56,28 +56,34 @@ public class BookCommands {
         return bookConverter.bookToString(savedBook);
     }
 
-    @ShellMethod(value = "Delete book by id", key = "bdel")
-    public void deleteBook(long id) {
+    @ShellMethod(value = "Delete book by id", key = "bdelbyid")
+    public String deleteBook(long id) {
         bookService.deleteById(id);
+        return "Book with id %d deleted successfully".formatted(id);
+    }
+
+    @ShellMethod(value = "Delete book by title", key = "bdelbyt")
+    public void deleteBook(String title) {
+        bookService.deleteByTitle(title);
     }
 
     @ShellMethod(value = "Count book by author id", key = "cbbyaid")
-    public int countByAuthorId(long authorId) {
+    public int countBooksByAuthorId(long authorId) {
         return bookService.countByAuthorId(authorId);
     }
 
     @ShellMethod(value = "Count book by author full name", key = "cbbyafn")
-    public int countByAuthorFullName(String authorFullName) {
+    public int countBooksByAuthorFullName(String authorFullName) {
         return bookService.countByAuthorFullName(authorFullName);
     }
 
     @ShellMethod(value = "Count book by genre id", key = "cbbygid")
-    public int countByGenreId(long genreId) {
+    public int countBooksByGenreId(long genreId) {
         return bookService.countByGenreId(genreId);
     }
 
     @ShellMethod(value = "Count book by genre name", key = "cbbygn")
-    public int countByGenreName(String genreName) {
+    public int countBooksByGenreName(String genreName) {
         return bookService.countByGenreName(genreName);
     }
 }

@@ -40,7 +40,7 @@ public class AuthorCommands {
     }
 
     @ShellMethod(value = "Insert and get author", key = "ains")
-    public String insert(Author author) {
+    public String insertAuthor(Author author) {
         return authorConverter.authorToString(authorService.insert(author));
     }
 }
