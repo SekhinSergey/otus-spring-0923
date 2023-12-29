@@ -90,19 +90,24 @@ public class JpaBookRepository implements BookRepository {
     }
 
     @Override
+    @SuppressWarnings("all")
     public int countByAuthorId(long authorId) {
-        TypedQuery<Book> query = entityManager.createQuery(
-                "select count(*) from Book b where b.author.id = :authorId", Book.class);
-        query.setParameter("authorId", authorId);
-        return query.getResultList().size();
+        Query nativeQuery = entityManager.createNativeQuery(
+                "select count(*) from books b where b.author_id = :authorId");
+        nativeQuery.setParameter("authorId", authorId);
+        return Integer.parseInt(nativeQuery.getSingleResult().toString());
     }
 
     @Override
+    @SuppressWarnings("all")
     public int countByAuthorFullName(String authorFullName) {
-        TypedQuery<Book> query = entityManager.createQuery(
-                "select count(*) from Book b where b.author.fullName = :authorFullName", Book.class);
-        query.setParameter("authorFullName", authorFullName);
-        return query.getResultList().size();
+        Query nativeQuery = entityManager.createNativeQuery(
+                "select count(*) " +
+                        "from books b " +
+                        "join authors a on b.author_id = a.id " +
+                        "where a.full_name = :authorFullName");
+        nativeQuery.setParameter("authorFullName", authorFullName);
+        return Integer.parseInt(nativeQuery.getSingleResult().toString());
     }
 
     @Override

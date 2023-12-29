@@ -18,6 +18,10 @@ import static java.util.Objects.isNull;
 @RequiredArgsConstructor
 public class JpaCommentRepository implements CommentRepository {
 
+    private static final String BOOK_ID = "bookId";
+
+    private static final String TITLE = "title";
+
     @PersistenceContext
     private final EntityManager entityManager;
 
@@ -49,7 +53,7 @@ public class JpaCommentRepository implements CommentRepository {
     public List<Comment> findAllByBookId(long bookId) {
         TypedQuery<Comment> query = entityManager.createQuery(
                 "select c from Comment c where c.book.id = :bookId", Comment.class);
-        query.setParameter("bookId", bookId);
+        query.setParameter(BOOK_ID, bookId);
         List<Comment> comments = query.getResultList();
         return comments.isEmpty() ? Collections.emptyList() : comments;
     }
@@ -58,7 +62,7 @@ public class JpaCommentRepository implements CommentRepository {
     public List<Comment> findAllByBookTitle(String title) {
         TypedQuery<Comment> query = entityManager.createQuery(
                 "select c from Comment c where c.book.title = :title", Comment.class);
-        query.setParameter("title", title);
+        query.setParameter(TITLE, title);
         List<Comment> comments = query.getResultList();
         return comments.isEmpty() ? Collections.emptyList() : comments;
     }
@@ -75,24 +79,32 @@ public class JpaCommentRepository implements CommentRepository {
     @Override
     public void deleteAllByBookId(long bookId) {
         Query query = entityManager.createQuery("delete Comment c where c.book.id = :bookId");
-        query.setParameter("bookId", bookId);
+        query.setParameter(BOOK_ID, bookId);
         query.executeUpdate();
     }
 
     @Override
     public void deleteAllByBookTitle(String title) {
         Query query = entityManager.createQuery("delete Comment c where c.book.title = :title");
-        query.setParameter("title", title);
+        query.setParameter(TITLE, title);
         query.executeUpdate();
     }
 
     @Override
+    @SuppressWarnings("all")
     public int countByBookId(long bookId) {
-        return findAllByBookId(bookId).size();
+        Query nativeQuery = entityManager.createNativeQuery(
+                "select count(*) from comments c where c.book_id = :bookId");
+        nativeQuery.setParameter(BOOK_ID, bookId);
+        return Integer.parseInt(nativeQuery.getSingleResult().toString());
     }
 
     @Override
+    @SuppressWarnings("all")
     public int countByBookTitle(String title) {
-        return findAllByBookTitle(title).size();
+        Query nativeQuery = entityManager.createNativeQuery(
+                "select count(*) from comments c join books b on c.book_id = b.id where b.title = :title");
+        nativeQuery.setParameter(TITLE, title);
+        return Integer.parseInt(nativeQuery.getSingleResult().toString());
     }
 }
