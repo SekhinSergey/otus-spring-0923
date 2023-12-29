@@ -14,5 +14,5 @@ public interface GenreService {
 
     Optional<Genre> findByName(String name);
 
-    Optional<Genre> insert(Genre genre);
+    Genre save(Genre genre);
 }

@@ -13,5 +13,5 @@ public interface AuthorRepository {
 
     Optional<Author> findByFullName(String fullName);
 
-    Optional<Author> insert(Author author);
+    Author save(Author author);
 }

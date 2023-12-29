@@ -39,8 +39,8 @@ public class AuthorCommands {
         return authorConverter.authorToString(authorService.findByFullName(fullName));
     }
 
-    @ShellMethod(value = "Insert and get author", key = "ains")
-    public String insertAuthor(Author author) {
-        return authorConverter.authorToString(authorService.insert(author));
+    @ShellMethod(value = "Save and get author", key = "ains")
+    public String saveAuthor(Author author) {
+        return authorConverter.authorToString(authorService.save(author));
     }
 }

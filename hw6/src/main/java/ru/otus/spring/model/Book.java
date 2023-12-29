@@ -10,14 +10,14 @@ import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.JoinTable;
 import jakarta.persistence.ManyToOne;
-import jakarta.persistence.NamedAttributeNode;
-import jakarta.persistence.NamedEntityGraph;
 import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import org.hibernate.annotations.Fetch;
+import org.hibernate.annotations.FetchMode;
 
 import java.util.List;
 import java.util.Objects;
@@ -28,9 +28,6 @@ import java.util.Objects;
 @NoArgsConstructor
 @AllArgsConstructor
 @Table(name = "books")
-@NamedEntityGraph(
-        name = "book-entity-graph",
-        attributeNodes = {@NamedAttributeNode("author"), @NamedAttributeNode("genres")})
 public class Book {
 
     @Id
@@ -40,10 +37,12 @@ public class Book {
     @Column(name = "title", nullable = false, unique = true)
     private String title;
 
+    @Fetch(FetchMode.JOIN)
     @JoinColumn(name = "author_id")
     @ManyToOne(targetEntity = Author.class, fetch = FetchType.LAZY, cascade = CascadeType.MERGE)
     private Author author;
 
+    @Fetch(FetchMode.SUBSELECT)
     @JoinTable(
             name = "books_genres",
             joinColumns = @JoinColumn(name = "book_id"),
@@ -61,14 +60,18 @@ public class Book {
                 || getClass() != o.getClass()
                 || !Objects.equals(id, book.id)
                 || !Objects.equals(title, book.title)
-                || !Objects.equals(author, book.author)) {
+                || !author.equals(book.author)) {
             return false;
         }
-        return Objects.equals(genres, book.genres);
+        return genres.equals(book.genres);
     }
 
     @Override
     public int hashCode() {
-        return id != null ? id.hashCode() : 0;
+        int result = id != null ? id.hashCode() : 0;
+        result = 31 * result + (title != null ? title.hashCode() : 0);
+        result = 31 * result + (author != null ? author.hashCode() : 0);
+        result = 31 * result + (genres != null ? genres.hashCode() : 0);
+        return result;
     }
 }

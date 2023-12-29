@@ -12,5 +12,5 @@ public interface AuthorService {
 
     Author findByFullName(String fullName);
 
-    Author insert(Author author);
+    Author save(Author author);
 }

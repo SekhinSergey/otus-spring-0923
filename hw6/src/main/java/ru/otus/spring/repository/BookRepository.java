@@ -13,7 +13,7 @@ public interface BookRepository {
 
     List<Book> findAll();
 
-    Optional<Book> save(Book book);
+    Book save(Book book);
 
     void deleteById(long id);
 

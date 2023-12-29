@@ -15,7 +15,7 @@ import static java.util.Objects.isNull;
 
 @Repository
 @RequiredArgsConstructor
-public class GenreRepositoryJpa implements GenreRepository {
+public class JpaGenreRepository implements GenreRepository {
 
     @PersistenceContext
     private final EntityManager entityManager;
@@ -42,12 +42,12 @@ public class GenreRepositoryJpa implements GenreRepository {
     }
 
     @Override
-    public Optional<Genre> insert(Genre genre) {
-        if (genre.getId() == 0) {
+    public Genre save(Genre genre) {
+        if (genre.getId() == null) {
             entityManager.persist(genre);
-            return findByName(genre.getName());
+            return findByName(genre.getName()).orElse(null);
         }
-        return getOptionalGenre(entityManager.merge(genre));
+        return entityManager.merge(genre);
     }
 
     private static Optional<Genre> getOptionalGenre(Genre genre) {

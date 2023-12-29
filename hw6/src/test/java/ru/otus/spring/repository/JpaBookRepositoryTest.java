@@ -23,8 +23,8 @@ import static ru.otus.spring.repository.TestBookUtils.getDbBooks;
 import static ru.otus.spring.repository.TestBookUtils.getDbGenres;
 
 @DataJpaTest
-@Import(BookRepositoryJpa.class)
-class BookRepositoryJpaTest {
+@Import(JpaBookRepository.class)
+class JpaBookRepositoryTest {
 
     private List<Author> dbAuthors;
 
@@ -33,7 +33,7 @@ class BookRepositoryJpaTest {
     private List<Book> dbBooks;
 
     @Autowired
-    private BookRepositoryJpa bookRepositoryJpa;
+    private JpaBookRepository jpaBookRepository;
 
     @Autowired
     private TestEntityManager testEntityManager;
@@ -48,7 +48,7 @@ class BookRepositoryJpaTest {
     @ParameterizedTest
     @MethodSource("ru.otus.spring.repository.TestBookUtils#getDbBooks")
     void shouldReturnCorrectBookByTitle(Book dbBook) {
-        var actualBook = bookRepositoryJpa.findByTitle(dbBook.getTitle());
+        var actualBook = jpaBookRepository.findByTitle(dbBook.getTitle());
         var expectedBook = testEntityManager.find(Book.class, dbBook.getId());
         assertThat(actualBook)
                 .isPresent()
@@ -59,7 +59,7 @@ class BookRepositoryJpaTest {
     @ParameterizedTest
     @MethodSource("ru.otus.spring.repository.TestBookUtils#getDbBooks")
     void shouldReturnCorrectBookById(Book dbBook) {
-        var actualBook = bookRepositoryJpa.findById(dbBook.getId());
+        var actualBook = jpaBookRepository.findById(dbBook.getId());
         var expectedBook = testEntityManager.find(Book.class, dbBook.getId());
         assertThat(actualBook)
                 .isPresent()
@@ -70,7 +70,7 @@ class BookRepositoryJpaTest {
     @Test
     @SuppressWarnings("all")
     void shouldReturnCorrectBookList() {
-        var actualBooks = bookRepositoryJpa.findAll();
+        var actualBooks = jpaBookRepository.findAll();
         var expectedBooks = dbBooks;
         IntStream.range(0, actualBooks.size())
                 .mapToObj(i -> actualBooks.get(i).equals(expectedBooks.get(i)))
@@ -94,14 +94,14 @@ class BookRepositoryJpaTest {
                 "BookTitle_10500",
                 dbAuthors.get(0),
                 List.of(dbGenres.get(0), dbGenres.get(2)));
-        var returnedBook = bookRepositoryJpa.save(expectedBook).get();
+        var returnedBook = jpaBookRepository.save(expectedBook);
         assertThat(returnedBook)
                 .isNotNull()
                 .matches(book -> book.getId() > 0)
                 .usingRecursiveComparison()
                 .ignoringExpectedNullFields()
                 .isEqualTo(expectedBook);
-        assertThat(bookRepositoryJpa.findById(returnedBook.getId()))
+        assertThat(jpaBookRepository.findById(returnedBook.getId()))
                 .isPresent()
                 .get()
                 .isEqualTo(returnedBook);
@@ -115,19 +115,19 @@ class BookRepositoryJpaTest {
                 "BookTitle_10500",
                 dbAuthors.get(2),
                 List.of(dbGenres.get(4), dbGenres.get(5)));
-        Optional<Book> beforeUpdateBook = bookRepositoryJpa.findById(expectedBook.getId());
+        Optional<Book> beforeUpdateBook = jpaBookRepository.findById(expectedBook.getId());
         assertThat(beforeUpdateBook)
                 .isPresent()
                 .get()
                 .isNotEqualTo(expectedBook);
-        var returnedBook = bookRepositoryJpa.save(expectedBook).get();
+        var returnedBook = jpaBookRepository.save(expectedBook);
         assertThat(returnedBook)
                 .isNotNull()
                 .matches(book -> book.getId() > 0)
                 .usingRecursiveComparison()
                 .ignoringExpectedNullFields()
                 .isEqualTo(expectedBook);
-        assertThat(bookRepositoryJpa.findById(returnedBook.getId()))
+        assertThat(jpaBookRepository.findById(returnedBook.getId()))
                 .isPresent()
                 .get()
                 .isEqualTo(returnedBook);
@@ -135,35 +135,35 @@ class BookRepositoryJpaTest {
 
     @Test
     void shouldDeleteBookById() {
-        assertThat(bookRepositoryJpa.findById(dbBooks.get(0).getId())).isPresent();
-        bookRepositoryJpa.deleteById(dbBooks.get(0).getId());
-        assertThat(bookRepositoryJpa.findById(dbBooks.get(0).getId())).isEmpty();
+        assertThat(jpaBookRepository.findById(dbBooks.get(0).getId())).isPresent();
+        jpaBookRepository.deleteById(dbBooks.get(0).getId());
+        assertThat(jpaBookRepository.findById(dbBooks.get(0).getId())).isEmpty();
     }
 
     @Test
     void shouldDeleteBookByTitle() {
-        assertThat(bookRepositoryJpa.findById(dbBooks.get(0).getId())).isPresent();
-        bookRepositoryJpa.deleteByTitle("BookTitle_1");
-        assertThat(bookRepositoryJpa.findById(dbBooks.get(0).getId())).isEmpty();
+        assertThat(jpaBookRepository.findById(dbBooks.get(0).getId())).isPresent();
+        jpaBookRepository.deleteByTitle("BookTitle_1");
+        assertThat(jpaBookRepository.findById(dbBooks.get(0).getId())).isEmpty();
     }
 
     @Test
     void shouldReturnCountByAuthorId() {
-        assertThat(bookRepositoryJpa.countByAuthorId(dbAuthors.get(0).getId())).isEqualTo(1);
+        assertThat(jpaBookRepository.countByAuthorId(dbAuthors.get(0).getId())).isEqualTo(1);
     }
 
     @Test
     void shouldReturnCountByAuthorFullName() {
-        assertThat(bookRepositoryJpa.countByAuthorFullName("Author_1")).isEqualTo(1);
+        assertThat(jpaBookRepository.countByAuthorFullName("Author_1")).isEqualTo(1);
     }
 
     @Test
     void shouldReturnCountByGenreId() {
-        assertThat(bookRepositoryJpa.countByGenreId(dbGenres.get(0).getId())).isEqualTo(1);
+        assertThat(jpaBookRepository.countByGenreId(dbGenres.get(0).getId())).isEqualTo(1);
     }
 
     @Test
     void shouldReturnCountByGenreName() {
-        assertThat(bookRepositoryJpa.countByGenreName("Genre_1")).isEqualTo(1);
+        assertThat(jpaBookRepository.countByGenreName("Genre_1")).isEqualTo(1);
     }
 }

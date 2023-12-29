@@ -17,13 +17,7 @@ public interface CommentRepository {
 
     List<Comment> findAllByBookTitle(String title);
 
-    Optional<Comment> insert(Comment comment);
-
-    Optional<Comment> updateTextById(long id, String text);
-
-    Optional<Comment> updateTextByBookId(long bookId, String text);
-
-    Optional<Comment> updateTextByBookTitle(String title, String text);
+    Comment save(Comment comment);
 
     void deleteAllByBookId(long bookId);
 

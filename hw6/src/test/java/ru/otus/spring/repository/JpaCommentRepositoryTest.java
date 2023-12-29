@@ -21,13 +21,13 @@ import static ru.otus.spring.repository.TestBookUtils.getDbAuthors;
 import static ru.otus.spring.repository.TestBookUtils.getDbBooks;
 
 @DataJpaTest
-@Import({CommentRepositoryJpa.class, BookRepositoryJpa.class})
-class CommentRepositoryJpaTest {
+@Import({JpaCommentRepository.class, JpaBookRepository.class})
+class JpaCommentRepositoryTest {
 
     private List<Comment> dbComments;
 
     @Autowired
-    private CommentRepositoryJpa commentRepositoryJpa;
+    private JpaCommentRepository jpaCommentRepository;
 
     @Autowired
     private TestEntityManager testEntityManager;
@@ -40,7 +40,7 @@ class CommentRepositoryJpaTest {
     @Test
     @SuppressWarnings("all")
     void shouldFindExpectedAllComments() {
-        var actualComments = commentRepositoryJpa.findAll();
+        var actualComments = jpaCommentRepository.findAll();
         var expectedComments = dbComments;
         IntStream.range(0, actualComments.size())
                 .mapToObj(i -> actualComments.get(i).equals(expectedComments.get(i)))
@@ -51,7 +51,7 @@ class CommentRepositoryJpaTest {
     @MethodSource("getDbComments")
     void shouldFindExpectedCommentById(Comment dbComment) {
         long id = dbComment.getId();
-        var actualComment = commentRepositoryJpa.findById(id);
+        var actualComment = jpaCommentRepository.findById(id);
         var expectedComment = testEntityManager.find(Comment.class, id);
         var expectedAuthor = testEntityManager.find(Author.class, dbComment.getBook().getAuthor().getId());
         expectedComment.getBook().setAuthor(expectedAuthor);
@@ -65,7 +65,7 @@ class CommentRepositoryJpaTest {
     @ParameterizedTest
     @MethodSource("getDbComments")
     void shouldFindExpectedCommentByText(Comment dbComment) {
-        var actualComment = commentRepositoryJpa.findByText(dbComment.getText());
+        var actualComment = jpaCommentRepository.findByText(dbComment.getText());
         var expectedComment = testEntityManager.find(Comment.class, dbComment.getId());
         var expectedAuthor = testEntityManager.find(Author.class, dbComment.getBook().getAuthor().getId());
         expectedComment.getBook().setAuthor(expectedAuthor);
@@ -78,7 +78,7 @@ class CommentRepositoryJpaTest {
 
     @Test
     void shouldFindAllExpectedCommentsByBookId() {
-        List<Comment> comments = commentRepositoryJpa.findAllByBookId(getDbBooks().get(0).getId());
+        List<Comment> comments = jpaCommentRepository.findAllByBookId(getDbBooks().get(0).getId());
         var actualComment = comments.get(0);
         var expectedComment = testEntityManager.find(Comment.class, dbComments.get(0).getId());
         var expectedAuthor = testEntityManager.find(Author.class, getDbAuthors().get(0).getId());
@@ -88,7 +88,7 @@ class CommentRepositoryJpaTest {
 
     @Test
     void shouldFindAllExpectedCommentsByBookTitle() {
-        List<Comment> comments = commentRepositoryJpa.findAllByBookTitle(getDbBooks().get(0).getTitle());
+        List<Comment> comments = jpaCommentRepository.findAllByBookTitle(getDbBooks().get(0).getTitle());
         var actualComment = comments.get(0);
         var expectedComment = testEntityManager.find(Comment.class, dbComments.get(0).getId());
         var expectedAuthor = testEntityManager.find(Author.class, getDbAuthors().get(0).getId());
@@ -108,70 +108,35 @@ class CommentRepositoryJpaTest {
     }
 
     void shouldInsertExpectedComment(long id) {
-        var actualComment = commentRepositoryJpa.insert(new Comment(id, "Comment_4", getDbBooks().get(0)));
+        var actualComment = jpaCommentRepository.save(new Comment(id, "Comment_4", getDbBooks().get(0)));
         var expectedComment = testEntityManager.find(Comment.class, 4);
         assertThat(actualComment)
-                .isPresent()
-                .get()
                 .usingRecursiveComparison()
                 .isEqualTo(expectedComment);
     }
 
     @Test
-    @SuppressWarnings("all")
-    void shouldUpdateCommentsByIdCorrectly() {
-        var oldComment = testEntityManager.find(Comment.class, dbComments.get(0).getId());
-        var actualComment = commentRepositoryJpa.updateTextById(
-                dbComments.get(0).getId(), "Comment_4").get();
-        assertThat(actualComment).isNotEqualTo(oldComment);
-        var newComment = testEntityManager.find(Comment.class, dbComments.get(0).getId());
-        assertThat(actualComment).isEqualTo(newComment);
-    }
-
-    @Test
-    @SuppressWarnings("all")
-    void shouldUpdateCommentsByBookIdCorrectly() {
-        var oldComment = testEntityManager.find(Comment.class, dbComments.get(0).getId());
-        var actualComment = commentRepositoryJpa.updateTextByBookId(
-                getDbBooks().get(0).getId(), "Comment_4").get();
-        assertThat(actualComment).isNotEqualTo(oldComment);
-        var newComment = testEntityManager.find(Comment.class, dbComments.get(0).getId());
-        assertThat(actualComment).isEqualTo(newComment);
-    }
-
-    @Test
-    @SuppressWarnings("all")
-    void shouldUpdateCommentsByBookTitleCorrectly() {
-        var oldComment = testEntityManager.find(Comment.class, dbComments.get(0).getId());
-        var actualComment = commentRepositoryJpa.updateTextByBookTitle(
-                getDbBooks().get(0).getTitle(), "Comment_4").get();
-        assertThat(actualComment).isNotEqualTo(oldComment);
-        var newComment = testEntityManager.find(Comment.class, dbComments.get(0).getId());
-        assertThat(actualComment).isEqualTo(newComment);
-    }
-
-    @Test
     void shouldDeleteCommentsByBookIdCorrectly() {
         Long bookId = getDbBooks().get(0).getId();
-        commentRepositoryJpa.deleteAllByBookId(bookId);
-        assertThat(commentRepositoryJpa.findAllByBookId(bookId)).isEmpty();
+        jpaCommentRepository.deleteAllByBookId(bookId);
+        assertThat(jpaCommentRepository.findAllByBookId(bookId)).isEmpty();
     }
 
     @Test
     void shouldDeleteCommentsByBookTitleCorrectly() {
         String title = getDbBooks().get(0).getTitle();
-        commentRepositoryJpa.deleteAllByBookTitle(title);
-        assertThat(commentRepositoryJpa.findAllByBookTitle(title)).isEmpty();
+        jpaCommentRepository.deleteAllByBookTitle(title);
+        assertThat(jpaCommentRepository.findAllByBookTitle(title)).isEmpty();
     }
 
     @Test
     void shouldCountCommentsByBookIdCorrectly() {
-        assertThat(commentRepositoryJpa.countByBookId(getDbBooks().get(0).getId())).isEqualTo(1);
+        assertThat(jpaCommentRepository.countByBookId(getDbBooks().get(0).getId())).isEqualTo(1);
     }
 
     @Test
     void shouldCountCommentsByBookTitleCorrectly() {
-        assertThat(commentRepositoryJpa.countByBookTitle(getDbBooks().get(0).getTitle())).isEqualTo(1);
+        assertThat(jpaCommentRepository.countByBookTitle(getDbBooks().get(0).getTitle())).isEqualTo(1);
     }
 
     private static List<Comment> getDbComments() {

@@ -16,13 +16,7 @@ public interface CommentService {
 
     List<Comment> findAllByBookTitle(String title);
 
-    Comment insert(Comment comment);
-
-    Comment updateTextById(long id, String text);
-
-    Comment updateTextByBookId(long bookId, String text);
-
-    Comment updateTextByBookTitle(String title, String text);
+    Comment save(Comment comment);
 
     void deleteAllByBookId(long bookId);
 

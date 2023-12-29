@@ -1,8 +1,0 @@
-package ru.otus.spring.exception;
-
-public class ParseException extends RuntimeException {
-
-    public ParseException(String message) {
-        super(message);
-    }
-}

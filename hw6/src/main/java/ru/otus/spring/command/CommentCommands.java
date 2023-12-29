@@ -48,24 +48,9 @@ public class CommentCommands {
                 .collect(Collectors.joining("," + System.lineSeparator()));
     }
 
-    @ShellMethod(value = "Insert comment", key = "insc")
-    public String insertComment(Comment comment) {
-        return commentConverter.commentToString(commentService.insert(comment));
-    }
-
-    @ShellMethod(value = "Update comment text by id", key = "updctbyid")
-    public String updateCommentTextById(long id, String text) {
-        return commentConverter.commentToString(commentService.updateTextById(id, text));
-    }
-
-    @ShellMethod(value = "Update comment text by book id", key = "updctbybid")
-    public String updateCommentTextByBookId(long bookId, String text) {
-        return commentConverter.commentToString(commentService.updateTextByBookId(bookId, text));
-    }
-
-    @ShellMethod(value = "Update comment text by book title", key = "updctbybt")
-    public String updateCommentTextByBookTitle(String title, String text) {
-        return commentConverter.commentToString(commentService.updateTextByBookTitle(title, text));
+    @ShellMethod(value = "Save comment", key = "insc")
+    public String saveComment(Comment comment) {
+        return commentConverter.commentToString(commentService.save(comment));
     }
 
     @ShellMethod(value = "Delete all comments by book id", key = "delacbybid")

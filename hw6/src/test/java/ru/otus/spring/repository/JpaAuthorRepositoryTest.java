@@ -17,13 +17,13 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static ru.otus.spring.repository.TestBookUtils.getDbAuthors;
 
 @DataJpaTest
-@Import(AuthorRepositoryJpa.class)
-class AuthorRepositoryJpaTest {
+@Import(JpaAuthorRepository.class)
+class JpaAuthorRepositoryTest {
 
     private List<Author> dbAuthors;
 
     @Autowired
-    private AuthorRepositoryJpa authorRepositoryJpa;
+    private JpaAuthorRepository jpaAuthorRepository;
 
     @Autowired
     private TestEntityManager testEntityManager;
@@ -35,7 +35,7 @@ class AuthorRepositoryJpaTest {
 
     @Test
     void shouldFindExpectedAllAuthors() {
-        var actualAuthors = authorRepositoryJpa.findAll();
+        var actualAuthors = jpaAuthorRepository.findAll();
         var expectedAuthors = dbAuthors;
         assertThat(actualAuthors).containsExactlyElementsOf(expectedAuthors);
     }
@@ -44,7 +44,7 @@ class AuthorRepositoryJpaTest {
     @MethodSource("ru.otus.spring.repository.TestBookUtils#getDbAuthors")
     void shouldFindExpectedAuthorById(Author dbAuthor) {
         long id = dbAuthor.getId();
-        var actualAuthor = authorRepositoryJpa.findById(id);
+        var actualAuthor = jpaAuthorRepository.findById(id);
         var expectedAuthor = testEntityManager.find(Author.class, id);
         assertThat(actualAuthor)
                 .isPresent()
@@ -56,7 +56,7 @@ class AuthorRepositoryJpaTest {
     @ParameterizedTest
     @MethodSource("ru.otus.spring.repository.TestBookUtils#getDbAuthors")
     void shouldFindExpectedAuthorByFullName(Author dbAuthor) {
-        var actualAuthor = authorRepositoryJpa.findByFullName(dbAuthor.getFullName());
+        var actualAuthor = jpaAuthorRepository.findByFullName(dbAuthor.getFullName());
         var expectedAuthor = testEntityManager.find(Author.class, dbAuthor.getId());
         assertThat(actualAuthor)
                 .isPresent()
@@ -77,11 +77,9 @@ class AuthorRepositoryJpaTest {
     }
 
     void shouldInsertExpectedAuthor(long id) {
-        var actualAuthor = authorRepositoryJpa.insert(new Author(id, "Author_4"));
+        var actualAuthor = jpaAuthorRepository.save(new Author(id, "Author_4"));
         var expectedAuthor = testEntityManager.find(Author.class, 4);
         assertThat(actualAuthor)
-                .isPresent()
-                .get()
                 .usingRecursiveComparison()
                 .isEqualTo(expectedAuthor);
     }

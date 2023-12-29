@@ -14,7 +14,7 @@ import static java.util.Objects.isNull;
 
 @Repository
 @RequiredArgsConstructor
-public class AuthorRepositoryJpa implements AuthorRepository {
+public class JpaAuthorRepository implements AuthorRepository {
 
     @PersistenceContext
     private final EntityManager entityManager;
@@ -37,16 +37,16 @@ public class AuthorRepositoryJpa implements AuthorRepository {
         return getOptionalAuthor(query.getSingleResult());
     }
 
-    @Override
-    public Optional<Author> insert(Author author) {
-        if (author.getId() == 0) {
-            entityManager.persist(author);
-            return findByFullName(author.getFullName());
-        }
-        return getOptionalAuthor(entityManager.merge(author));
-    }
-
     private static Optional<Author> getOptionalAuthor(Author author) {
         return isNull(author) ? Optional.empty() : Optional.of(author);
+    }
+
+    @Override
+    public Author save(Author author) {
+        if (author.getId() == null) {
+            entityManager.persist(author);
+            return findByFullName(author.getFullName()).orElse(null);
+        }
+        return entityManager.merge(author);
     }
 }

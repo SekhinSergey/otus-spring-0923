@@ -23,7 +23,7 @@ public class Author {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private long id;
+    private Long id;
 
     @Column(name = "full_name", nullable = false, unique = true)
     private String fullName;
@@ -42,6 +42,8 @@ public class Author {
 
     @Override
     public int hashCode() {
-        return (int) (id ^ (id >>> 32));
+        int result = (int) (id ^ (id >>> 32));
+        result = 31 * result + (fullName != null ? fullName.hashCode() : 0);
+        return result;
     }
 }

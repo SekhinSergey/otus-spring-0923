@@ -8,6 +8,8 @@ import ru.otus.spring.repository.AuthorRepository;
 
 import java.util.List;
 
+import static java.util.Objects.isNull;
+
 @Service
 @RequiredArgsConstructor
 public class AuthorServiceImpl implements AuthorService {
@@ -32,9 +34,12 @@ public class AuthorServiceImpl implements AuthorService {
     }
 
     @Override
-    public Author insert(Author author) {
-        return authorRepository.insert(author).orElseThrow(() -> new EntityNotFoundException(
-                "An error occurred when trying to insert the author with full name %S"
-                        .formatted(author.getFullName())));
+    public Author save(Author author) {
+        Author savedAuthor = authorRepository.save(author);
+        if (isNull(savedAuthor)) {
+            throw new EntityNotFoundException("An error occurred when trying to save the author with full name %s"
+                            .formatted(author.getFullName()));
+        }
+        return savedAuthor;
     }
 }

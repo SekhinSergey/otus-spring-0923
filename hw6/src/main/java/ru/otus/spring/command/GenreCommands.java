@@ -48,11 +48,8 @@ public class GenreCommands {
                 .orElse("Genre with name %s not found".formatted(name));
     }
 
-    @ShellMethod(value = "Insert and get genre", key = "gins")
-    public String insertGenre(Genre genre) {
-        return genreService.insert(genre)
-                .map(genreConverter::genreToString)
-                .orElse("An error occurred when trying to insert the genre with name %s"
-                        .formatted(genre.getName()));
+    @ShellMethod(value = "Save and get genre", key = "gins")
+    public String saveGenre(Genre genre) {
+        return genreConverter.genreToString(genreService.save(genre));
     }
 }

@@ -6,18 +6,19 @@ import ru.otus.spring.model.Genre;
 
 import java.util.List;
 import java.util.stream.IntStream;
+import java.util.stream.LongStream;
 
 public class TestBookUtils {
 
     public static List<Author> getDbAuthors() {
-        return IntStream.range(1, 4)
+        return LongStream.range(1, 4)
                 .boxed()
                 .map(id -> new Author(id, "Author_" + id))
                 .toList();
     }
 
     public static List<Genre> getDbGenres() {
-        return IntStream.range(1, 7)
+        return LongStream.range(1, 7)
                 .boxed()
                 .map(id -> new Genre(id, "Genre_" + id))
                 .toList();
