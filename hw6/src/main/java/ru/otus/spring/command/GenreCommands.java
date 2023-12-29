@@ -19,6 +19,7 @@ public class GenreCommands {
 
     private final GenreConverter genreConverter;
 
+    @SuppressWarnings("all")
     @ShellMethod(value = "Find all genres", key = "ag")
     public String findAllGenres() {
         List<Genre> genres = genreService.findAll();
@@ -30,6 +31,7 @@ public class GenreCommands {
                 .collect(Collectors.joining("," + System.lineSeparator()));
     }
 
+    @SuppressWarnings("all")
     @ShellMethod(value = "Find all genres by ids", key = "agbyids")
     public String findAllGenresByIds(Set<Long> ids) {
         List<Genre> genres = genreService.findAllByIds(ids);
@@ -41,6 +43,7 @@ public class GenreCommands {
                 .collect(Collectors.joining("," + System.lineSeparator()));
     }
 
+    @SuppressWarnings("all")
     @ShellMethod(value = "Find genre by name", key = "agbyn")
     public String findGenreByName(String name) {
         return genreService.findByName(name)
@@ -48,6 +51,7 @@ public class GenreCommands {
                 .orElse("Genre with name %s not found".formatted(name));
     }
 
+    @SuppressWarnings("all")
     @ShellMethod(value = "Save and get genre", key = "gins")
     public String saveGenre(Genre genre) {
         return genreConverter.genreToString(genreService.save(genre));

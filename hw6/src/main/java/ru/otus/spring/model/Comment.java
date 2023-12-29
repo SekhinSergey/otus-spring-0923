@@ -22,6 +22,7 @@ import org.hibernate.annotations.FetchMode;
 @Entity
 @NoArgsConstructor
 @AllArgsConstructor
+@SuppressWarnings("all")
 @Table(name = "comments")
 public class Comment {
 

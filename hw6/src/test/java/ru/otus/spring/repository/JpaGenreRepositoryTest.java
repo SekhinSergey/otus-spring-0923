@@ -67,15 +67,15 @@ class JpaGenreRepositoryTest {
     @Test
     @DirtiesContext(methodMode = DirtiesContext.MethodMode.BEFORE_METHOD)
     void shouldPersistExpectedGenre() {
-        shouldInsertExpectedGenre(0);
+        shouldSaveExpectedGenre(0);
     }
 
     @Test
     void shouldMergeExpectedGenre() {
-        shouldInsertExpectedGenre(7);
+        shouldSaveExpectedGenre(7);
     }
 
-    void shouldInsertExpectedGenre(long id) {
+    void shouldSaveExpectedGenre(long id) {
         var actualGenre = jpaGenreRepository.save(new Genre(id, "Genre_7"));
         var expectedGenre = testEntityManager.find(Genre.class, 7);
         assertThat(actualGenre)

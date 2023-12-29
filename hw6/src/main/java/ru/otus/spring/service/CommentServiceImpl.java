@@ -2,6 +2,7 @@ package ru.otus.spring.service;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import ru.otus.spring.exception.EntityNotFoundException;
 import ru.otus.spring.model.Comment;
 import ru.otus.spring.repository.BookRepository;
@@ -55,6 +56,7 @@ public class CommentServiceImpl implements CommentService {
     }
 
     @Override
+    @Transactional
     @SuppressWarnings("all")
     public Comment save(Comment comment) {
         if (isNull(comment.getBook()) || isNull(comment.getBook().getId())) {

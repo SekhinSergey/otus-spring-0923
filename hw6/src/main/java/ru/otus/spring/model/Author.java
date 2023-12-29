@@ -19,6 +19,7 @@ import lombok.Setter;
 @NoArgsConstructor
 @AllArgsConstructor
 @Table(name = "authors")
+@SuppressWarnings("all")
 public class Author {
 
     @Id

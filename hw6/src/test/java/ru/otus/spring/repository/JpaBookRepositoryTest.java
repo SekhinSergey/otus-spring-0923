@@ -79,16 +79,16 @@ class JpaBookRepositoryTest {
 
     @Test
     void shouldPersistNewBookCorrectly() {
-        shouldInsertBookCorrectly(null);
+        shouldSaveBookCorrectly(null);
     }
 
     @Test
     void shouldMergeNewBookCorrectly() {
-        shouldInsertBookCorrectly(4L);
+        shouldSaveBookCorrectly(4L);
     }
 
     @SuppressWarnings("all")
-    void shouldInsertBookCorrectly(Long id) {
+    void shouldSaveBookCorrectly(Long id) {
         var expectedBook = new Book(
                 id,
                 "BookTitle_10500",

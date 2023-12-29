@@ -28,6 +28,7 @@ import java.util.Objects;
 @NoArgsConstructor
 @AllArgsConstructor
 @Table(name = "books")
+@SuppressWarnings("all")
 public class Book {
 
     @Id

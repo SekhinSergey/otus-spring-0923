@@ -99,15 +99,15 @@ class JpaCommentRepositoryTest {
     @Test
     @DirtiesContext(methodMode = DirtiesContext.MethodMode.BEFORE_METHOD)
     void shouldPersistExpectedComment() {
-        shouldInsertExpectedComment(0);
+        shouldSaveExpectedComment(0);
     }
 
     @Test
     void shouldMergeExpectedComment() {
-        shouldInsertExpectedComment(4);
+        shouldSaveExpectedComment(4);
     }
 
-    void shouldInsertExpectedComment(long id) {
+    void shouldSaveExpectedComment(long id) {
         var actualComment = jpaCommentRepository.save(new Comment(id, "Comment_4", getDbBooks().get(0)));
         var expectedComment = testEntityManager.find(Comment.class, 4);
         assertThat(actualComment)

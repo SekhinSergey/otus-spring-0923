@@ -17,6 +17,7 @@ import lombok.Setter;
 @NoArgsConstructor
 @AllArgsConstructor
 @Table(name = "genres")
+@SuppressWarnings("all")
 public class Genre {
 
     @Id

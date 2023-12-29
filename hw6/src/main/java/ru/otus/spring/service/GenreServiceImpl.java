@@ -2,6 +2,7 @@ package ru.otus.spring.service;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import ru.otus.spring.exception.EntityNotFoundException;
 import ru.otus.spring.model.Genre;
 import ru.otus.spring.repository.GenreRepository;
@@ -34,6 +35,7 @@ public class GenreServiceImpl implements GenreService {
     }
 
     @Override
+    @Transactional
     public Genre save(Genre genre) {
         Genre savedGenre = genreRepository.save(genre);
         if (isNull(savedGenre)) {

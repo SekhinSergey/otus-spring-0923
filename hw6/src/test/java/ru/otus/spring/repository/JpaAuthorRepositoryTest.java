@@ -67,16 +67,16 @@ class JpaAuthorRepositoryTest {
 
     @Test
     void shouldPersistExpectedAuthor() {
-        shouldInsertExpectedAuthor(0);
+        shouldSaveExpectedAuthor(0);
     }
 
     @Test
     @DirtiesContext(methodMode = DirtiesContext.MethodMode.BEFORE_METHOD)
     void shouldMergeExpectedAuthor() {
-        shouldInsertExpectedAuthor(4);
+        shouldSaveExpectedAuthor(4);
     }
 
-    void shouldInsertExpectedAuthor(long id) {
+    void shouldSaveExpectedAuthor(long id) {
         var actualAuthor = jpaAuthorRepository.save(new Author(id, "Author_4"));
         var expectedAuthor = testEntityManager.find(Author.class, 4);
         assertThat(actualAuthor)

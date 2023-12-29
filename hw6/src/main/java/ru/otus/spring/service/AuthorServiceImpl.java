@@ -2,6 +2,7 @@ package ru.otus.spring.service;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import ru.otus.spring.exception.EntityNotFoundException;
 import ru.otus.spring.model.Author;
 import ru.otus.spring.repository.AuthorRepository;
@@ -34,6 +35,7 @@ public class AuthorServiceImpl implements AuthorService {
     }
 
     @Override
+    @Transactional
     public Author save(Author author) {
         Author savedAuthor = authorRepository.save(author);
         if (isNull(savedAuthor)) {
