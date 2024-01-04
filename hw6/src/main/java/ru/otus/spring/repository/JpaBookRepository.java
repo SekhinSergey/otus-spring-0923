@@ -45,7 +45,7 @@ public class JpaBookRepository implements BookRepository {
         } catch (NoResultException exception) {
             book = null;
         }
-        return isNull(book) ? Optional.empty() : Optional.of(book);
+        return Optional.ofNullable(book);
     }
 
     @Override
@@ -55,20 +55,12 @@ public class JpaBookRepository implements BookRepository {
 
     @Override
     public Book save(Book book) {
-        Long id = book.getId();
-        return id == null ? insert(book) : update(book);
+        return book.getId() == null ? insert(book) : entityManager.merge(book);
     }
 
     private Book insert(Book book) {
-        if (book.getId() == null) {
-            entityManager.persist(book);
-            return findByTitle(book.getTitle()).orElse(null);
-        }
-        return entityManager.merge(book);
-    }
-
-    private Book update(Book book) {
-        return entityManager.merge(book);
+        entityManager.persist(book);
+        return book;
     }
 
     @Override

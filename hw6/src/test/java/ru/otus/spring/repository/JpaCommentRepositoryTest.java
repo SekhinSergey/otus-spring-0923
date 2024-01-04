@@ -1,6 +1,5 @@
 package ru.otus.spring.repository;
 
-import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
@@ -10,19 +9,21 @@ import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 import org.springframework.boot.test.autoconfigure.orm.jpa.TestEntityManager;
 import org.springframework.context.annotation.Import;
 import org.springframework.test.annotation.DirtiesContext;
-import ru.otus.spring.model.Author;
 import ru.otus.spring.model.Comment;
 
 import java.util.List;
+import java.util.function.Function;
+import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static ru.otus.spring.repository.TestBookUtils.getDbAuthors;
-import static ru.otus.spring.repository.TestBookUtils.getDbBooks;
+import static ru.otus.spring.repository.TestBookUtils.*;
 
 @DataJpaTest
-@Import({JpaCommentRepository.class, JpaBookRepository.class})
+@Import(JpaCommentRepository.class)
 class JpaCommentRepositoryTest {
+
+    private static final String SIZE_ASSERTION_RULE = "java:S5838";
 
     private List<Comment> dbComments;
 
@@ -38,42 +39,38 @@ class JpaCommentRepositoryTest {
     }
 
     @Test
-    @SuppressWarnings("all")
+    @SuppressWarnings(SIZE_ASSERTION_RULE)
     void shouldFindExpectedAllComments() {
-        var actualComments = jpaCommentRepository.findAll();
-        var expectedComments = dbComments;
-        IntStream.range(0, actualComments.size())
-                .mapToObj(i -> actualComments.get(i).equals(expectedComments.get(i)))
-                .forEach(Assertions::assertThat);
+        var actualCommentList = jpaCommentRepository.findAll();
+        var expectedCommentList = dbComments;
+        assertThat(actualCommentList.size()).isEqualTo(expectedCommentList.size());
+        var expectedCommentMap = expectedCommentList.stream()
+                .collect(Collectors.toMap(Comment::getId, Function.identity()));
+        actualCommentList.forEach(actualComment -> {
+            var expectedComment = expectedCommentMap.get(actualComment.getId());
+            assertThatActualAndExpectedCommentAreEqual(actualComment, expectedComment);
+        });
     }
 
     @ParameterizedTest
     @MethodSource("getDbComments")
     void shouldFindExpectedCommentById(Comment dbComment) {
         long id = dbComment.getId();
-        var actualComment = jpaCommentRepository.findById(id);
+        var optionalActualComment = jpaCommentRepository.findById(id);
         var expectedComment = testEntityManager.find(Comment.class, id);
-        var expectedAuthor = testEntityManager.find(Author.class, dbComment.getBook().getAuthor().getId());
-        expectedComment.getBook().setAuthor(expectedAuthor);
-        assertThat(actualComment)
-                .isPresent()
-                .get()
-                .usingRecursiveComparison()
-                .isEqualTo(expectedComment);
+        assertThat(optionalActualComment).isPresent();
+        var actualComment = optionalActualComment.get();
+        assertThatActualAndExpectedCommentAreEqual(actualComment, expectedComment);
     }
 
     @ParameterizedTest
     @MethodSource("getDbComments")
     void shouldFindExpectedCommentByText(Comment dbComment) {
-        var actualComment = jpaCommentRepository.findByText(dbComment.getText());
+        var optionalActualComment = jpaCommentRepository.findByText(dbComment.getText());
         var expectedComment = testEntityManager.find(Comment.class, dbComment.getId());
-        var expectedAuthor = testEntityManager.find(Author.class, dbComment.getBook().getAuthor().getId());
-        expectedComment.getBook().setAuthor(expectedAuthor);
-        assertThat(actualComment)
-                .isPresent()
-                .get()
-                .usingRecursiveComparison()
-                .isEqualTo(expectedComment);
+        assertThat(optionalActualComment).isPresent();
+        var actualComment = optionalActualComment.get();
+        assertThatActualAndExpectedCommentAreEqual(actualComment, expectedComment);
     }
 
     @Test
@@ -81,9 +78,7 @@ class JpaCommentRepositoryTest {
         List<Comment> comments = jpaCommentRepository.findAllByBookId(getDbBooks().get(0).getId());
         var actualComment = comments.get(0);
         var expectedComment = testEntityManager.find(Comment.class, dbComments.get(0).getId());
-        var expectedAuthor = testEntityManager.find(Author.class, getDbAuthors().get(0).getId());
-        expectedComment.getBook().setAuthor(expectedAuthor);
-        assertThat(actualComment).isEqualTo(expectedComment);
+        assertThatActualAndExpectedCommentAreEqual(actualComment, expectedComment);
     }
 
     @Test
@@ -91,9 +86,7 @@ class JpaCommentRepositoryTest {
         List<Comment> comments = jpaCommentRepository.findAllByBookTitle(getDbBooks().get(0).getTitle());
         var actualComment = comments.get(0);
         var expectedComment = testEntityManager.find(Comment.class, dbComments.get(0).getId());
-        var expectedAuthor = testEntityManager.find(Author.class, getDbAuthors().get(0).getId());
-        expectedComment.getBook().setAuthor(expectedAuthor);
-        assertThat(actualComment).isEqualTo(expectedComment);
+        assertThatActualAndExpectedCommentAreEqual(actualComment, expectedComment);
     }
 
     @Test
@@ -110,9 +103,13 @@ class JpaCommentRepositoryTest {
     void shouldSaveExpectedComment(long id) {
         var actualComment = jpaCommentRepository.save(new Comment(id, "Comment_4", getDbBooks().get(0)));
         var expectedComment = testEntityManager.find(Comment.class, 4);
-        assertThat(actualComment)
-                .usingRecursiveComparison()
-                .isEqualTo(expectedComment);
+        assertThatActualAndExpectedCommentAreEqual(actualComment, expectedComment);
+    }
+
+    private void assertThatActualAndExpectedCommentAreEqual(Comment actualComment, Comment expectedComment) {
+        assertThat(actualComment.getId()).isEqualTo(actualComment.getId());
+        assertThat(actualComment.getText()).isEqualTo(expectedComment.getText());
+        assertThatActualAndExpectedBookAreEqual(actualComment.getBook(), expectedComment.getBook());
     }
 
     @Test

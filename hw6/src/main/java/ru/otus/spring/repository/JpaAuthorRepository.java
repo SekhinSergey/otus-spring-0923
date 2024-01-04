@@ -10,8 +10,6 @@ import ru.otus.spring.model.Author;
 import java.util.List;
 import java.util.Optional;
 
-import static java.util.Objects.isNull;
-
 @Repository
 @RequiredArgsConstructor
 public class JpaAuthorRepository implements AuthorRepository {
@@ -26,7 +24,7 @@ public class JpaAuthorRepository implements AuthorRepository {
 
     @Override
     public Optional<Author> findById(long id) {
-        return getOptionalAuthor(entityManager.find(Author.class, id));
+        return Optional.ofNullable(entityManager.find(Author.class, id));
     }
 
     @Override
@@ -34,18 +32,14 @@ public class JpaAuthorRepository implements AuthorRepository {
         TypedQuery<Author> query = entityManager.createQuery(
                 "select a from Author a where a.fullName = :fullName", Author.class);
         query.setParameter("fullName", fullName);
-        return getOptionalAuthor(query.getSingleResult());
-    }
-
-    private static Optional<Author> getOptionalAuthor(Author author) {
-        return isNull(author) ? Optional.empty() : Optional.of(author);
+        return Optional.ofNullable(query.getSingleResult());
     }
 
     @Override
     public Author save(Author author) {
         if (author.getId() == null) {
             entityManager.persist(author);
-            return findByFullName(author.getFullName()).orElse(null);
+            return author;
         }
         return entityManager.merge(author);
     }

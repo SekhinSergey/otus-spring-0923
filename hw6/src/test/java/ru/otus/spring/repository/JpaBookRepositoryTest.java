@@ -1,6 +1,5 @@
 package ru.otus.spring.repository;
 
-import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
@@ -14,17 +13,17 @@ import ru.otus.spring.model.Book;
 import ru.otus.spring.model.Genre;
 
 import java.util.List;
-import java.util.Optional;
-import java.util.stream.IntStream;
+import java.util.function.Function;
+import java.util.stream.Collectors;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static ru.otus.spring.repository.TestBookUtils.getDbAuthors;
-import static ru.otus.spring.repository.TestBookUtils.getDbBooks;
-import static ru.otus.spring.repository.TestBookUtils.getDbGenres;
+import static ru.otus.spring.repository.TestBookUtils.*;
 
 @DataJpaTest
 @Import(JpaBookRepository.class)
 class JpaBookRepositoryTest {
+
+    private static final String SIZE_ASSERTION_RULE = "java:S5838";
 
     private List<Author> dbAuthors;
 
@@ -48,89 +47,76 @@ class JpaBookRepositoryTest {
     @ParameterizedTest
     @MethodSource("ru.otus.spring.repository.TestBookUtils#getDbBooks")
     void shouldReturnCorrectBookByTitle(Book dbBook) {
-        var actualBook = jpaBookRepository.findByTitle(dbBook.getTitle());
+        var optionalActualBook = jpaBookRepository.findByTitle(dbBook.getTitle());
         var expectedBook = testEntityManager.find(Book.class, dbBook.getId());
-        assertThat(actualBook)
-                .isPresent()
-                .get()
-                .isEqualTo(expectedBook);
+        assertThat(optionalActualBook).isPresent();
+        var actualBook = optionalActualBook.get();
+        assertThatActualAndExpectedBookAreEqual(actualBook, expectedBook);
     }
 
     @ParameterizedTest
     @MethodSource("ru.otus.spring.repository.TestBookUtils#getDbBooks")
     void shouldReturnCorrectBookById(Book dbBook) {
-        var actualBook = jpaBookRepository.findById(dbBook.getId());
+        var optionalActualBook = jpaBookRepository.findById(dbBook.getId());
         var expectedBook = testEntityManager.find(Book.class, dbBook.getId());
-        assertThat(actualBook)
-                .isPresent()
-                .get()
-                .isEqualTo(expectedBook);
+        assertThat(optionalActualBook).isPresent();
+        var actualBook = optionalActualBook.get();
+        assertThatActualAndExpectedBookAreEqual(actualBook, expectedBook);
     }
 
     @Test
-    @SuppressWarnings("all")
+    @SuppressWarnings(SIZE_ASSERTION_RULE)
     void shouldReturnCorrectBookList() {
-        var actualBooks = jpaBookRepository.findAll();
-        var expectedBooks = dbBooks;
-        IntStream.range(0, actualBooks.size())
-                .mapToObj(i -> actualBooks.get(i).equals(expectedBooks.get(i)))
-                .forEach(Assertions::assertThat);
+        var actualBookList = jpaBookRepository.findAll();
+        var expectedBookList = dbBooks;
+        assertThat(actualBookList.size()).isEqualTo(expectedBookList.size());
+        var expectedBookMap = expectedBookList.stream()
+                .collect(Collectors.toMap(Book::getId, Function.identity()));
+        actualBookList.forEach(actualBook -> {
+            var expectedBook = expectedBookMap.get(actualBook.getId());
+            assertThatActualAndExpectedBookAreEqual(actualBook, expectedBook);
+        });
     }
 
     @Test
     void shouldPersistNewBookCorrectly() {
-        shouldSaveBookCorrectly(null);
-    }
-
-    @Test
-    void shouldMergeNewBookCorrectly() {
-        shouldSaveBookCorrectly(4L);
-    }
-
-    @SuppressWarnings("all")
-    void shouldSaveBookCorrectly(Long id) {
         var expectedBook = new Book(
-                id,
+                null,
                 "BookTitle_10500",
                 dbAuthors.get(0),
                 List.of(dbGenres.get(0), dbGenres.get(2)));
-        var returnedBook = jpaBookRepository.save(expectedBook);
-        assertThat(returnedBook)
-                .isNotNull()
-                .matches(book -> book.getId() > 0)
-                .usingRecursiveComparison()
-                .ignoringExpectedNullFields()
-                .isEqualTo(expectedBook);
-        assertThat(jpaBookRepository.findById(returnedBook.getId()))
-                .isPresent()
-                .get()
-                .isEqualTo(returnedBook);
+        shouldSaveBook(expectedBook);
     }
 
     @Test
-    @SuppressWarnings("all")
     void shouldSaveUpdatedBook() {
-        var expectedBook = new Book(
+        var expectedOldBook = new Book(
                 dbBooks.get(0).getId(),
-                "BookTitle_10500",
-                dbAuthors.get(2),
-                List.of(dbGenres.get(4), dbGenres.get(5)));
-        Optional<Book> beforeUpdateBook = jpaBookRepository.findById(expectedBook.getId());
-        assertThat(beforeUpdateBook)
-                .isPresent()
-                .get()
-                .isNotEqualTo(expectedBook);
-        var returnedBook = jpaBookRepository.save(expectedBook);
-        assertThat(returnedBook)
+                "BookTitle_1",
+                dbAuthors.get(0),
+                List.of(dbGenres.get(0), dbGenres.get(1)));
+        var optionalFoundBook = jpaBookRepository.findById(expectedOldBook.getId());
+        assertThat(optionalFoundBook).isPresent();
+        var foundBook = optionalFoundBook.get();
+        assertThatActualAndExpectedBookAreEqual(foundBook, expectedOldBook);
+        var expectedNewBook = new Book(
+                dbBooks.get(0).getId(),
+                "BookTitle_4",
+                dbAuthors.get(1),
+                List.of(dbGenres.get(2), dbGenres.get(3)));
+        shouldSaveBook(expectedNewBook);
+    }
+
+    private void shouldSaveBook(Book expectedBook) {
+        var savedBook = jpaBookRepository.save(expectedBook);
+        assertThat(savedBook)
                 .isNotNull()
-                .matches(book -> book.getId() > 0)
-                .usingRecursiveComparison()
-                .ignoringExpectedNullFields()
-                .isEqualTo(expectedBook);
-        assertThat(jpaBookRepository.findById(returnedBook.getId()))
-                .isPresent()
-                .get()
-                .isEqualTo(returnedBook);
+                .matches(book -> book.getId() > 0);
+        assertThatActualAndExpectedBookAreEqual(savedBook, expectedBook);
+        var optionalFoundSavedBook = jpaBookRepository.findById(savedBook.getId());
+        assertThat(optionalFoundSavedBook).isPresent();
+        var foundSavedBook = optionalFoundSavedBook.get();
+        assertThatActualAndExpectedBookAreEqual(foundSavedBook, savedBook);
     }
 
     @Test

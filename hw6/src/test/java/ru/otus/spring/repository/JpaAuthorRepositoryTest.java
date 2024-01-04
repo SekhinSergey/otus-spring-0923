@@ -12,13 +12,18 @@ import org.springframework.test.annotation.DirtiesContext;
 import ru.otus.spring.model.Author;
 
 import java.util.List;
+import java.util.function.Function;
+import java.util.stream.Collectors;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static ru.otus.spring.repository.TestBookUtils.assertThatActualAndExpectedAuthorAreEqual;
 import static ru.otus.spring.repository.TestBookUtils.getDbAuthors;
 
 @DataJpaTest
 @Import(JpaAuthorRepository.class)
 class JpaAuthorRepositoryTest {
+
+    private static final String SIZE_ASSERTION_RULE = "java:S5838";
 
     private List<Author> dbAuthors;
 
@@ -34,35 +39,38 @@ class JpaAuthorRepositoryTest {
     }
 
     @Test
+    @SuppressWarnings(SIZE_ASSERTION_RULE)
     void shouldFindExpectedAllAuthors() {
-        var actualAuthors = jpaAuthorRepository.findAll();
-        var expectedAuthors = dbAuthors;
-        assertThat(actualAuthors).containsExactlyElementsOf(expectedAuthors);
+        var actualAuthorList = jpaAuthorRepository.findAll();
+        var expectedAuthorList = dbAuthors;
+        assertThat(actualAuthorList.size()).isEqualTo(expectedAuthorList.size());
+        var expectedAuthorMap = expectedAuthorList.stream()
+                .collect(Collectors.toMap(Author::getId, Function.identity()));
+        actualAuthorList.forEach(actualAuthor -> {
+            var expectedAuthor = expectedAuthorMap.get(actualAuthor.getId());
+            assertThatActualAndExpectedAuthorAreEqual(actualAuthor, expectedAuthor);
+        });
     }
 
     @ParameterizedTest
     @MethodSource("ru.otus.spring.repository.TestBookUtils#getDbAuthors")
     void shouldFindExpectedAuthorById(Author dbAuthor) {
         long id = dbAuthor.getId();
-        var actualAuthor = jpaAuthorRepository.findById(id);
+        var optionalActualAuthor = jpaAuthorRepository.findById(id);
         var expectedAuthor = testEntityManager.find(Author.class, id);
-        assertThat(actualAuthor)
-                .isPresent()
-                .get()
-                .usingRecursiveComparison()
-                .isEqualTo(expectedAuthor);
+        assertThat(optionalActualAuthor).isPresent();
+        var actualAuthor = optionalActualAuthor.get();
+        assertThatActualAndExpectedAuthorAreEqual(actualAuthor, expectedAuthor);
     }
 
     @ParameterizedTest
     @MethodSource("ru.otus.spring.repository.TestBookUtils#getDbAuthors")
     void shouldFindExpectedAuthorByFullName(Author dbAuthor) {
-        var actualAuthor = jpaAuthorRepository.findByFullName(dbAuthor.getFullName());
+        var optionalActualAuthor = jpaAuthorRepository.findByFullName(dbAuthor.getFullName());
         var expectedAuthor = testEntityManager.find(Author.class, dbAuthor.getId());
-        assertThat(actualAuthor)
-                .isPresent()
-                .get()
-                .usingRecursiveComparison()
-                .isEqualTo(expectedAuthor);
+        assertThat(optionalActualAuthor).isPresent();
+        var actualAuthor = optionalActualAuthor.get();
+        assertThatActualAndExpectedAuthorAreEqual(actualAuthor, expectedAuthor);
     }
 
     @Test
@@ -79,8 +87,6 @@ class JpaAuthorRepositoryTest {
     void shouldSaveExpectedAuthor(long id) {
         var actualAuthor = jpaAuthorRepository.save(new Author(id, "Author_4"));
         var expectedAuthor = testEntityManager.find(Author.class, 4);
-        assertThat(actualAuthor)
-                .usingRecursiveComparison()
-                .isEqualTo(expectedAuthor);
+        assertThatActualAndExpectedAuthorAreEqual(actualAuthor, expectedAuthor);
     }
 }

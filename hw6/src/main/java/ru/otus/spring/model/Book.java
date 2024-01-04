@@ -20,7 +20,6 @@ import org.hibernate.annotations.Fetch;
 import org.hibernate.annotations.FetchMode;
 
 import java.util.List;
-import java.util.Objects;
 
 @Entity
 @Getter
@@ -50,29 +49,4 @@ public class Book {
             inverseJoinColumns = @JoinColumn(name = "genre_id"))
     @OneToMany(targetEntity = Genre.class, fetch = FetchType.LAZY, cascade = {CascadeType.MERGE, CascadeType.REFRESH})
     private List<Genre> genres;
-
-    @Override
-    public boolean equals(Object o) {
-        if (this == o) {
-            return true;
-        }
-        Book book = (Book) o;
-        if (o == null
-                || getClass() != o.getClass()
-                || !Objects.equals(id, book.id)
-                || !Objects.equals(title, book.title)
-                || !author.equals(book.author)) {
-            return false;
-        }
-        return genres.equals(book.genres);
-    }
-
-    @Override
-    public int hashCode() {
-        int result = id != null ? id.hashCode() : 0;
-        result = 31 * result + (title != null ? title.hashCode() : 0);
-        result = 31 * result + (author != null ? author.hashCode() : 0);
-        result = 31 * result + (genres != null ? genres.hashCode() : 0);
-        return result;
-    }
 }

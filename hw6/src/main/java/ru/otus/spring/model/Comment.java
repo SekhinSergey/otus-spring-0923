@@ -37,24 +37,4 @@ public class Comment {
     @JoinColumn(name = "book_id")
     @ManyToOne(targetEntity = Book.class, fetch = FetchType.LAZY, cascade = CascadeType.MERGE)
     private Book book;
-
-    @Override
-    public boolean equals(Object o) {
-        if (this == o) {
-            return true;
-        }
-        Comment comment = (Comment) o;
-        if (o == null || getClass() != o.getClass() || id != comment.id || !text.equals(comment.text)) {
-            return false;
-        }
-        return book.equals(comment.book);
-    }
-
-    @Override
-    public int hashCode() {
-        int result = (int) (id ^ (id >>> 32));
-        result = 31 * result + (text != null ? text.hashCode() : 0);
-        result = 31 * result + (book != null ? book.hashCode() : 0);
-        return result;
-    }
 }

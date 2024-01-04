@@ -12,8 +12,6 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 
-import static java.util.Objects.isNull;
-
 @Repository
 @RequiredArgsConstructor
 public class JpaCommentRepository implements CommentRepository {
@@ -35,7 +33,7 @@ public class JpaCommentRepository implements CommentRepository {
         TypedQuery<Comment> query = entityManager.createQuery(
                 "select c from Comment c where c.id = :id", Comment.class);
         query.setParameter("id", id);
-        return getOptionalComment(query.getSingleResult());
+        return Optional.ofNullable(query.getSingleResult());
     }
 
     @Override
@@ -43,11 +41,7 @@ public class JpaCommentRepository implements CommentRepository {
         TypedQuery<Comment> query = entityManager.createQuery(
                 "select c from Comment c where c.text = :text", Comment.class);
         query.setParameter("text", text);
-        return getOptionalComment(query.getSingleResult());
-    }
-
-    private static Optional<Comment> getOptionalComment(Comment comment) {
-        return isNull(comment) ? Optional.empty() : Optional.of(comment);
+        return Optional.ofNullable(query.getSingleResult());
     }
 
     public List<Comment> findAllByBookId(long bookId) {
@@ -71,7 +65,7 @@ public class JpaCommentRepository implements CommentRepository {
     public Comment save(Comment comment) {
         if (comment.getId() == null) {
             entityManager.persist(comment);
-            return findByText(comment.getText()).orElse(null);
+            return comment;
         }
         return entityManager.merge(comment);
     }

@@ -15,7 +15,7 @@ import java.util.HashSet;
 import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static ru.otus.spring.repository.TestBookUtils.getDbGenres;
+import static ru.otus.spring.repository.TestBookUtils.*;
 
 @DataJpaTest
 @Import(JpaGenreRepository.class)
@@ -36,9 +36,9 @@ class JpaGenreRepositoryTest {
 
     @Test
     void shouldFindExpectedAllGenres() {
-        var actualGenres = jpaGenreRepository.findAll();
-        var expectedGenres = dbGenres;
-        assertThat(actualGenres).containsExactlyElementsOf(expectedGenres);
+        var actualGenreList = jpaGenreRepository.findAll();
+        var expectedGenreList = dbGenres;
+        assertThatActualAndExpectedGenreListAreEqual(actualGenreList, expectedGenreList);
     }
 
     @ParameterizedTest
@@ -49,19 +49,17 @@ class JpaGenreRepositoryTest {
         ids.add(dbGenre.getId());
         var actualGenre = jpaGenreRepository.findAllByIds(ids).get(0);
         var expectedGenre = testEntityManager.find(Genre.class, id);
-        assertThat(actualGenre).isEqualTo(expectedGenre);
+        assertThatActualAndExpectedGenreAreEqual(actualGenre, expectedGenre);
     }
 
     @ParameterizedTest
     @MethodSource("ru.otus.spring.repository.TestBookUtils#getDbGenres")
     void shouldFindExpectedGenreByName(Genre dbGenre) {
-        var actualGenre = jpaGenreRepository.findByName(dbGenre.getName());
+        var actualOptionalGenre = jpaGenreRepository.findByName(dbGenre.getName());
         var expectedGenre = testEntityManager.find(Genre.class, dbGenre.getId());
-        assertThat(actualGenre)
-                .isPresent()
-                .get()
-                .usingRecursiveComparison()
-                .isEqualTo(expectedGenre);
+        assertThat(actualOptionalGenre).isPresent();
+        var actualGenre = actualOptionalGenre.get();
+        assertThatActualAndExpectedGenreAreEqual(actualGenre, expectedGenre);
     }
 
     @Test
@@ -78,8 +76,6 @@ class JpaGenreRepositoryTest {
     void shouldSaveExpectedGenre(long id) {
         var actualGenre = jpaGenreRepository.save(new Genre(id, "Genre_7"));
         var expectedGenre = testEntityManager.find(Genre.class, 7);
-        assertThat(actualGenre)
-                .usingRecursiveComparison()
-                .isEqualTo(expectedGenre);
+        assertThatActualAndExpectedGenreAreEqual(actualGenre, expectedGenre);
     }
 }

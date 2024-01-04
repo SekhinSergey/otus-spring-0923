@@ -11,8 +11,6 @@ import java.util.List;
 import java.util.Optional;
 import java.util.Set;
 
-import static java.util.Objects.isNull;
-
 @Repository
 @RequiredArgsConstructor
 public class JpaGenreRepository implements GenreRepository {
@@ -38,19 +36,15 @@ public class JpaGenreRepository implements GenreRepository {
         TypedQuery<Genre> query = entityManager.createQuery(
                 "select g from Genre g where g.name = :name", Genre.class);
         query.setParameter("name", name);
-        return getOptionalGenre(query.getSingleResult());
+        return Optional.ofNullable(query.getSingleResult());
     }
 
     @Override
     public Genre save(Genre genre) {
         if (genre.getId() == null) {
             entityManager.persist(genre);
-            return findByName(genre.getName()).orElse(null);
+            return genre;
         }
         return entityManager.merge(genre);
-    }
-
-    private static Optional<Genre> getOptionalGenre(Genre genre) {
-        return isNull(genre) ? Optional.empty() : Optional.of(genre);
     }
 }
