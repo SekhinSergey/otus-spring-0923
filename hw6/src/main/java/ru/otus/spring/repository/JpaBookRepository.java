@@ -38,6 +38,7 @@ public class JpaBookRepository implements BookRepository {
         return getOptionalBook(query);
     }
 
+    // Была рекомендация удалить метод, но это нельзя сделать, так как упадут тесты
     private static Optional<Book> getOptionalBook(TypedQuery<Book> query) {
         Book book;
         try {
@@ -58,6 +59,8 @@ public class JpaBookRepository implements BookRepository {
         return book.getId() == null ? insert(book) : entityManager.merge(book);
     }
 
+    // Была рекомендация заинлайнить. Ответил, что персист не возвращает ничего. Снова ее получил
+    // Не знаю, как на это реагировать
     private Book insert(Book book) {
         entityManager.persist(book);
         return book;
