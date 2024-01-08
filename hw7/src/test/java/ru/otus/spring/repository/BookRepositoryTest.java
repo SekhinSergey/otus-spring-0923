@@ -74,6 +74,4 @@ class BookRepositoryTest {
     void shouldReturnCountByGenreName() {
         assertThat(bookRepository.countByGenresName("Genre_1")).isEqualTo(1);
     }
-
-    //
 }
