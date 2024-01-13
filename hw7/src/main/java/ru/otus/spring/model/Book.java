@@ -16,8 +16,6 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
-import org.hibernate.annotations.Fetch;
-import org.hibernate.annotations.FetchMode;
 
 import java.util.List;
 
@@ -37,11 +35,6 @@ public class Book {
     @Column(name = "title", nullable = false, unique = true)
     private String title;
 
-    // Получал рекомендацию удалить. Якобы это по умолчанию есть, хотя это не так, в чем убеждался неоднократно
-    // Параллельно с этим дана рекомендация добавить граф для автора
-    // Граф не позволяет получить автора книги в комментарии. Указания аннотации графа над каждым методом засоряет код
-    // Поэтому рекомендации проигнорированы
-    @Fetch(FetchMode.JOIN)
     @JoinColumn(name = "author_id")
     @ManyToOne(targetEntity = Author.class, fetch = FetchType.LAZY, cascade = CascadeType.MERGE)
     private Author author;

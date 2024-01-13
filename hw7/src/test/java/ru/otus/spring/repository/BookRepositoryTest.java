@@ -12,12 +12,16 @@ import ru.otus.spring.model.Book;
 import ru.otus.spring.model.Genre;
 
 import java.util.List;
+import java.util.function.Function;
+import java.util.stream.Collectors;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static ru.otus.spring.repository.TestBookUtils.*;
 
 @DataJpaTest
 class BookRepositoryTest {
+
+    private static final String SIZE_ASSERTION_RULE = "java:S5838";
 
     private List<Author> dbAuthors;
 
@@ -36,6 +40,30 @@ class BookRepositoryTest {
         dbAuthors = getDbAuthors();
         dbGenres = getDbGenres();
         dbBooks = getDbBooks(dbAuthors, dbGenres);
+    }
+
+    @Test
+    @SuppressWarnings(SIZE_ASSERTION_RULE)
+    void shouldReturnCorrectBookList() {
+        var actualBookList = bookRepository.findAll();
+        var expectedBookList = dbBooks;
+        assertThat(actualBookList.size()).isEqualTo(expectedBookList.size());
+        var expectedBookMap = expectedBookList.stream()
+                .collect(Collectors.toMap(Book::getId, Function.identity()));
+        actualBookList.forEach(actualBook -> {
+            var expectedBook = expectedBookMap.get(actualBook.getId());
+            assertThatActualAndExpectedBookAreEqual(actualBook, expectedBook);
+        });
+    }
+
+    @ParameterizedTest
+    @MethodSource("ru.otus.spring.repository.TestBookUtils#getDbBooks")
+    void shouldReturnCorrectBookById(Book dbBook) {
+        var optionalActualBook = bookRepository.findById(dbBook.getId());
+        var expectedBook = testEntityManager.find(Book.class, dbBook.getId());
+        assertThat(optionalActualBook).isPresent();
+        var actualBook = optionalActualBook.get();
+        assertThatActualAndExpectedBookAreEqual(actualBook, expectedBook);
     }
 
     @ParameterizedTest

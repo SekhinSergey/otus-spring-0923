@@ -14,8 +14,6 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
-import org.hibernate.annotations.Fetch;
-import org.hibernate.annotations.FetchMode;
 
 @Getter
 @Setter
@@ -33,8 +31,6 @@ public class Comment {
     @Column(name = "text", nullable = false)
     private String text;
 
-    // Ещё раз обращаю внимание (с прошлого реквеста), что книга без этого не грузится
-    @Fetch(FetchMode.JOIN)
     @JoinColumn(name = "book_id")
     @ManyToOne(targetEntity = Book.class, fetch = FetchType.LAZY, cascade = CascadeType.MERGE)
     private Book book;
