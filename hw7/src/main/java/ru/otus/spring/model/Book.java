@@ -16,6 +16,8 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import org.hibernate.annotations.Fetch;
+import org.hibernate.annotations.FetchMode;
 
 import java.util.List;
 
@@ -39,6 +41,7 @@ public class Book {
     @ManyToOne(targetEntity = Author.class, fetch = FetchType.LAZY, cascade = CascadeType.MERGE)
     private Author author;
 
+    @Fetch(FetchMode.SUBSELECT)
     @JoinTable(
             name = "books_genres",
             joinColumns = @JoinColumn(name = "book_id"),

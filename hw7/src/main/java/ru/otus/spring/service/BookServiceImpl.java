@@ -41,9 +41,12 @@ public class BookServiceImpl implements BookService {
     }
 
     @Override
+    @SuppressWarnings("all")
     @Transactional(readOnly = true)
     public List<Book> findAll() {
-        return bookRepository.findAll();
+        List<Book> books = bookRepository.findAll();
+        books.forEach(book -> book.getGenres().size());
+        return books;
     }
 
     @Override
