@@ -1,0 +1,7 @@
+spring:
+  data:
+    mongodb:
+      database: catalog
+mongock:
+  runner-type: "ApplicationRunner"
+  change-logs-scan-package: ru.otus.spring.mongock
