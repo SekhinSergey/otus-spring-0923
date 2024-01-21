@@ -44,6 +44,9 @@ public class CommentServiceImpl implements CommentService {
     @Transactional(readOnly = true)
     public List<Comment> findAllByBookId(long bookId) {
         List<Comment> comments = commentRepository.findAllByBookId(bookId);
+        // Не понял рекомендацию
+        // Можно удалить везде, где возвращается список
+        // EntityNotFoundException можно выбросить, если запрос идет по id
         if (comments.isEmpty()) {
             throw new EntityNotFoundException("Comments with book id %d not found".formatted(bookId));
         }
@@ -54,6 +57,9 @@ public class CommentServiceImpl implements CommentService {
     @Transactional(readOnly = true)
     public List<Comment> findAllByBookTitle(String title) {
         List<Comment> comments = commentRepository.findAllByBookTitle(title);
+        // Не понял рекомендацию
+        // Можно удалить везде, где возвращается список
+        // EntityNotFoundException можно выбросить, если запрос идет по id
         if (comments.isEmpty()) {
             throw new EntityNotFoundException("Comments with book title %s not found".formatted(title));
         }

@@ -14,10 +14,10 @@ public interface BookRepository extends JpaRepository<Book, Long> {
     List<Book> findAll();
 
     @Override
-    @EntityGraph(attributePaths = {"author"})
+    @EntityGraph(attributePaths = {"author", "genres"})
     Optional<Book> findById(Long id);
 
-    @EntityGraph(attributePaths = {"author"})
+    @EntityGraph(attributePaths = {"author", "genres"})
     Optional<Book> findByTitle(String title);
 
     void deleteByTitle(String title);
