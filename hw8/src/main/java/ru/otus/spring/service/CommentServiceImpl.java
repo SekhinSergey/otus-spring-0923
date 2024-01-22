@@ -43,27 +43,13 @@ public class CommentServiceImpl implements CommentService {
     @Override
     @Transactional(readOnly = true)
     public List<Comment> findAllByBookId(String bookId) {
-        List<Comment> comments = commentRepository.findAllByBookId(bookId);
-        // Не понял рекомендацию
-        // Можно удалить везде, где возвращается список
-        // EntityNotFoundException можно выбросить, если запрос идет по id
-        if (comments.isEmpty()) {
-            throw new EntityNotFoundException("Comments with book id %s not found".formatted(bookId));
-        }
-        return comments;
+        return commentRepository.findAllByBookId(bookId);
     }
 
     @Override
     @Transactional(readOnly = true)
     public List<Comment> findAllByBookTitle(String title) {
-        List<Comment> comments = commentRepository.findAllByBookTitle(title);
-        // Не понял рекомендацию
-        // Можно удалить везде, где возвращается список
-        // EntityNotFoundException можно выбросить, если запрос идет по id
-        if (comments.isEmpty()) {
-            throw new EntityNotFoundException("Comments with book title %s not found".formatted(title));
-        }
-        return comments;
+        return commentRepository.findAllByBookTitle(title);
     }
 
     @Override

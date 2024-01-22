@@ -72,12 +72,6 @@ public class BookServiceImpl implements BookService {
     }
 
     private List<Genre> getGenres(Set<String> genresIds) {
-        // Не понял рекомендацию
-        // Можно удалить везде, где возвращается список
-        // EntityNotFoundException можно выбросить, если запрос идет по id
-        if (genresIds.isEmpty()) {
-            throw new EntityNotFoundException("Requested genre list is empty");
-        }
         var genres = genreRepository.findAllByIdIn(genresIds);
         if (genresIds.size() != genres.size()) {
             throw new EntityNotFoundException(
