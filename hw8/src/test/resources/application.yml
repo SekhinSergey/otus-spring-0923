@@ -2,11 +2,9 @@ spring:
   data:
     mongodb:
       database: catalog
-de:
-  flapdoodle:
-    mongodb:
-      embedded:
-        version: 4.12.2
+  mongodb:
+    embedded:
+      version: 4.0.2
 mongock:
   runner-type: "InitializingBean"
   change-logs-scan-package: ru.otus.spring.mongock
