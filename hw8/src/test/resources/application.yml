@@ -3,10 +3,5 @@ spring:
     mongodb:
       database: catalog
 mongock:
-  runner-type: "ApplicationRunner"
+  runner-type: "InitializingBean"
   change-logs-scan-package: ru.otus.spring.mongock
-  mongo-db:
-    write-concern:
-      journal: false
-    read-concern: local
-  enabled: true
