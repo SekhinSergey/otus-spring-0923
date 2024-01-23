@@ -3,6 +3,7 @@ package ru.otus.spring.mongock;
 import com.github.cloudyrock.mongock.ChangeLog;
 import com.github.cloudyrock.mongock.ChangeSet;
 import com.mongodb.client.MongoDatabase;
+import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import ru.otus.spring.model.Author;
 import ru.otus.spring.model.Book;
 import ru.otus.spring.model.Comment;
@@ -16,6 +17,7 @@ import java.util.Arrays;
 
 @ChangeLog
 @SuppressWarnings("all")
+@EnableConfigurationProperties
 public class Changelog {
 
     @ChangeSet(author = "SekhinSergey", id = "dropDatabase", order = "001", runAlways = true)
