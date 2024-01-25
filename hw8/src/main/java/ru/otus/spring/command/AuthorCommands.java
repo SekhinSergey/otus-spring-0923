@@ -38,31 +38,29 @@ public class AuthorCommands {
     }
 
     @SuppressWarnings("all")
-    @ShellMethod(value = "Find author by full name", key = "abyf")
-    public String findAuthorByFullName(String fullName) {
-        return authorConverter.authorToString(authorService.findByFullName(fullName));
+    @ShellMethod(value = "Create and get author", key = "anew")
+    public String createAuthor(Author author) {
+        return authorConverter.authorToString(authorService.create(author));
     }
 
     @SuppressWarnings("all")
-    @ShellMethod(value = "Save and get author", key = "ains")
-    public String saveAuthor(Author author) {
-        return authorConverter.authorToString(authorService.save(author));
+    @ShellMethod(value = "Update and get author", key = "aupd")
+    public String updateAuthor(Author author) {
+        return authorConverter.authorToString(authorService.update(author));
     }
 
     @SuppressWarnings("all")
-    @ShellMethod(value = "Find author by example", key = "abye")
-    public String findByAuthorExample(Author author) {
-        return authorConverter.authorToString(authorService.findByExample(author));
+    @ShellMethod(value = "Create author batch", key = "anewb")
+    public String createAuthorBatch(Set<Author> authors) {
+        return authorService.createBatch(authors).stream()
+                .map(authorConverter::authorToString)
+                .collect(Collectors.joining("," + System.lineSeparator()));
     }
 
     @SuppressWarnings("all")
-    @ShellMethod(value = "Save author batch", key = "ainsb")
-    public String saveAuthorBatch(Set<Author> authors) {
-        List<Author> savedAuthors = authorService.saveBatch(authors);
-        if (savedAuthors.isEmpty()) {
-            return "No authors saved";
-        }
-        return savedAuthors.stream()
+    @ShellMethod(value = "Update author batch", key = "aupdb")
+    public String updateAuthorBatch(Set<Author> authors) {
+        return authorService.updateBatch(authors).stream()
                 .map(authorConverter::authorToString)
                 .collect(Collectors.joining("," + System.lineSeparator()));
     }

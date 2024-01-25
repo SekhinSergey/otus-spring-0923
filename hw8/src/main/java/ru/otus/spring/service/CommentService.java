@@ -11,25 +11,19 @@ public interface CommentService {
 
     Comment findById(String id);
 
-    Comment findByText(String text);
-
     List<Comment> findAllByBookId(String bookId);
-
-    List<Comment> findAllByBookTitle(String title);
-
-    Comment save(Comment comment);
 
     void deleteAllByBookId(String bookId);
 
-    void deleteAllByBookTitle(String title);
-
     int countByBookId(String bookId);
 
-    int countByBookTitle(String title);
+    Comment create(Comment comment);
 
-    Comment findByExample(Comment comment);
+    Comment update(Comment comment);
 
-    List<Comment> saveBatch(Set<Comment> comments);
+    List<Comment> createBatch(Set<Comment> comments);
+
+    List<Comment> updateBatch(Set<Comment> comments);
 
     void deleteAllByIds(Set<String> ids);
 }

@@ -1,15 +1,16 @@
 package ru.otus.spring.service;
 
 import lombok.RequiredArgsConstructor;
-import org.springframework.data.domain.Example;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import ru.otus.spring.exception.EntityNotFoundException;
 import ru.otus.spring.model.Author;
 import ru.otus.spring.repository.AuthorRepository;
 
+import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -31,30 +32,39 @@ public class AuthorServiceImpl implements AuthorService {
     }
 
     @Override
-    @Transactional(readOnly = true)
-    public Author findByFullName(String fullName) {
-        return authorRepository.findByFullName(fullName)
-                .orElseThrow(() -> new EntityNotFoundException(
-                        "Author with full name %s not found".formatted(fullName)));
-    }
-
-    @Override
     @Transactional
-    public Author save(Author author) {
+    public Author create(Author author) {
         return authorRepository.save(author);
     }
 
     @Override
-    @Transactional(readOnly = true)
-    public Author findByExample(Author author) {
-        return authorRepository.findOne(Example.of(author))
-                .orElseThrow(() -> new EntityNotFoundException(
-                        "Author with full name %s not found".formatted(author.getFullName())));
+    @Transactional
+    public Author update(Author author) {
+        findById(author.getId());
+        return authorRepository.save(author);
     }
 
     @Override
     @Transactional
-    public List<Author> saveBatch(Set<Author> authors) {
+    public List<Author> createBatch(Set<Author> authors) {
         return authorRepository.saveAll(authors);
+    }
+
+    @Override
+    @Transactional
+    public List<Author> updateBatch(Set<Author> authors) {
+        validateAuthors(authors);
+        return authorRepository.saveAll(authors);
+    }
+
+    private void validateAuthors(Set<Author> authors) {
+        Set<String> authorsIds = authors.stream()
+                .map(Author::getId)
+                .collect(Collectors.toCollection(HashSet::new));
+        List<Author> foundAuthors = authorRepository.findAllById(authorsIds);
+        if (authorsIds.size() != foundAuthors.size()) {
+            throw new EntityNotFoundException(
+                    "The number of requested authors does not match the number in the database");
+        }
     }
 }

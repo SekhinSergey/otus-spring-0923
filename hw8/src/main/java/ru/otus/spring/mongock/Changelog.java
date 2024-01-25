@@ -23,8 +23,8 @@ public class Changelog {
         db.drop();
     }
 
-    @ChangeSet(author = "SekhinSergey", id = "insertData", order = "002", runAlways = true)
-    public void insertData(AuthorRepository authorRepository,
+    @ChangeSet(author = "SekhinSergey", id = "createData", order = "002", runAlways = true)
+    public void createData(AuthorRepository authorRepository,
                            BookRepository bookRepository,
                            GenreRepository genreRepository,
                            CommentRepository commentRepository) {

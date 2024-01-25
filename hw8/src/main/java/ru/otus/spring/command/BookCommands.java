@@ -40,24 +40,16 @@ public class BookCommands {
     }
 
     @SuppressWarnings("all")
-    @ShellMethod(value = "Find book by title", key = "bbyt")
-    public String findBookByTitle(String title) {
-        return bookService.findByTitle(title)
-                .map(bookConverter::bookToString)
-                .orElse("Book with title %s not found".formatted(title));
-    }
-
-    @SuppressWarnings("all")
-    @ShellMethod(value = "Insert book", key = "bins")
-    public String insertBook(String title, String authorId, Set<String> genresIds) {
-        var savedBook = bookService.insert(title, authorId, genresIds);
+    @ShellMethod(value = "Create book", key = "bins")
+    public String createBook(Book book) {
+        var savedBook = bookService.create(book);
         return bookConverter.bookToString(savedBook);
     }
 
     @SuppressWarnings("all")
     @ShellMethod(value = "Update book", key = "bupd")
-    public String updateBook(String id, String title, String authorId, Set<String> genresIds) {
-        var savedBook = bookService.update(id, title, authorId, genresIds);
+    public String updateBook(Book book) {
+        var savedBook = bookService.update(book);
         return bookConverter.bookToString(savedBook);
     }
 
@@ -69,21 +61,9 @@ public class BookCommands {
     }
 
     @SuppressWarnings("all")
-    @ShellMethod(value = "Delete book by title", key = "bdelbyt")
-    public void deleteBookByTitle(String title) {
-        bookService.deleteByTitle(title);
-    }
-
-    @SuppressWarnings("all")
     @ShellMethod(value = "Count book by author id", key = "cbbyaid")
     public int countBooksByAuthorId(String authorId) {
         return bookService.countByAuthorId(authorId);
-    }
-
-    @SuppressWarnings("all")
-    @ShellMethod(value = "Count book by author full name", key = "cbbyafn")
-    public int countBooksByAuthorFullName(String authorFullName) {
-        return bookService.countByAuthorFullName(authorFullName);
     }
 
     @SuppressWarnings("all")
@@ -93,21 +73,21 @@ public class BookCommands {
     }
 
     @SuppressWarnings("all")
-    @ShellMethod(value = "Count book by genre name", key = "cbbygn")
-    public int countBooksByGenreName(String genreName) {
-        return bookService.countByGenreName(genreName);
+    @ShellMethod(value = "Create book batch", key = "bnewb")
+    public String createBookBatch(Set<Book> books) {
+        List<Book> savedBooks = bookService.createBatch(books);
+        if (books.isEmpty()) {
+            return "No books saved";
+        }
+        return savedBooks.stream()
+                .map(bookConverter::bookToString)
+                .collect(Collectors.joining("," + System.lineSeparator()));
     }
 
     @SuppressWarnings("all")
-    @ShellMethod(value = "Find book by example", key = "bbye")
-    public String findBookByExample(Book book) {
-        return bookConverter.bookToString(bookService.findByExample(book));
-    }
-
-    @SuppressWarnings("all")
-    @ShellMethod(value = "Save book batch", key = "binsb")
-    public String saveBookBatch(Set<Book> books) {
-        List<Book> savedBooks = bookService.saveBatch(books);
+    @ShellMethod(value = "Update book batch", key = "bupdb")
+    public String updateBookBatch(Set<Book> books) {
+        List<Book> savedBooks = bookService.updateBatch(books);
         if (books.isEmpty()) {
             return "No books saved";
         }

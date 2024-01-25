@@ -7,7 +7,6 @@ import ru.otus.spring.converter.CommentConverter;
 import ru.otus.spring.model.Comment;
 import ru.otus.spring.service.CommentService;
 
-import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -34,31 +33,11 @@ public class CommentCommands {
     }
 
     @SuppressWarnings("all")
-    @ShellMethod(value = "Find comment by text", key = "cbyt")
-    public String findCommentByText(String text) {
-        return commentConverter.commentToString(commentService.findByText(text));
-    }
-
-    @SuppressWarnings("all")
     @ShellMethod(value = "Find all comments by book id", key = "acbybid")
     public String findAllCommentsByBookId(String bookId) {
         return commentService.findAllByBookId(bookId).stream()
                 .map(commentConverter::commentToString)
                 .collect(Collectors.joining("," + System.lineSeparator()));
-    }
-
-    @SuppressWarnings("all")
-    @ShellMethod(value = "Find all comments by book title", key = "acbybt")
-    public String findAllCommentsByBookTitle(String title) {
-        return commentService.findAllByBookTitle(title).stream()
-                .map(commentConverter::commentToString)
-                .collect(Collectors.joining("," + System.lineSeparator()));
-    }
-
-    @SuppressWarnings("all")
-    @ShellMethod(value = "Save comment", key = "insc")
-    public String saveComment(Comment comment) {
-        return commentConverter.commentToString(commentService.save(comment));
     }
 
     @SuppressWarnings("all")
@@ -69,38 +48,35 @@ public class CommentCommands {
     }
 
     @SuppressWarnings("all")
-    @ShellMethod(value = "Delete all comments by book title", key = "delacbybt")
-    public String deleteAllCommentsByBookTitle(String title) {
-        commentService.deleteAllByBookTitle(title);
-        return "Comments with book title %s deleted successfully".formatted(title);
-    }
-
-    @SuppressWarnings("all")
     @ShellMethod(value = "Count comments by book id", key = "ccbybid")
     public int countCommentsByBookId(String bookId) {
         return commentService.countByBookId(bookId);
     }
 
     @SuppressWarnings("all")
-    @ShellMethod(value = "Count comments by book title", key = "ccbybt")
-    public int countCommentsByBookTitle(String title) {
-        return commentService.countByBookTitle(title);
+    @ShellMethod(value = "Create comment", key = "cnew")
+    public String createComment(Comment comment) {
+        return commentConverter.commentToString(commentService.create(comment));
     }
 
     @SuppressWarnings("all")
-    @ShellMethod(value = "Find comment by example", key = "cbye")
-    public String findCommentByExample(Comment comment) {
-        return commentConverter.commentToString(commentService.findByExample(comment));
+    @ShellMethod(value = "Update comment", key = "cupd")
+    public String updateComment(Comment comment) {
+        return commentConverter.commentToString(commentService.update(comment));
     }
 
     @SuppressWarnings("all")
-    @ShellMethod(value = "Save comment batch", key = "cinsb")
-    public String saveCommentBatch(Set<Comment> comments) {
-        List<Comment> savedComments = commentService.saveBatch(comments);
-        if (comments.isEmpty()) {
-            return "No comments saved";
-        }
-        return savedComments.stream()
+    @ShellMethod(value = "Create comment batch", key = "cnewb")
+    public String createCommentBatch(Set<Comment> comments) {
+        return commentService.createBatch(comments).stream()
+                .map(commentConverter::commentToString)
+                .collect(Collectors.joining("," + System.lineSeparator()));
+    }
+
+    @SuppressWarnings("all")
+    @ShellMethod(value = "Update comment batch", key = "cupdb")
+    public String updateCommentBatch(Set<Comment> comments) {
+        return commentService.updateBatch(comments).stream()
                 .map(commentConverter::commentToString)
                 .collect(Collectors.joining("," + System.lineSeparator()));
     }

@@ -11,11 +11,11 @@ public interface AuthorService {
 
     Author findById(String id);
 
-    Author findByFullName(String fullName);
+    Author create(Author author);
 
-    Author save(Author author);
+    Author update(Author author);
 
-    Author findByExample(Author author);
+    List<Author> createBatch(Set<Author> authors);
 
-    List<Author> saveBatch(Set<Author> authors);
+    List<Author> updateBatch(Set<Author> authors);
 }

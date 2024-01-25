@@ -44,35 +44,29 @@ public class GenreCommands {
     }
 
     @SuppressWarnings("all")
-    @ShellMethod(value = "Find genre by name", key = "agbyn")
-    public String findGenreByName(String name) {
-        return genreService.findByName(name)
+    @ShellMethod(value = "Create and get genre", key = "gnew")
+    public String createGenre(Genre genre) {
+        return genreConverter.genreToString(genreService.create(genre));
+    }
+
+    @SuppressWarnings("all")
+    @ShellMethod(value = "Update and get genre", key = "gupd")
+    public String updateGenre(Genre genre) {
+        return genreConverter.genreToString(genreService.update(genre));
+    }
+
+    @SuppressWarnings("all")
+    @ShellMethod(value = "Create genre batch", key = "gnewb")
+    public String createGenreBatch(Set<Genre> genres) {
+        return genreService.createBatch(genres).stream()
                 .map(genreConverter::genreToString)
-                .orElse("Genre with name %s not found".formatted(name));
+                .collect(Collectors.joining("," + System.lineSeparator()));
     }
 
     @SuppressWarnings("all")
-    @ShellMethod(value = "Save and get genre", key = "gins")
-    public String saveGenre(Genre genre) {
-        return genreConverter.genreToString(genreService.save(genre));
-    }
-
-    @SuppressWarnings("all")
-    @ShellMethod(value = "Find genre by example", key = "gbye")
-    public String findByGenreExample(Genre genre) {
-        return genreService.findByExample(genre)
-                .map(genreConverter::genreToString)
-                .orElse("Genre with name %s not found".formatted(genre.getName()));
-    }
-
-    @SuppressWarnings("all")
-    @ShellMethod(value = "Save genre batch", key = "ginsb")
-    public String saveGenreBatch(Set<Genre> genres) {
-        List<Genre> savedGenres = genreService.saveBatch(genres);
-        if (savedGenres.isEmpty()) {
-            return "No genres saved";
-        }
-        return savedGenres.stream()
+    @ShellMethod(value = "Update genre batch", key = "gupdb")
+    public String updateGenreBatch(Set<Genre> genres) {
+        return genreService.updateBatch(genres).stream()
                 .map(genreConverter::genreToString)
                 .collect(Collectors.joining("," + System.lineSeparator()));
     }

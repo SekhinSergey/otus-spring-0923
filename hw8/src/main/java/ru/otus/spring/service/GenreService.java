@@ -3,7 +3,6 @@ package ru.otus.spring.service;
 import ru.otus.spring.model.Genre;
 
 import java.util.List;
-import java.util.Optional;
 import java.util.Set;
 
 public interface GenreService {
@@ -12,11 +11,11 @@ public interface GenreService {
 
     List<Genre> findAllByIds(Set<String> ids);
 
-    Optional<Genre> findByName(String name);
+    Genre create(Genre genre);
 
-    Genre save(Genre genre);
+    Genre update(Genre genre);
 
-    Optional<Genre> findByExample(Genre genre);
+    List<Genre> createBatch(Set<Genre> genres);
 
-    List<Genre> saveBatch(Set<Genre> genres);
+    List<Genre> updateBatch(Set<Genre> genres);
 }

@@ -3,7 +3,6 @@ package ru.otus.spring.model;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import org.springframework.data.annotation.Id;
-import org.springframework.data.mongodb.core.mapping.DBRef;
 import org.springframework.data.mongodb.core.mapping.Document;
 
 import java.util.List;
@@ -18,9 +17,7 @@ public class Book {
 
     private String title;
 
-    @DBRef
     private Author author;
 
-    @DBRef
     private List<Genre> genres;
 }
