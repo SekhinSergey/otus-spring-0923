@@ -19,3 +19,6 @@ HW6: каталог книг (JPA + Hibernate)
 
 
 HW7: каталог книг (Spring Data)
+
+
+HW8: каталог книг (Spring Data + Mongo)
