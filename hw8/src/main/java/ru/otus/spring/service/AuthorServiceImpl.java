@@ -34,6 +34,7 @@ public class AuthorServiceImpl implements AuthorService {
     @Override
     @Transactional
     public Author create(Author author) {
+        throwExceptionIfExists(author);
         return authorRepository.save(author);
     }
 
@@ -47,7 +48,15 @@ public class AuthorServiceImpl implements AuthorService {
     @Override
     @Transactional
     public List<Author> createBatch(Set<Author> authors) {
+        authors.forEach(this::throwExceptionIfExists);
         return authorRepository.saveAll(authors);
+    }
+
+    private void throwExceptionIfExists(Author author) {
+        String id = author.getId();
+        if (authorRepository.findById(id).isPresent()) {
+            throw new EntityNotFoundException("Author with id %s already exists".formatted(id));
+        }
     }
 
     @Override

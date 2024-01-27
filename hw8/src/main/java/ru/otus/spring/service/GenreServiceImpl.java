@@ -33,6 +33,7 @@ public class GenreServiceImpl implements GenreService {
     @Override
     @Transactional
     public Genre create(Genre genre) {
+        throwExceptionIfExists(genre);
         return genreRepository.save(genre);
     }
 
@@ -46,7 +47,15 @@ public class GenreServiceImpl implements GenreService {
     @Override
     @Transactional
     public List<Genre> createBatch(Set<Genre> genres) {
+        genres.forEach(this::throwExceptionIfExists);
         return genreRepository.saveAll(genres);
+    }
+
+    private void throwExceptionIfExists(Genre genre) {
+        String id = genre.getId();
+        if (genreRepository.findById(id).isPresent()) {
+            throw new EntityNotFoundException("Genre with id %s already exists".formatted(id));
+        }
     }
 
     @Override

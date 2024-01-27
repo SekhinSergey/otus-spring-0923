@@ -22,7 +22,7 @@ public class BookServiceImpl implements BookService {
 
     private final CommentRepository commentRepository;
 
-    private final BookUtil bookUtil;
+    private final BookValidator bookValidator;
 
     @Override
     @Transactional(readOnly = true)
@@ -40,6 +40,7 @@ public class BookServiceImpl implements BookService {
     @Override
     @Transactional
     public Book create(Book book) {
+        throwExceptionIfExists(book);
         return save(book);
     }
 
@@ -54,15 +55,15 @@ public class BookServiceImpl implements BookService {
     }
 
     private Book save(Book book) {
-        bookUtil.validateBook(book);
+        bookValidator.validateBook(book);
         return bookRepository.save(book);
     }
 
     @Override
     @Transactional
     public void deleteById(String id) {
-        bookRepository.deleteById(id);
         commentRepository.deleteAllByBookId(id);
+        bookRepository.deleteById(id);
     }
 
     @Override
@@ -80,8 +81,18 @@ public class BookServiceImpl implements BookService {
     @Override
     @Transactional
     public List<Book> createBatch(Set<Book> books) {
-        books.forEach(bookUtil::validateBook);
+        books.forEach(book -> {
+            throwExceptionIfExists(book);
+            bookValidator.validateBook(book);
+        });
         return bookRepository.saveAll(books);
+    }
+
+    private void throwExceptionIfExists(Book book) {
+        String id = book.getId();
+        if (bookRepository.findById(id).isPresent()) {
+            throw new EntityNotFoundException("Book with id %s already exists".formatted(id));
+        }
     }
 
     @Override
@@ -92,7 +103,7 @@ public class BookServiceImpl implements BookService {
             String id = book.getId();
             bookRepository.findById(id)
                     .orElseThrow(() -> new EntityNotFoundException("Book with id %s not found".formatted(id)));
-            bookUtil.validateBook(book);
+            bookValidator.validateBook(book);
         });
         return bookRepository.saveAll(books);
     }
@@ -100,7 +111,7 @@ public class BookServiceImpl implements BookService {
     @Override
     @Transactional
     public void deleteAllByIds(Set<String> ids) {
-        bookRepository.deleteAllById(ids);
         commentRepository.deleteAllByBookIdIn(ids);
+        bookRepository.deleteAllById(ids);
     }
 }

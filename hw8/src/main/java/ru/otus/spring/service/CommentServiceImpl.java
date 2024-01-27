@@ -9,6 +9,7 @@ import ru.otus.spring.model.Comment;
 import ru.otus.spring.repository.BookRepository;
 import ru.otus.spring.repository.CommentRepository;
 
+import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -24,7 +25,7 @@ public class CommentServiceImpl implements CommentService {
 
     private final BookRepository bookRepository;
 
-    private final BookUtil bookUtil;
+    private final BookValidator bookValidator;
 
     @Override
     @Transactional(readOnly = true)
@@ -60,13 +61,14 @@ public class CommentServiceImpl implements CommentService {
     @Override
     @Transactional
     public Comment create(Comment comment) {
+        validateBooks(Collections.singleton(comment));
         return commentRepository.save(comment);
     }
 
     @Override
     @Transactional
     public Comment update(Comment comment) {
-        findById(comment.getId());
+        validateComments(Collections.singleton(comment));
         return commentRepository.save(comment);
     }
 
@@ -105,7 +107,7 @@ public class CommentServiceImpl implements CommentService {
             String id = book.getId();
             bookRepository.findById(id)
                     .orElseThrow(() -> new EntityNotFoundException("Book with id %s not found".formatted(id)));
-            bookUtil.validateBook(book);
+            bookValidator.validateBook(book);
         });
     }
 

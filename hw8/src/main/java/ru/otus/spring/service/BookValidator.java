@@ -14,7 +14,7 @@ import java.util.stream.Collectors;
 
 @Component
 @RequiredArgsConstructor
-public class BookUtil {
+public class BookValidator {
 
     private static final String OR_ELSE_THROW_RULE = "java:S2201";
 
