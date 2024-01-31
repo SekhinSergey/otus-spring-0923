@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8"/>
+    <title th:text="#{books-title}">List of all books</title>
+    <style type="text/css">
+        body {
+            padding: 50px;
+        }
+        .books {
+            border: 1px solid steelblue;
+            width: 300px;
+            border-collapse: collapse;
+        }
+        .books tr td, th {
+            padding: 5px;
+            border: 1px solid steelblue;
+        }
+        .books td:last-child, td:first-child {
+            width: 50px;
+        }
+    </style>
+</head>
+<body>
+<h3 th:text="#{lang-switcher-header}">Select language</h3>
+<div>
+    <div><a href="#" th:href="@{/(lang=en)}" th:text="#{en-lang-switch-button-caption}">Language - EN</a></div>
+    <div><a href="#" th:href="@{/(lang=ru)}" th:text="#{ru-lang-switch-button-caption}">Language - RU</a></div>
+</div>
+<h3 th:text="#{books-head}">Books:</h3>
+<table class="books">
+    <thead>
+    <tr>
+        <th th:text="#{id}">ID</th>
+        <th th:text="#{book-title}">Title</th>
+        <th th:text="#{author}">Author</th>
+        <th th:text="#{genres}">Genres</th>
+        <th th:text="#{editing}">Editing</th>
+        <th th:text="#{deleting}">Deleting</th>
+        <th th:text="#{comments}">Deleting</th>
+    </tr>
+    </thead>
+    <tbody>
+    <tr th:each="book : ${books}">
+        <td th:text="${book.id}">1</td>
+        <td th:text="${book.title}">Fathers and Sons</td>
+        <td th:text="${book.author}">Ivan Turgenev</td>
+        <td th:text="${book.genres}">Novel</td>
+        <td>
+            <a href="editBook.html" th:text="#{edit}" th:href="@{/editBook(id=${book.id})}">Edit</a>
+        </td>
+        <td>
+            <a href="deleteBook.html" th:text="#{delete}">Delete</a>
+        </td>
+        <td>
+            <a href="comments.html" th:text="#{comments}" th:href="@{/comments(id=${book.id})}">Comments</a>
+        </td>
+    </tr>
+    <td>
+        <a href="addBook.html" th:text="#{add}">Add</a>
+    </td>
+    </tbody>
+</table>
+</body>
+</html>

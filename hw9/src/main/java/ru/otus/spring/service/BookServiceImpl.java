@@ -55,9 +55,6 @@ public class BookServiceImpl implements BookService {
     @Transactional
     @SuppressWarnings("all")
     public Book update(Book book) {
-        Long id = book.getId();
-        bookRepository.findById(id)
-                .orElseThrow(() -> new EntityNotFoundException("Book with id %d not found".formatted(id)));
         return save(book);
     }
 

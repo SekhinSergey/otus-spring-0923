@@ -5,6 +5,7 @@ import ru.otus.spring.model.Genre;
 import java.util.List;
 import java.util.Set;
 
+@SuppressWarnings("all")
 public interface GenreService {
 
     List<Genre> findAll();

@@ -1,11 +1,13 @@
 spring:
+  messages:
+    encoding: UTF-8
   datasource:
     url: jdbc:h2:mem:maindb
   sql:
     init:
       mode: always
-      data-locations: data.sql
-      schema-locations: schema.sql
+      data-locations: classpath:data.sql
+      schema-locations: classpath:schema.sql
   jpa:
     generate-ddl: false
     hibernate:

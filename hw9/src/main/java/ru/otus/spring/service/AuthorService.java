@@ -5,6 +5,7 @@ import ru.otus.spring.model.Author;
 import java.util.List;
 import java.util.Set;
 
+@SuppressWarnings("all")
 public interface AuthorService {
 
     List<Author> findAll();

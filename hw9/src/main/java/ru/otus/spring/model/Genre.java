@@ -26,4 +26,9 @@ public class Genre {
 
     @Column(name = "name", nullable = false, unique = true)
     private String name;
+
+    @Override
+    public String toString() {
+        return name;
+    }
 }

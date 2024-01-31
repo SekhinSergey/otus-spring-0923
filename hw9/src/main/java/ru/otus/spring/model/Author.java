@@ -28,4 +28,9 @@ public class Author {
 
     @Column(name = "full_name", nullable = false, unique = true)
     private String fullName;
+
+    @Override
+    public String toString() {
+        return fullName;
+    }
 }
