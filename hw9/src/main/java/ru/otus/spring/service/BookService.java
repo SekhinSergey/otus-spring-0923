@@ -3,7 +3,6 @@ package ru.otus.spring.service;
 import ru.otus.spring.model.Book;
 
 import java.util.List;
-import java.util.Optional;
 import java.util.Set;
 
 @SuppressWarnings("all")
@@ -11,7 +10,7 @@ public interface BookService {
 
     List<Book> findAll();
 
-    Optional<Book> findById(Long id);
+    Book findById(Long id);
 
     List<Book> findAllByIds(Set<Long> ids);
 

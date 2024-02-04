@@ -2,7 +2,7 @@
 <html lang="en" xmlns:th="http://www.thymeleaf.org">
 <head>
     <meta charset="UTF-8"/>
-    <title th:text="#{bookEditing}">Book editing</title>
+    <title th:text="#{bookAdding}">Book adding</title>
     <style type="text/css">
         body {
             padding: 50px;
@@ -20,19 +20,19 @@
     </style>
 </head>
 <body>
-<form id="edit-form" action="editBook.html" th:method="post" th:action="@{/editBook(id=${book.id})}" th:object="${book}">
+<form id="add-form" action="addBook.html" th:method="post" th:action="@{/addBook}" th:object="${book}">
     <h3 th:text="#{bookInfo}">Book info:</h3>
     <div class="row">
         <label for="book-title-input" th:text="#{book-title}">Title:</label>
-        <input id="book-title-input" name="title" type="text" th:value="*{title}"/>
+        <input id="book-title-input" name="title" type="text" th:value=""/>
     </div>
     <div class="row">
         <label for="book-author-id-input" th:text="#{author-id}">Author ID:</label>
-        <input id="book-author-id-input" name="authorId" type="text" th:value="*{authorId}"/>
+        <input id="book-author-id-input" name="authorId" type="text" th:value=""/>
     </div>
     <div class="row">
         <label for="book-genres-input" th:text="#{genreIds}">Genres:</label>
-        <input id="book-genres-input" name="genreIds" type="text" th:value="*{genreIds}"/>
+        <input id="book-genres-input" name="genreIds" type="text" th:value=""/>
     </div>
     <div class="row">
         <button type="submit" th:text="#{save}">Save</button>

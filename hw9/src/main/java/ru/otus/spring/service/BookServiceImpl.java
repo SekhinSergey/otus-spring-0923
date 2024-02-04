@@ -9,12 +9,13 @@ import ru.otus.spring.repository.BookRepository;
 import ru.otus.spring.repository.CommentRepository;
 
 import java.util.List;
-import java.util.Optional;
 import java.util.Set;
 
 @Service
 @RequiredArgsConstructor
 public class BookServiceImpl implements BookService {
+
+    private static final String NOT_FOUND_MESSAGE = "Book with id %d not found";
 
     private static final String OR_ELSE_THROW_RULE = "java:S2201";
 
@@ -35,8 +36,9 @@ public class BookServiceImpl implements BookService {
 
     @Override
     @Transactional(readOnly = true)
-    public Optional<Book> findById(Long id) {
-        return bookRepository.findById(id);
+    public Book findById(Long id) {
+        return bookRepository.findById(id)
+                .orElseThrow(() -> new EntityNotFoundException(NOT_FOUND_MESSAGE.formatted(id)));
     }
 
     @Override
@@ -55,6 +57,9 @@ public class BookServiceImpl implements BookService {
     @Transactional
     @SuppressWarnings("all")
     public Book update(Book book) {
+        Long id = book.getId();
+        bookRepository.findById(id)
+                .orElseThrow(() -> new EntityNotFoundException(NOT_FOUND_MESSAGE.formatted(id)));
         return save(book);
     }
 
@@ -106,7 +111,7 @@ public class BookServiceImpl implements BookService {
         books.forEach(book -> {
             Long id = book.getId();
             bookRepository.findById(id)
-                    .orElseThrow(() -> new EntityNotFoundException("Book with id %d not found".formatted(id)));
+                    .orElseThrow(() -> new EntityNotFoundException(NOT_FOUND_MESSAGE.formatted(id)));
             bookValidator.validateBook(book);
         });
         return bookRepository.saveAll(books);

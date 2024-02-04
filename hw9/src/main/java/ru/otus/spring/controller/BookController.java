@@ -1,12 +1,13 @@
 package ru.otus.spring.controller;
 
-import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
+import ru.otus.spring.dto.BookDto;
+import ru.otus.spring.mapper.BookMapper;
 import ru.otus.spring.model.Book;
 import ru.otus.spring.service.BookService;
 
@@ -18,6 +19,8 @@ public class BookController {
 
     private final BookService bookService;
 
+    private final BookMapper bookMapper;
+
     @GetMapping("/")
     public String getAll(Model model) {
         model.addAttribute(BOOKS, bookService.findAll());
@@ -26,15 +29,27 @@ public class BookController {
 
     @GetMapping("/editBook")
     public String getBookForEditing(@RequestParam("id") long id, Model model) {
-        Book book = bookService.findById(id)
-                .orElseThrow(() -> new EntityNotFoundException("Book with id %d not found".formatted(id)));
-        model.addAttribute("book", book);
+        model.addAttribute("book", bookMapper.mapEntityToDto(bookService.findById(id)));
         return "editBook";
     }
 
     @PostMapping("/editBook")
-    public String edit(Book book) {
-        bookService.update(book);
+    public String editBook(BookDto bookDto) {
+        bookService.update(bookMapper.mapDtoToEntity(bookDto));
+        return "redirect:/";
+    }
+
+    @GetMapping("/addBook")
+    public String formEmptyBook(Model model) {
+        model.addAttribute("book", BookDto.builder().build());
+        return "addBook";
+    }
+
+    @PostMapping("/addBook")
+    public String addBook(BookDto bookDto) {
+        Book book = bookMapper.mapDtoToEntity(bookDto);
+        book.setId(null);
+        bookService.create(book);
         return "redirect:/";
     }
 }
