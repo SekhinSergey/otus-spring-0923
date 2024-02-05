@@ -16,7 +16,7 @@ import java.util.function.Function;
 import java.util.stream.Collectors;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static ru.otus.spring.repository.TestBookUtils.*;
+import static ru.otus.spring.utils.TestBookUtils.*;
 
 @DataJpaTest
 class BookRepositoryTest {
@@ -57,7 +57,7 @@ class BookRepositoryTest {
     }
 
     @ParameterizedTest
-    @MethodSource("ru.otus.spring.repository.TestBookUtils#getDbBooks")
+    @MethodSource("ru.otus.spring.utils.TestBookUtils#getDbBooks")
     void shouldReturnCorrectBookById(Book dbBook) {
         var optionalActualBook = bookRepository.findById(dbBook.getId());
         var expectedBook = testEntityManager.find(Book.class, dbBook.getId());

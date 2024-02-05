@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
 <head>
     <meta charset="UTF-8"/>
     <title th:text="#{books-title}">List of all books</title>
@@ -50,14 +50,16 @@
             <a href="editBook.html" th:text="#{edit}" th:href="@{/editBook(id=${book.id})}">Edit</a>
         </td>
         <td>
-            <a href="deleteBook.html" th:text="#{delete}">Delete</a>
+            <form id="delete-book-form" action="books.html" th:action="@{/deleteBook(id=${book.id})}" th:method="post">
+                <button class="btn btn-primary" type="submit" th:text="#{delete}">Delete</button>
+            </form>
         </td>
         <td>
-            <a href="comments.html" th:text="#{comments}" th:href="@{/comments(id=${book.id})}">Comments</a>
+            <a href="comments.html" th:text="#{comments}" th:href="@{/comments(bookId=${book.id})}">Comments</a>
         </td>
     </tr>
     <td>
-        <a href="addBook.html" th:text="#{add}">Add</a>
+        <a href="addBook" th:text="#{add}" th:href="@{/addBook}">Add</a>
     </td>
     </tbody>
 </table>

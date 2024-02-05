@@ -1,7 +1,8 @@
-package ru.otus.spring.repository;
+package ru.otus.spring.utils;
 
 import ru.otus.spring.model.Author;
 import ru.otus.spring.model.Book;
+import ru.otus.spring.model.Comment;
 import ru.otus.spring.model.Genre;
 
 import java.util.List;
@@ -75,5 +76,12 @@ public class TestBookUtils {
         assertThat(actualBook.getTitle()).isEqualTo(expectedBook.getTitle());
         assertThatActualAndExpectedAuthorAreEqual(actualBook.getAuthor(), expectedBook.getAuthor());
         assertThatActualAndExpectedGenreListAreEqual(actualBook.getGenres(), expectedBook.getGenres());
+    }
+
+    public static List<Comment> getDbComments() {
+        return IntStream.range(1, 4)
+                .boxed()
+                .map(id -> new Comment((long) id, ("Comment_" + id), getDbBooks().get(id - 1)))
+                .toList();
     }
 }

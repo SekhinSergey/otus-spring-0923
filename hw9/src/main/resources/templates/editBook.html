@@ -25,14 +25,17 @@
     <div class="row">
         <label for="book-title-input" th:text="#{book-title}">Title:</label>
         <input id="book-title-input" name="title" type="text" th:value="*{title}"/>
+        <div class="errors" th:if="${#fields.hasErrors('title')}" th:errors="*{title}">Wrong book title error</div>
     </div>
     <div class="row">
         <label for="book-author-id-input" th:text="#{author-id}">Author ID:</label>
         <input id="book-author-id-input" name="authorId" type="text" th:value="*{authorId}"/>
+        <div class="errors" th:if="${#fields.hasErrors('authorId')}" th:errors="*{authorId}">Wrong book author id error</div>
     </div>
     <div class="row">
         <label for="book-genres-input" th:text="#{genreIds}">Genres:</label>
         <input id="book-genres-input" name="genreIds" type="text" th:value="*{genreIds}"/>
+        <div class="errors" th:if="${#fields.hasErrors('genreIds')}" th:errors="*{genreIds}">Wrong book genres ids error</div>
     </div>
     <div class="row">
         <button type="submit" th:text="#{save}">Save</button>

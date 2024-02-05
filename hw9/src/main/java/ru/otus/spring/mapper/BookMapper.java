@@ -32,21 +32,21 @@ public class BookMapper {
         return BookDto.builder()
                 .id(book.getId())
                 .title(book.getTitle())
-                .authorId(book.getAuthor().getId())
+                .authorId(book.getAuthor().getId().toString())
                 .genreIds(genreIds)
                 .build();
     }
 
     public Book mapDtoToEntity(BookDto bookDto) {
-        Author author = authorService.findById(bookDto.authorId());
-        List<Genre> genres = Arrays.stream(bookDto.genreIds()
+        Author author = authorService.findById(Long.parseLong(bookDto.getAuthorId()));
+        List<Genre> genres = Arrays.stream(bookDto.getGenreIds()
                 .split(SPACE))
                 .toList().stream()
                     .map(id -> genreService.findById(Long.parseLong(id)))
                     .toList();
         return Book.builder()
-                .id(bookDto.id())
-                .title(bookDto.title())
+                .id(bookDto.getId())
+                .title(bookDto.getTitle())
                 .author(author)
                 .genres(genres)
                 .build();

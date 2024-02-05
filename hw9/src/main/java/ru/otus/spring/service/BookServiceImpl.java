@@ -9,6 +9,7 @@ import ru.otus.spring.repository.BookRepository;
 import ru.otus.spring.repository.CommentRepository;
 
 import java.util.List;
+import java.util.Objects;
 import java.util.Set;
 
 @Service
@@ -99,7 +100,7 @@ public class BookServiceImpl implements BookService {
 
     private void throwExceptionIfExists(Book book) {
         Long id = book.getId();
-        if (bookRepository.findById(id).isPresent()) {
+        if (Objects.nonNull(id) && bookRepository.findById(id).isPresent()) {
             throw new EntityNotFoundException("Book with id %d already exists".formatted(id));
         }
     }

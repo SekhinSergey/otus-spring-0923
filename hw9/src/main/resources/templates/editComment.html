@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8"/>
+    <title th:text="#{commentEditing}">Comment editing</title>
+    <style type="text/css">
+        body {
+            padding: 50px;
+        }
+        label {
+            display: inline-block;
+            width: 100px;
+        }
+        input:read-only {
+            background: lightgray;
+        }
+        .row {
+            margin-top: 10px;
+        }
+    </style>
+</head>
+<body>
+<form id="edit-form" action="editComment.html" th:method="post" th:action="@{/editComment(id=${comment.id})}" th:object="${comment}">
+    <h3 th:text="#{commentInfo}">Comment info:</h3>
+    <div class="row">
+        <label for="book-id-input" th:text="#{book-id}">Text:</label>
+        <input id="book-id-input" name="bookId" type="text" th:value="*{bookId}" readonly="readonly"/>
+    </div>
+    <div class="row">
+        <label for="comment-text-input" th:text="#{comment-text}">Text:</label>
+        <input id="comment-text-input" name="text" type="text" th:value="*{text}"/>
+        <div class="errors" th:if="${#fields.hasErrors('text')}" th:errors="*{text}">Wrong comment text error</div>
+    </div>
+    <div class="row">
+        <button type="submit" th:text="#{save}">Save</button>
+        <a href="comments.html" th:href="@{/}">
+            <button type="button" th:text="#{cancel}">Cancel</button>
+        </a>
+    </div>
+</form>
+</body>
+</html>

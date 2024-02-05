@@ -9,10 +9,9 @@ import ru.otus.spring.model.Comment;
 
 import java.util.List;
 import java.util.Set;
-import java.util.stream.IntStream;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static ru.otus.spring.repository.TestBookUtils.*;
+import static ru.otus.spring.utils.TestBookUtils.*;
 
 @DataJpaTest
 class CommentRepositoryTest {
@@ -59,12 +58,5 @@ class CommentRepositoryTest {
     @Test
     void shouldCountCommentsByBookIdCorrectly() {
         assertThat(commentRepository.countByBookId(getDbBooks().get(0).getId())).isEqualTo(1);
-    }
-
-    private static List<Comment> getDbComments() {
-        return IntStream.range(1, 4)
-                .boxed()
-                .map(id -> new Comment((long) id, ("Comment_" + id), getDbBooks().get(id - 1)))
-                .toList();
     }
 }

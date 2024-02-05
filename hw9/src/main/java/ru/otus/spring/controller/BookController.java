@@ -1,9 +1,12 @@
 package ru.otus.spring.controller;
 
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
+import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import ru.otus.spring.dto.BookDto;
@@ -13,9 +16,8 @@ import ru.otus.spring.service.BookService;
 
 @Controller
 @RequiredArgsConstructor
+@SuppressWarnings("all")
 public class BookController {
-
-    private static final String BOOKS = "books";
 
     private final BookService bookService;
 
@@ -23,8 +25,8 @@ public class BookController {
 
     @GetMapping("/")
     public String getAll(Model model) {
-        model.addAttribute(BOOKS, bookService.findAll());
-        return BOOKS;
+        model.addAttribute("books", bookService.findAll());
+        return "books";
     }
 
     @GetMapping("/editBook")
@@ -34,7 +36,10 @@ public class BookController {
     }
 
     @PostMapping("/editBook")
-    public String editBook(BookDto bookDto) {
+    public String editBook(@Valid @ModelAttribute("bookDto") BookDto bookDto, BindingResult bindingResult) {
+        if (bindingResult.hasErrors()) {
+            return "redirect:/editBook?id=" + bookDto.getId();
+        }
         bookService.update(bookMapper.mapDtoToEntity(bookDto));
         return "redirect:/";
     }
@@ -46,10 +51,18 @@ public class BookController {
     }
 
     @PostMapping("/addBook")
-    public String addBook(BookDto bookDto) {
+    public String addBook(@Valid @ModelAttribute("bookDto") BookDto bookDto, BindingResult bindingResult) {
+        if (bindingResult.hasErrors()) {
+            return "redirect:/addBook?id=" + bookDto.getId();
+        }
         Book book = bookMapper.mapDtoToEntity(bookDto);
-        book.setId(null);
         bookService.create(book);
+        return "redirect:/";
+    }
+
+    @PostMapping("/deleteBook")
+    public String deleteBook(@RequestParam("id") long id) {
+        bookService.deleteById(id);
         return "redirect:/";
     }
 }
