@@ -13,9 +13,8 @@ public class CommentDto {
     /**
      * Валидация не позволит совершить попытку сохранения пустого значения, откатит назад, но и не выведет сообщение
      * Решить проблему не удалось
-     * Также индикатором проблемы является то, что бандл помечает переменную как неиспользуемую
      */
-    @NotBlank(message = "{field-value-should-not-be-blank}")
+    @NotBlank(message = "field-value-should-not-be-blank")
     private String text;
 
     private Long bookId;
