@@ -3,7 +3,7 @@ package ru.otus.spring.service;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import ru.otus.spring.exception.EntityNotFoundException;
+import ru.otus.spring.exception.NotFoundException;
 import ru.otus.spring.model.Author;
 import ru.otus.spring.repository.AuthorRepository;
 
@@ -28,7 +28,7 @@ public class AuthorServiceImpl implements AuthorService {
     @Transactional(readOnly = true)
     public Author findById(Long id) {
         return authorRepository.findById(id)
-                .orElseThrow(() -> new EntityNotFoundException("Author with id %d not found".formatted(id)));
+                .orElseThrow(() -> new NotFoundException("Author with id %d not found".formatted(id)));
     }
 
     @Override
@@ -61,7 +61,7 @@ public class AuthorServiceImpl implements AuthorService {
     private void throwExceptionIfExists(Author author) {
         Long id = author.getId();
         if (authorRepository.findById(id).isPresent()) {
-            throw new EntityNotFoundException("Author with id %d already exists".formatted(id));
+            throw new NotFoundException("Author with id %d already exists".formatted(id));
         }
     }
 
@@ -78,7 +78,7 @@ public class AuthorServiceImpl implements AuthorService {
                 .collect(Collectors.toCollection(HashSet::new));
         List<Author> foundAuthors = authorRepository.findAllById(authorsIds);
         if (authorsIds.size() != foundAuthors.size()) {
-            throw new EntityNotFoundException(
+            throw new NotFoundException(
                     "The number of requested authors does not match the number in the database");
         }
     }

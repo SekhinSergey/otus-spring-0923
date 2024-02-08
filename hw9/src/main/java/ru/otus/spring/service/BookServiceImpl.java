@@ -3,7 +3,7 @@ package ru.otus.spring.service;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import ru.otus.spring.exception.EntityNotFoundException;
+import ru.otus.spring.exception.NotFoundException;
 import ru.otus.spring.model.Book;
 import ru.otus.spring.repository.BookRepository;
 import ru.otus.spring.repository.CommentRepository;
@@ -17,8 +17,6 @@ import java.util.Set;
 public class BookServiceImpl implements BookService {
 
     private static final String NOT_FOUND_MESSAGE = "Book with id %d not found";
-
-    private static final String OR_ELSE_THROW_RULE = "java:S2201";
 
     private final BookRepository bookRepository;
 
@@ -39,7 +37,7 @@ public class BookServiceImpl implements BookService {
     @Transactional(readOnly = true)
     public Book findById(Long id) {
         return bookRepository.findById(id)
-                .orElseThrow(() -> new EntityNotFoundException(NOT_FOUND_MESSAGE.formatted(id)));
+                .orElseThrow(() -> new NotFoundException(NOT_FOUND_MESSAGE.formatted(id)));
     }
 
     @Override
@@ -60,7 +58,7 @@ public class BookServiceImpl implements BookService {
     public Book update(Book book) {
         Long id = book.getId();
         bookRepository.findById(id)
-                .orElseThrow(() -> new EntityNotFoundException(NOT_FOUND_MESSAGE.formatted(id)));
+                .orElseThrow(() -> new NotFoundException(NOT_FOUND_MESSAGE.formatted(id)));
         return save(book);
     }
 
@@ -101,18 +99,18 @@ public class BookServiceImpl implements BookService {
     private void throwExceptionIfExists(Book book) {
         Long id = book.getId();
         if (Objects.nonNull(id) && bookRepository.findById(id).isPresent()) {
-            throw new EntityNotFoundException("Book with id %d already exists".formatted(id));
+            throw new NotFoundException("Book with id %d already exists".formatted(id));
         }
     }
 
     @Override
     @Transactional
-    @SuppressWarnings(OR_ELSE_THROW_RULE)
+    @SuppressWarnings("all")
     public List<Book> updateBatch(Set<Book> books) {
         books.forEach(book -> {
             Long id = book.getId();
             bookRepository.findById(id)
-                    .orElseThrow(() -> new EntityNotFoundException(NOT_FOUND_MESSAGE.formatted(id)));
+                    .orElseThrow(() -> new NotFoundException(NOT_FOUND_MESSAGE.formatted(id)));
             bookValidator.validateBook(book);
         });
         return bookRepository.saveAll(books);

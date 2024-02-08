@@ -3,7 +3,7 @@ package ru.otus.spring.service;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import ru.otus.spring.exception.EntityNotFoundException;
+import ru.otus.spring.exception.NotFoundException;
 import ru.otus.spring.model.Genre;
 import ru.otus.spring.repository.GenreRepository;
 
@@ -27,7 +27,7 @@ public class GenreServiceImpl implements GenreService {
     @Override
     public Genre findById(Long id) {
         return genreRepository.findById(id)
-                .orElseThrow(() -> new EntityNotFoundException("Genre with id %d not found".formatted(id)));
+                .orElseThrow(() -> new NotFoundException("Genre with id %d not found".formatted(id)));
     }
 
     @Override
@@ -60,7 +60,7 @@ public class GenreServiceImpl implements GenreService {
     private void throwExceptionIfExists(Genre genre) {
         Long id = genre.getId();
         if (genreRepository.findById(id).isPresent()) {
-            throw new EntityNotFoundException("Genre with id %d already exists".formatted(id));
+            throw new NotFoundException("Genre with id %d already exists".formatted(id));
         }
     }
 
@@ -77,7 +77,7 @@ public class GenreServiceImpl implements GenreService {
                 .collect(Collectors.toCollection(HashSet::new));
         List<Genre> foundGenres = genreRepository.findAllById(genresIds);
         if (genresIds.size() != foundGenres.size()) {
-            throw new EntityNotFoundException(
+            throw new NotFoundException(
                     "The number of requested genres does not match the number in the database");
         }
     }

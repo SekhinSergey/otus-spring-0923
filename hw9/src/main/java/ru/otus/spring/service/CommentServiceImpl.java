@@ -3,7 +3,7 @@ package ru.otus.spring.service;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import ru.otus.spring.exception.EntityNotFoundException;
+import ru.otus.spring.exception.NotFoundException;
 import ru.otus.spring.model.Book;
 import ru.otus.spring.model.Comment;
 import ru.otus.spring.repository.BookRepository;
@@ -18,8 +18,6 @@ import java.util.stream.Collectors;
 @Service
 @RequiredArgsConstructor
 public class CommentServiceImpl implements CommentService {
-
-    private static final String OR_ELSE_THROW_RULE = "java:S2201";
 
     private final CommentRepository commentRepository;
 
@@ -37,7 +35,7 @@ public class CommentServiceImpl implements CommentService {
     @Transactional(readOnly = true)
     public Comment findById(Long id) {
         return commentRepository.findById(id)
-                .orElseThrow(() -> new EntityNotFoundException("Comment with id %d not found".formatted(id)));
+                .orElseThrow(() -> new NotFoundException("Comment with id %d not found".formatted(id)));
     }
 
     @Override
@@ -102,13 +100,13 @@ public class CommentServiceImpl implements CommentService {
                 .collect(Collectors.toCollection(HashSet::new));
         List<Comment> foundComments = commentRepository.findAllById(commentsIds);
         if (commentsIds.size() != foundComments.size()) {
-            throw new EntityNotFoundException(
+            throw new NotFoundException(
                     "The number of requested comments does not match the number in the database");
         }
         validateBooks(comments);
     }
 
-    @SuppressWarnings(OR_ELSE_THROW_RULE)
+    @SuppressWarnings("all")
     private void validateBooks(Set<Comment> comments) {
         Set<Book> books = comments.stream()
                 .map(Comment::getBook)
@@ -116,7 +114,7 @@ public class CommentServiceImpl implements CommentService {
         books.forEach(book -> {
             Long id = book.getId();
             bookRepository.findById(id)
-                    .orElseThrow(() -> new EntityNotFoundException("Book with id %d not found".formatted(id)));
+                    .orElseThrow(() -> new NotFoundException("Book with id %d not found".formatted(id)));
             bookValidator.validateBook(book);
         });
     }

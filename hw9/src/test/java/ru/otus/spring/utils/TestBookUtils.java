@@ -5,7 +5,9 @@ import ru.otus.spring.model.Book;
 import ru.otus.spring.model.Comment;
 import ru.otus.spring.model.Genre;
 
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
@@ -38,7 +40,7 @@ public class TestBookUtils {
                         (long) id,
                         "BookTitle_" + id,
                         dbAuthors.get(id - 1),
-                        dbGenres.subList((id - 1) * 2, (id - 1) * 2 + 2)
+                        new HashSet<>(dbGenres.subList((id - 1) * 2, (id - 1) * 2 + 2))
                 ))
                 .toList();
     }
@@ -60,12 +62,12 @@ public class TestBookUtils {
     }
 
     @SuppressWarnings(SIZE_ASSERTION_RULE)
-    public static void assertThatActualAndExpectedGenreListAreEqual(List<Genre> actualGenreList,
-                                                                    List<Genre> expectedGenreList) {
-        assertThat(actualGenreList.size()).isEqualTo(expectedGenreList.size());
-        var expectedGenreMap = expectedGenreList.stream()
+    public static void assertThatActualAndExpectedGenreListAreEqual(Set<Genre> actualGenreSet,
+                                                                    Set<Genre> expectedGenreSet) {
+        assertThat(actualGenreSet.size()).isEqualTo(expectedGenreSet.size());
+        var expectedGenreMap = expectedGenreSet.stream()
                 .collect(Collectors.toMap(Genre::getId, Function.identity()));
-        actualGenreList.forEach(actualGenre -> {
+        actualGenreSet.forEach(actualGenre -> {
             var expectedGenre = expectedGenreMap.get(actualGenre.getId());
             assertThatActualAndExpectedGenreAreEqual(actualGenre, expectedGenre);
         });

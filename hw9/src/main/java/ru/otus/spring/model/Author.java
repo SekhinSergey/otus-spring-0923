@@ -31,6 +31,6 @@ public class Author {
 
     @Override
     public String toString() {
-        return fullName;
+        return id.toString();
     }
 }

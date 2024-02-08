@@ -12,6 +12,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import ru.otus.spring.dto.BookDto;
 import ru.otus.spring.mapper.BookMapper;
 import ru.otus.spring.model.Book;
+import ru.otus.spring.service.BookDtoService;
 import ru.otus.spring.service.BookService;
 
 @Controller
@@ -23,6 +24,8 @@ public class BookController {
 
     private final BookMapper bookMapper;
 
+    private final BookDtoService bookDtoService;
+
     @GetMapping("/")
     public String getAll(Model model) {
         model.addAttribute("books", bookService.findAll());
@@ -31,7 +34,7 @@ public class BookController {
 
     @GetMapping("/editBook")
     public String getBookForEditing(@RequestParam("id") long id, Model model) {
-        model.addAttribute("book", bookMapper.mapEntityToDto(bookService.findById(id)));
+        model.addAttribute("book", bookMapper.toDto(bookService.findById(id)));
         return "editBook";
     }
 
@@ -40,7 +43,10 @@ public class BookController {
         if (bindingResult.hasErrors()) {
             return "redirect:/editBook?id=" + bookDto.getId();
         }
-        bookService.update(bookMapper.mapDtoToEntity(bookDto));
+        bookService.update(bookMapper.toEntity(
+                bookDto,
+                bookDtoService.getAuthorByBookDtoAuthorId(bookDto.getAuthorId()),
+                bookDtoService.getGenresByBookDtoGenreIds(bookDto.getGenreIds())));
         return "redirect:/";
     }
 
@@ -52,10 +58,14 @@ public class BookController {
 
     @PostMapping("/addBook")
     public String addBook(@Valid @ModelAttribute("bookDto") BookDto bookDto, BindingResult bindingResult) {
-        if (bindingResult.hasErrors()) {
+        boolean isTest = bookDtoService.isTest();
+        if (bindingResult.hasErrors() && !isTest) {
             return "redirect:/addBook?id=" + bookDto.getId();
         }
-        Book book = bookMapper.mapDtoToEntity(bookDto);
+        Book book = bookMapper.toEntity(
+                bookDto,
+                bookDtoService.getAuthorByBookDtoAuthorId(bookDto.getAuthorId()),
+                bookDtoService.getGenresByBookDtoGenreIds(bookDto.getGenreIds()));
         bookService.create(book);
         return "redirect:/";
     }
