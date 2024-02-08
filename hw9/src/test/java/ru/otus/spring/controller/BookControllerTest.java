@@ -1,5 +1,7 @@
 package ru.otus.spring.controller;
 
+import org.hamcrest.CoreMatchers;
+import org.hamcrest.Matcher;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
@@ -12,6 +14,7 @@ import ru.otus.spring.model.Genre;
 import ru.otus.spring.service.BookDtoService;
 import ru.otus.spring.service.BookService;
 
+import java.util.Arrays;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -81,20 +84,41 @@ class BookControllerTest {
     void addTest() throws Exception {
         when(bookDtoService.isTest()).thenReturn(true);
         Book book = getDbBooks().get(0);
-        when(bookMapper.toEntity(any(), any(), anySet())).thenReturn(Book.builder()
+        Book createdBook = Book.builder()
                 .title(TEST_BOOK_TITLE)
                 .author(book.getAuthor())
                 .genres(book.getGenres())
-                .build());
+                .build();
+        when(bookMapper.toEntity(any(), any(), anySet())).thenReturn(createdBook);
         this.mockMvc
                 .perform(post("/addBook"))
                 .andExpect(status().is3xxRedirection());
+        given(bookService.findAll()).willReturn(Arrays.asList(
+                createdBook,
+                getDbBooks().get(1),
+                getDbBooks().get(2)));
+        this.mockMvc
+                .perform(get("/"))
+                .andExpect(status().isOk())
+                .andExpect(content().string(containsString(TEST_BOOK_TITLE)));
     }
 
     @Test
     void deleteTest() throws Exception {
+        Book book = getDbBooks().get(0);
         this.mockMvc
-                .perform(post("/deleteBook?id=" + getDbBooks().get(0).getId()))
-                .andExpect(status().is3xxRedirection());
+                .perform(post("/deleteBook?id=" + book.getId()))
+                .andExpect(status()
+                        .is3xxRedirection());
+        given(bookService.findAll()).willReturn(Arrays.asList(
+                getDbBooks().get(1),
+                getDbBooks().get(2)));
+        this.mockMvc
+                .perform(get("/")).andExpect(status().isOk())
+                .andExpect(content().string(doesNotContainsString(book.getTitle())));
+    }
+
+    private static Matcher<String> doesNotContainsString(String s) {
+        return CoreMatchers.not(containsString(s));
     }
 }
