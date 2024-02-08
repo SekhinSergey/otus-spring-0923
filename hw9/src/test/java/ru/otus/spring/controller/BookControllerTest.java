@@ -44,7 +44,6 @@ class BookControllerTest {
     private BookMapper bookMapper;
 
     @MockBean
-    @SuppressWarnings("all")
     private BookDtoService bookDtoService;
 
     @Test
