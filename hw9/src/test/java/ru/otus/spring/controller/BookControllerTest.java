@@ -93,9 +93,10 @@ class BookControllerTest {
                 .perform(post("/addBook"))
                 .andExpect(status().is3xxRedirection());
         given(bookService.findAll()).willReturn(Arrays.asList(
-                createdBook,
+                getDbBooks().get(0),
                 getDbBooks().get(1),
-                getDbBooks().get(2)));
+                getDbBooks().get(2),
+                createdBook));
         this.mockMvc
                 .perform(get("/"))
                 .andExpect(status().isOk())
