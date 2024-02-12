@@ -1,6 +1,8 @@
 package ru.otus.spring.service;
 
-import ru.otus.spring.model.Book;
+import ru.otus.spring.dto.BookDto;
+import ru.otus.spring.dto.create.BookCreateDto;
+import ru.otus.spring.dto.update.BookUpdateDto;
 
 import java.util.List;
 import java.util.Set;
@@ -8,15 +10,17 @@ import java.util.Set;
 @SuppressWarnings("all")
 public interface BookService {
 
-    List<Book> findAll();
+    List<BookDto> findAll();
 
-    Book findById(Long id);
+    BookDto findById(Long id);
 
-    List<Book> findAllByIds(Set<Long> ids);
+    BookUpdateDto findByIdForEditing(Long id);
 
-    Book create(Book book);
+    List<BookDto> findAllByIds(Set<Long> ids);
 
-    Book update(Book book);
+    BookCreateDto create(BookCreateDto bookCreateDto);
+
+    BookUpdateDto update(BookUpdateDto bookUpdateDto);
 
     void deleteById(Long id);
 
@@ -24,9 +28,11 @@ public interface BookService {
 
     int countByGenreId(long genreId);
 
-    List<Book> createBatch(Set<Book> books);
+    List<BookCreateDto> createBatch(Set<BookCreateDto> bookCreateDtos);
 
-    List<Book> updateBatch(Set<Book> books);
+    List<BookUpdateDto> updateBatch(Set<BookUpdateDto> bookUpdateDtos);
 
     void deleteAllByIds(Set<Long> ids);
+
+    boolean isTest();
 }

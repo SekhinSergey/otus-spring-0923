@@ -44,8 +44,8 @@
     <tr th:each="book : ${books}">
         <td th:text="${book.id}">1</td>
         <td th:text="${book.title}">Fathers and Sons</td>
-        <td th:text="${book.author}">Ivan Turgenev</td>
-        <td th:text="${book.genres}">Novel</td>
+        <td th:text="${book.authorId}">Ivan Turgenev</td>
+        <td th:text="${book.genreIds}">Novel</td>
         <td>
             <a href="editBook.html" th:text="#{edit}" th:href="@{/editBook(id=${book.id})}">Edit</a>
         </td>

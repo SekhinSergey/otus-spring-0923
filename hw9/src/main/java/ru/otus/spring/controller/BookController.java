@@ -9,10 +9,8 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
-import ru.otus.spring.dto.BookDto;
-import ru.otus.spring.mapper.BookMapper;
-import ru.otus.spring.model.Book;
-import ru.otus.spring.service.BookDtoService;
+import ru.otus.spring.dto.create.BookCreateDto;
+import ru.otus.spring.dto.update.BookUpdateDto;
 import ru.otus.spring.service.BookService;
 
 @Controller
@@ -22,10 +20,6 @@ public class BookController {
 
     private final BookService bookService;
 
-    private final BookMapper bookMapper;
-
-    private final BookDtoService bookDtoService;
-
     @GetMapping("/")
     public String getAll(Model model) {
         model.addAttribute("books", bookService.findAll());
@@ -34,39 +28,32 @@ public class BookController {
 
     @GetMapping("/editBook")
     public String getBookForEditing(@RequestParam("id") long id, Model model) {
-        model.addAttribute("book", bookMapper.toDto(bookService.findById(id)));
+        model.addAttribute("book", bookService.findByIdForEditing(id));
         return "editBook";
     }
 
     @PostMapping("/editBook")
-    public String editBook(@Valid @ModelAttribute("bookDto") BookDto bookDto, BindingResult bindingResult) {
+    public String editBook(@Valid @ModelAttribute("book") BookUpdateDto bookUpdateDto, BindingResult bindingResult) {
         if (bindingResult.hasErrors()) {
-            return "redirect:/editBook?id=" + bookDto.getId();
+            return "redirect:/editBook?id=" + bookUpdateDto.getId();
         }
-        bookService.update(bookMapper.toEntity(
-                bookDto,
-                bookDtoService.getAuthorByBookDtoAuthorId(bookDto.getAuthorId()),
-                bookDtoService.getGenresByBookDtoGenreIds(bookDto.getGenreIds())));
+        bookService.update(bookUpdateDto);
         return "redirect:/";
     }
 
     @GetMapping("/addBook")
     public String formEmptyBook(Model model) {
-        model.addAttribute("book", BookDto.builder().build());
+        model.addAttribute("book", BookCreateDto.builder().build());
         return "addBook";
     }
 
     @PostMapping("/addBook")
-    public String addBook(@Valid @ModelAttribute("bookDto") BookDto bookDto, BindingResult bindingResult) {
-        boolean isTest = bookDtoService.isTest();
+    public String addBook(@Valid @ModelAttribute("book") BookCreateDto bookCreateDto, BindingResult bindingResult) {
+        boolean isTest = bookService.isTest();
         if (bindingResult.hasErrors() && !isTest) {
-            return "redirect:/addBook?id=" + bookDto.getId();
+            return "redirect:/addBook?id=" + bookCreateDto.getId();
         }
-        Book book = bookMapper.toEntity(
-                bookDto,
-                bookDtoService.getAuthorByBookDtoAuthorId(bookDto.getAuthorId()),
-                bookDtoService.getGenresByBookDtoGenreIds(bookDto.getGenreIds()));
-        bookService.create(book);
+        bookService.create(bookCreateDto);
         return "redirect:/";
     }
 

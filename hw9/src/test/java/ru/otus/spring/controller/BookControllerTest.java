@@ -8,19 +8,19 @@ import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.test.web.servlet.MockMvc;
 import ru.otus.spring.dto.BookDto;
-import ru.otus.spring.mapper.BookMapper;
+import ru.otus.spring.dto.create.BookCreateDto;
+import ru.otus.spring.dto.update.BookUpdateDto;
 import ru.otus.spring.model.Book;
 import ru.otus.spring.model.Genre;
-import ru.otus.spring.service.BookDtoService;
 import ru.otus.spring.service.BookService;
 
-import java.util.Arrays;
 import java.util.Set;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
+import static org.apache.commons.lang3.StringUtils.SPACE;
 import static org.hamcrest.Matchers.containsString;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.anySet;
+import static org.mockito.ArgumentMatchers.*;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
@@ -40,15 +40,22 @@ class BookControllerTest {
     @MockBean
     private BookService bookService;
 
-    @MockBean
-    private BookMapper bookMapper;
-
-    @MockBean
-    private BookDtoService bookDtoService;
-
     @Test
     void getAllTest() throws Exception {
-        given(bookService.findAll()).willReturn(getDbBooks());
+        given(bookService.findAll()).willReturn(getDbBooks().stream()
+                .map(book -> {
+                    Set<Long> genreIds = book.getGenres()
+                            .stream()
+                            .map(Genre::getId)
+                            .collect(Collectors.toSet());
+                    return BookDto.builder()
+                            .id(book.getId())
+                            .title(book.getTitle())
+                            .authorId(book.getAuthor().getId())
+                            .genreIds(genreIds)
+                            .build();
+                })
+                .toList());
         this.mockMvc
                 .perform(get("/"))
                 .andExpect(status().isOk())
@@ -63,16 +70,19 @@ class BookControllerTest {
     @Test
     void editTest() throws Exception {
         Book book = getDbBooks().get(0);
+        String genreIds = book.getGenres()
+                .stream()
+                .map(genre -> genre.getId().toString() + SPACE)
+                .collect(Collectors.joining())
+                .trim();
         Long id = book.getId();
-        Set<Long> genreIds = book.getGenres().stream()
-                .map(Genre::getId)
-                .collect(Collectors.toSet());
-        when(bookMapper.toDto(any())).thenReturn(BookDto.builder()
+        BookUpdateDto bookUpdateDto = BookUpdateDto.builder()
                 .id(id)
                 .title(TEST_BOOK_TITLE)
                 .authorId(book.getAuthor().getId())
                 .genreIds(genreIds)
-                .build());
+                .build();
+        when(bookService.findByIdForEditing(anyLong())).thenReturn(bookUpdateDto);
         this.mockMvc
                 .perform(get("/editBook?id=" + id))
                 .andExpect(status().isOk())
@@ -81,22 +91,47 @@ class BookControllerTest {
 
     @Test
     void addTest() throws Exception {
-        when(bookDtoService.isTest()).thenReturn(true);
-        Book book = getDbBooks().get(0);
-        Book createdBook = Book.builder()
+        when(bookService.isTest()).thenReturn(true);
+        Book firstBook = getDbBooks().get(0);
+        String genreIds = firstBook.getGenres()
+                .stream()
+                .map(genre -> genre.getId().toString() + SPACE)
+                .collect(Collectors.joining())
+                .trim();
+        BookCreateDto bookCreateDto = BookCreateDto.builder()
+                .id(firstBook.getId())
                 .title(TEST_BOOK_TITLE)
-                .author(book.getAuthor())
-                .genres(book.getGenres())
+                .authorId(firstBook.getAuthor().getId())
+                .genreIds(genreIds)
                 .build();
-        when(bookMapper.toEntity(any(), any(), anySet())).thenReturn(createdBook);
+        when(bookService.create(any())).thenReturn(bookCreateDto);
         this.mockMvc
                 .perform(post("/addBook"))
                 .andExpect(status().is3xxRedirection());
-        given(bookService.findAll()).willReturn(Arrays.asList(
-                getDbBooks().get(0),
-                getDbBooks().get(1),
-                getDbBooks().get(2),
-                createdBook));
+        Book newBook = Book.builder()
+                .id(bookCreateDto.getId())
+                .title(TEST_BOOK_TITLE)
+                .author(firstBook.getAuthor())
+                .genres(firstBook.getGenres())
+                .build();
+        given(bookService.findAll()).willReturn(Stream.of(
+                        getDbBooks().get(0),
+                        getDbBooks().get(1),
+                        getDbBooks().get(2),
+                        newBook)
+                .map(book -> {
+                    Set<Long> genreIdList = book.getGenres()
+                            .stream()
+                            .map(Genre::getId)
+                            .collect(Collectors.toSet());
+                    return BookDto.builder()
+                            .id(book.getId())
+                            .title(book.getTitle())
+                            .authorId(book.getAuthor().getId())
+                            .genreIds(genreIdList)
+                            .build();
+                })
+                .toList());
         this.mockMvc
                 .perform(get("/"))
                 .andExpect(status().isOk())
@@ -105,17 +140,28 @@ class BookControllerTest {
 
     @Test
     void deleteTest() throws Exception {
-        Book book = getDbBooks().get(0);
+        Book firstBook = getDbBooks().get(0);
         this.mockMvc
-                .perform(post("/deleteBook?id=" + book.getId()))
+                .perform(post("/deleteBook?id=" + firstBook.getId()))
                 .andExpect(status()
                         .is3xxRedirection());
-        given(bookService.findAll()).willReturn(Arrays.asList(
-                getDbBooks().get(1),
-                getDbBooks().get(2)));
+        given(bookService.findAll()).willReturn(Stream.of(getDbBooks().get(1), getDbBooks().get(2))
+                .map(book -> {
+                    Set<Long> genreIds = book.getGenres()
+                            .stream()
+                            .map(Genre::getId)
+                            .collect(Collectors.toSet());
+                    return BookDto.builder()
+                            .id(book.getId())
+                            .title(book.getTitle())
+                            .authorId(book.getAuthor().getId())
+                            .genreIds(genreIds)
+                            .build();
+                })
+                .toList());
         this.mockMvc
                 .perform(get("/")).andExpect(status().isOk())
-                .andExpect(content().string(doesNotContainsString(book.getTitle())));
+                .andExpect(content().string(doesNotContainsString(firstBook.getTitle())));
     }
 
     private static Matcher<String> doesNotContainsString(String s) {

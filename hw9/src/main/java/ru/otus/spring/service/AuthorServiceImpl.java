@@ -3,7 +3,11 @@ package ru.otus.spring.service;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import ru.otus.spring.dto.AuthorDto;
+import ru.otus.spring.dto.create.AuthorCreateDto;
+import ru.otus.spring.dto.update.AuthorUpdateDto;
 import ru.otus.spring.exception.NotFoundException;
+import ru.otus.spring.mapper.AuthorMapper;
 import ru.otus.spring.model.Author;
 import ru.otus.spring.repository.AuthorRepository;
 
@@ -12,54 +16,67 @@ import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
 
+import static ru.otus.spring.constant.Constants.NO_AUTHOR_BY_ID_ERROR_MESSAGE;
+
 @Service
 @RequiredArgsConstructor
 public class AuthorServiceImpl implements AuthorService {
 
     private final AuthorRepository authorRepository;
 
-    @Override
-    @Transactional(readOnly = true)
-    public List<Author> findAll() {
-        return authorRepository.findAll();
-    }
+    private final AuthorMapper authorMapper;
 
     @Override
     @Transactional(readOnly = true)
-    public Author findById(Long id) {
-        return authorRepository.findById(id)
-                .orElseThrow(() -> new NotFoundException("Author with id %d not found".formatted(id)));
+    public List<AuthorDto> findAll() {
+        return authorRepository.findAll().stream()
+                .map(authorMapper::toDto)
+                .toList();
     }
 
     @Override
     @Transactional(readOnly = true)
-    public List<Author> findAllByIds(Set<Long> ids) {
-        return authorRepository.findAllById(ids);
+    public AuthorDto findById(Long id) {
+        return authorMapper.toDto(authorRepository.findById(id)
+                .orElseThrow(() -> new NotFoundException(NO_AUTHOR_BY_ID_ERROR_MESSAGE.formatted(id))));
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public List<AuthorDto> findAllByIds(Set<Long> ids) {
+        return authorRepository.findAllById(ids).stream()
+                .map(authorMapper::toDto)
+                .toList();
     }
 
     @Override
     @Transactional
-    public Author create(Author author) {
-        throwExceptionIfExists(author);
-        return authorRepository.save(author);
+    public AuthorCreateDto create(AuthorCreateDto authorCreateDto) {
+        throwExceptionIfExists(authorCreateDto);
+        return authorMapper.toCreateDto(authorRepository.save(authorMapper.createDtoToEntity(authorCreateDto)));
     }
 
     @Override
     @Transactional
-    public Author update(Author author) {
-        findById(author.getId());
-        return authorRepository.save(author);
+    public AuthorUpdateDto update(AuthorUpdateDto authorUpdateDto) {
+        findById(authorUpdateDto.getId());
+        return authorMapper.toUpdateDto(authorRepository.save(authorMapper.updateDtoToEntity(authorUpdateDto)));
     }
 
     @Override
     @Transactional
-    public List<Author> createBatch(Set<Author> authors) {
-        authors.forEach(this::throwExceptionIfExists);
-        return authorRepository.saveAll(authors);
+    public List<AuthorCreateDto> createBatch(Set<AuthorCreateDto> authorCreateDtos) {
+        authorCreateDtos.forEach(this::throwExceptionIfExists);
+        List<Author> authors = authorCreateDtos.stream()
+                .map(authorMapper::createDtoToEntity)
+                .toList();
+        return authorRepository.saveAll(authors).stream()
+                .map(authorMapper::toCreateDto)
+                .toList();
     }
 
-    private void throwExceptionIfExists(Author author) {
-        Long id = author.getId();
+    private void throwExceptionIfExists(AuthorCreateDto authorCreateDto) {
+        long id = authorCreateDto.getId();
         if (authorRepository.findById(id).isPresent()) {
             throw new NotFoundException("Author with id %d already exists".formatted(id));
         }
@@ -67,19 +84,20 @@ public class AuthorServiceImpl implements AuthorService {
 
     @Override
     @Transactional
-    public List<Author> updateBatch(Set<Author> authors) {
-        validateAuthors(authors);
-        return authorRepository.saveAll(authors);
-    }
-
-    private void validateAuthors(Set<Author> authors) {
-        Set<Long> authorsIds = authors.stream()
-                .map(Author::getId)
+    public List<AuthorUpdateDto> updateBatch(Set<AuthorUpdateDto> authorUpdateDtos) {
+        Set<Long> authorsIds = authorUpdateDtos.stream()
+                .map(AuthorUpdateDto::getId)
                 .collect(Collectors.toCollection(HashSet::new));
         List<Author> foundAuthors = authorRepository.findAllById(authorsIds);
         if (authorsIds.size() != foundAuthors.size()) {
             throw new NotFoundException(
                     "The number of requested authors does not match the number in the database");
         }
+        List<Author> authors = authorUpdateDtos.stream()
+                .map(authorMapper::updateDtoToEntity)
+                .toList();
+        return authorRepository.saveAll(authors).stream()
+                .map(authorMapper::toUpdateDto)
+                .toList();
     }
 }

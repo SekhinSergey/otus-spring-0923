@@ -12,5 +12,3 @@ spring:
     generate-ddl: false
     hibernate:
       ddl-auto: none
-server:
-  port: 8081

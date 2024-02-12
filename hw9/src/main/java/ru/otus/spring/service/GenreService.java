@@ -1,6 +1,8 @@
 package ru.otus.spring.service;
 
-import ru.otus.spring.model.Genre;
+import ru.otus.spring.dto.GenreDto;
+import ru.otus.spring.dto.create.GenreCreateDto;
+import ru.otus.spring.dto.update.GenreUpdateDto;
 
 import java.util.List;
 import java.util.Set;
@@ -8,17 +10,17 @@ import java.util.Set;
 @SuppressWarnings("all")
 public interface GenreService {
 
-    List<Genre> findAll();
+    List<GenreDto> findAll();
 
-    Genre findById(Long id);
+    GenreDto findById(Long id);
 
-    List<Genre> findAllByIds(Set<Long> ids);
+    List<GenreDto> findAllByIds(Set<Long> ids);
 
-    Genre create(Genre genre);
+    GenreCreateDto create(GenreCreateDto genreCreateDto);
 
-    Genre update(Genre genre);
+    GenreUpdateDto update(GenreUpdateDto genreUpdateDto);
 
-    List<Genre> createBatch(Set<Genre> genres);
+    List<GenreCreateDto> createBatch(Set<GenreCreateDto> genres);
 
-    List<Genre> updateBatch(Set<Genre> genres);
+    List<GenreUpdateDto> updateBatch(Set<GenreUpdateDto> genreUpdateDtos);
 }

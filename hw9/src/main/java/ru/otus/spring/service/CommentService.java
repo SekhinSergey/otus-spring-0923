@@ -1,6 +1,8 @@
 package ru.otus.spring.service;
 
-import ru.otus.spring.model.Comment;
+import ru.otus.spring.dto.CommentDto;
+import ru.otus.spring.dto.create.CommentCreateDto;
+import ru.otus.spring.dto.update.CommentUpdateDto;
 
 import java.util.List;
 import java.util.Set;
@@ -8,13 +10,15 @@ import java.util.Set;
 @SuppressWarnings("all")
 public interface CommentService {
 
-    List<Comment> findAll();
+    List<CommentDto> findAll();
 
-    Comment findById(Long id);
+    CommentDto findById(Long id);
 
-    List<Comment> findAllByIds(Set<Long> ids);
+    CommentUpdateDto findByIdForEditing(Long id);
 
-    List<Comment> findAllByBookId(Long bookId);
+    List<CommentDto> findAllByIds(Set<Long> ids);
+
+    List<CommentDto> findAllByBookId(Long bookId);
 
     void deleteById(Long id);
 
@@ -22,13 +26,13 @@ public interface CommentService {
 
     int countByBookId(Long bookId);
 
-    Comment create(Comment comment);
+    CommentCreateDto create(CommentCreateDto commentCreateDto);
 
-    Comment update(Comment comment);
+    CommentUpdateDto update(CommentUpdateDto commentUpdateDto);
 
-    List<Comment> createBatch(Set<Comment> comments);
+    List<CommentCreateDto> createBatch(Set<CommentCreateDto> commentCreateDtos);
 
-    List<Comment> updateBatch(Set<Comment> comments);
+    List<CommentUpdateDto> updateBatch(Set<CommentUpdateDto> commentUpdateDtos);
 
     void deleteAllByIds(Set<Long> ids);
 }
