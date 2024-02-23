@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8"/>
+    <title th:text="#{bookAdding}">Book adding</title>
+    <style type="text/css">
+        body {
+            padding: 50px;
+        }
+        label {
+            display: inline-block;
+            width: 100px;
+        }
+        input:read-only {
+            background: lightgray;
+        }
+        .row {
+            margin-top: 10px;
+        }
+    </style>
+</head>
+<body>
+<form id="add-form" action="addBook.html" th:method="post" th:action="@{/addBook}" th:object="${book}">
+    <h3 th:text="#{bookInfo}">Book info:</h3>
+    <div class="row">
+        <label for="book-title-input" th:text="#{book-title}">Title:</label>
+        <input id="book-title-input" name="title" type="text"/>
+        <div class="errors" th:if="${#fields.hasErrors('title')}" th:errors="*{title}">Wrong book title error</div>
+    </div>
+    <div class="row">
+        <label for="book-author-id-input" th:text="#{author-id}">Author ID:</label>
+        <input id="book-author-id-input" name="authorId" type="text"/>
+        <div class="errors" th:if="${#fields.hasErrors('authorId')}" th:errors="*{authorId}">Wrong book author id error</div>
+    </div>
+    <div class="row">
+        <label for="book-genres-input" th:text="#{genreIds}">Genres:</label>
+        <input id="book-genres-input" name="genreIds" type="text"/>
+        <div class="errors" th:if="${#fields.hasErrors('genreIds')}" th:errors="*{genreIds}">Wrong book genres ids error</div>
+    </div>
+    <div class="row">
+        <button type="submit" th:text="#{save}">Save</button>
+        <a href="books.html" th:href="@{/}">
+            <button type="button" th:text="#{cancel}">Cancel</button>
+        </a>
+    </div>
+</form>
+</body>
+</html>

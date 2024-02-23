@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8"/>
+    <title th:text="#{comments-title}">List of all comments</title>
+    <style type="text/css">
+        body {
+            padding: 50px;
+        }
+        .comments {
+            border: 1px solid steelblue;
+            width: 300px;
+            border-collapse: collapse;
+        }
+        .comments tr td, th {
+            padding: 5px;
+            border: 1px solid steelblue;
+        }
+        .comments td:last-child, td:first-child {
+            width: 50px;
+        }
+    </style>
+</head>
+<body>
+<h3 th:text="#{comments-head}">Comments:</h3>
+<table class="comments">
+    <thead>
+    <tr>
+        <th th:text="#{comment-text}">Text</th>
+        <th th:text="#{editing}">Editing</th>
+        <th th:text="#{deleting}">Deleting</th>
+    </tr>
+    </thead>
+    <tbody>
+    <tr th:each="comment : ${comments}">
+        <td th:text="${comment.text}">Good</td>
+        <td>
+            <a href="editComment.html" th:text="#{edit}" th:href="@{/editComment(id=${comment.id})}">Edit</a>
+        </td>
+        <td>
+            <form id="delete-comment-form" action="comments.html" th:action="@{/deleteComment(id=${comment.id})}" th:method="post">
+                <button class="btn btn-primary" type="submit" th:text="#{delete}">Delete</button>
+            </form>
+        </td>
+        <td>
+            <a href="addComment" th:text="#{add}" th:href="@{/addComment(bookId=${comment.bookId})}">Add</a>
+        </td>
+    </tr>
+    </tbody>
+</table>
+<div>
+    <a href="/" th:text="#{books-title}">List of all books</a>
+</div>
+</body>
+</html>
