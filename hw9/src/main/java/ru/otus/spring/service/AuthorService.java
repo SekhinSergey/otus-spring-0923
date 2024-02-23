@@ -7,7 +7,6 @@ import ru.otus.spring.dto.update.AuthorUpdateDto;
 import java.util.List;
 import java.util.Set;
 
-@SuppressWarnings("all")
 public interface AuthorService {
 
     List<AuthorDto> findAll();

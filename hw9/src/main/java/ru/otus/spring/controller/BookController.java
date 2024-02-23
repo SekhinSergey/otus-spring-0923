@@ -15,7 +15,6 @@ import ru.otus.spring.service.BookService;
 
 @Controller
 @RequiredArgsConstructor
-@SuppressWarnings("all")
 public class BookController {
 
     private final BookService bookService;

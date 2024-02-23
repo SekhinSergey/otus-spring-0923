@@ -20,7 +20,8 @@ import java.util.stream.Stream;
 
 import static org.apache.commons.lang3.StringUtils.SPACE;
 import static org.hamcrest.Matchers.containsString;
-import static org.mockito.ArgumentMatchers.*;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;

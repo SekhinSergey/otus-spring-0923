@@ -12,6 +12,8 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
+import static java.util.Objects.isNull;
+
 @Entity
 @Getter
 @Setter
@@ -19,7 +21,6 @@ import lombok.Setter;
 @NoArgsConstructor
 @AllArgsConstructor
 @Table(name = "authors")
-@SuppressWarnings("all")
 public class Author {
 
     @Id
@@ -31,6 +32,6 @@ public class Author {
 
     @Override
     public String toString() {
-        return id.toString();
+        return isNull(id) ? null : id.toString();
     }
 }

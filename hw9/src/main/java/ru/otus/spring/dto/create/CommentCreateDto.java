@@ -9,8 +9,6 @@ import lombok.Getter;
 @Builder
 public class CommentCreateDto {
 
-    private Long id;
-
     @NotBlank(message = "field-value-should-not-be-blank")
     private String text;
 

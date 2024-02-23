@@ -65,13 +65,4 @@ public class BookMapper {
                 .genreIds(genreIds)
                 .build();
     }
-
-    public Book updateDtoToEntity(BookUpdateDto bookUpdateDto, Author author, Set<Genre> genres) {
-        return Book.builder()
-                .id(bookUpdateDto.getId())
-                .title(bookUpdateDto.getTitle())
-                .author(author)
-                .genres(genres)
-                .build();
-    }
 }

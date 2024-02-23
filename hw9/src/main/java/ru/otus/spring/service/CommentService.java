@@ -7,7 +7,6 @@ import ru.otus.spring.dto.update.CommentUpdateDto;
 import java.util.List;
 import java.util.Set;
 
-@SuppressWarnings("all")
 public interface CommentService {
 
     List<CommentDto> findAll();

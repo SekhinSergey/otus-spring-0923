@@ -22,7 +22,6 @@ import lombok.Setter;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-@SuppressWarnings("all")
 @Table(name = "comments")
 public class Comment {
 

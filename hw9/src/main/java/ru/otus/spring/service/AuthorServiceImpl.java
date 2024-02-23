@@ -16,6 +16,7 @@ import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
 
+import static ru.otus.spring.constant.Constants.AUTHORS_SIZE_ERROR_MESSAGE;
 import static ru.otus.spring.constant.Constants.NO_AUTHOR_BY_ID_ERROR_MESSAGE;
 
 @Service
@@ -52,34 +53,43 @@ public class AuthorServiceImpl implements AuthorService {
     @Override
     @Transactional
     public AuthorCreateDto create(AuthorCreateDto authorCreateDto) {
-        throwExceptionIfExists(authorCreateDto);
+        long id = authorCreateDto.getId();
+        if (authorRepository.findById(id).isPresent()) {
+            throw new NotFoundException("Author with id %d already exists".formatted(id));
+        }
         return authorMapper.toCreateDto(authorRepository.save(authorMapper.createDtoToEntity(authorCreateDto)));
     }
 
     @Override
     @Transactional
     public AuthorUpdateDto update(AuthorUpdateDto authorUpdateDto) {
-        findById(authorUpdateDto.getId());
-        return authorMapper.toUpdateDto(authorRepository.save(authorMapper.updateDtoToEntity(authorUpdateDto)));
+        Long id = authorUpdateDto.getId();
+        Author author = authorRepository.findById(id)
+                .orElseThrow(() -> new NotFoundException(NO_AUTHOR_BY_ID_ERROR_MESSAGE.formatted(id)));
+        String fullName = authorUpdateDto.getFullName();
+        if (author.getFullName().equals(fullName)) {
+            return authorMapper.toUpdateDto(author);
+        } else {
+            author.setFullName(fullName);
+        }
+        return authorMapper.toUpdateDto(authorRepository.save(author));
     }
 
     @Override
     @Transactional
     public List<AuthorCreateDto> createBatch(Set<AuthorCreateDto> authorCreateDtos) {
-        authorCreateDtos.forEach(this::throwExceptionIfExists);
+        Set<Long> ids = authorCreateDtos.stream()
+                .map(AuthorCreateDto::getId)
+                .collect(Collectors.toSet());
+        if (!authorRepository.findAllById(ids).isEmpty()) {
+            throw new NotFoundException("Some authors already exists");
+        }
         List<Author> authors = authorCreateDtos.stream()
                 .map(authorMapper::createDtoToEntity)
                 .toList();
         return authorRepository.saveAll(authors).stream()
                 .map(authorMapper::toCreateDto)
                 .toList();
-    }
-
-    private void throwExceptionIfExists(AuthorCreateDto authorCreateDto) {
-        long id = authorCreateDto.getId();
-        if (authorRepository.findById(id).isPresent()) {
-            throw new NotFoundException("Author with id %d already exists".formatted(id));
-        }
     }
 
     @Override
@@ -90,8 +100,7 @@ public class AuthorServiceImpl implements AuthorService {
                 .collect(Collectors.toCollection(HashSet::new));
         List<Author> foundAuthors = authorRepository.findAllById(authorsIds);
         if (authorsIds.size() != foundAuthors.size()) {
-            throw new NotFoundException(
-                    "The number of requested authors does not match the number in the database");
+            throw new NotFoundException(AUTHORS_SIZE_ERROR_MESSAGE);
         }
         List<Author> authors = authorUpdateDtos.stream()
                 .map(authorMapper::updateDtoToEntity)

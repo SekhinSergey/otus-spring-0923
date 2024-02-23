@@ -13,12 +13,13 @@ import ru.otus.spring.model.Comment;
 import ru.otus.spring.repository.BookRepository;
 import ru.otus.spring.repository.CommentRepository;
 
-import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
 
+import static ru.otus.spring.constant.Constants.BOOKS_SIZE_ERROR_MESSAGE;
 import static ru.otus.spring.constant.Constants.NO_BOOK_BY_ID_ERROR_MESSAGE;
 
 @Service
@@ -87,62 +88,86 @@ public class CommentServiceImpl implements CommentService {
     @Override
     @Transactional
     public CommentCreateDto create(CommentCreateDto commentCreateDto) {
-        return commentMapper.toCreateDto(commentRepository.save(createDtoToEntity(commentCreateDto)));
+        long bookId = commentCreateDto.getBookId();
+        Book book = bookRepository.findById(bookId)
+                .orElseThrow(() -> new NotFoundException(NO_BOOK_BY_ID_ERROR_MESSAGE.formatted(bookId)));
+        return commentMapper.toCreateDto(
+                commentRepository.save(commentMapper.createDtoToEntity(commentCreateDto, book)));
     }
 
     @Override
     @Transactional
     public CommentUpdateDto update(CommentUpdateDto commentUpdateDto) {
-        validateComments(Collections.singleton(commentUpdateDto));
-        return commentMapper.toUpdateDto(commentRepository.save(updateDtoToEntity(commentUpdateDto)));
+        Long id = commentUpdateDto.getId();
+        Comment comment = commentRepository.findById(id)
+                .orElseThrow(() -> new NotFoundException("Comment with id %d not found".formatted(id)));
+        long bookId = commentUpdateDto.getBookId();
+        bookRepository.findById(bookId)
+                .orElseThrow(() -> new NotFoundException(NO_BOOK_BY_ID_ERROR_MESSAGE.formatted(bookId)));
+        String text = commentUpdateDto.getText();
+        if (text.equals(comment.getText())) {
+            return commentMapper.toUpdateDto(comment);
+        } else {
+            comment.setText(text);
+        }
+        return commentMapper.toUpdateDto(commentRepository.save(comment));
     }
 
     @Override
     @Transactional
     public List<CommentCreateDto> createBatch(Set<CommentCreateDto> commentCreateDtos) {
+        Set<Long> bookIds = commentCreateDtos.stream()
+                .map(CommentCreateDto::getBookId)
+                .collect(Collectors.toSet());
+        Map<Long, Book> bookByBookIdMap = bookRepository.findAllById(bookIds).stream()
+                .collect(Collectors.toMap(Book::getId, book -> book, (a, b) -> b));
+        if (bookIds.size() != bookByBookIdMap.size()) {
+            throw new NotFoundException(BOOKS_SIZE_ERROR_MESSAGE);
+        }
         Set<Comment> comments = commentCreateDtos.stream()
-                .map(this::createDtoToEntity)
+                .map(dto -> Comment.builder()
+                        .text(dto.getText())
+                        .book(bookByBookIdMap.get(dto.getBookId()))
+                        .build())
                 .collect(Collectors.toSet());
         return commentRepository.saveAll(comments).stream()
                 .map(commentMapper::toCreateDto)
                 .toList();
     }
 
-    private Comment createDtoToEntity(CommentCreateDto commentCreateDto) {
-        long bookId = commentCreateDto.getBookId();
-        Book book = bookRepository.findById(bookId)
-                .orElseThrow(() -> new NotFoundException(NO_BOOK_BY_ID_ERROR_MESSAGE.formatted(bookId)));
-        return commentMapper.createDtoToEntity(commentCreateDto, book);
-    }
-
     @Override
     @Transactional
     public List<CommentUpdateDto> updateBatch(Set<CommentUpdateDto> commentUpdateDtos) {
-        validateComments(commentUpdateDtos);
-        Set<Comment> comments = commentUpdateDtos.stream()
-                .map(this::updateDtoToEntity)
+        Set<Long> commentIds = commentUpdateDtos.stream()
+                .map(CommentUpdateDto::getId)
+                .collect(Collectors.toCollection(HashSet::new));
+        if (commentIds.size() != commentRepository.findAllById(commentIds).size()) {
+            throw new NotFoundException(
+                    "The number of requested foundComments does not match the number in the database");
+        }
+        Set<Long> bookIds = commentUpdateDtos.stream()
+                .map(CommentUpdateDto::getBookId)
                 .collect(Collectors.toSet());
+        Map<Long, Book> bookByBookIdMap = bookRepository.findAllById(bookIds).stream()
+                .collect(Collectors.toMap(Book::getId, book -> book, (a, b) -> b));
+        if (bookIds.size() != bookByBookIdMap.size()) {
+            throw new NotFoundException(BOOKS_SIZE_ERROR_MESSAGE);
+        }
+        Set<Comment> comments = getFormedCommentsForUpdate(commentUpdateDtos, bookByBookIdMap);
         return commentRepository.saveAll(comments).stream()
                 .map(commentMapper::toUpdateDto)
                 .toList();
     }
 
-    private Comment updateDtoToEntity(CommentUpdateDto commentUpdateDto) {
-        long bookId = commentUpdateDto.getBookId();
-        Book book = bookRepository.findById(bookId)
-                .orElseThrow(() -> new NotFoundException(NO_BOOK_BY_ID_ERROR_MESSAGE.formatted(bookId)));
-        return commentMapper.updateDtoToEntity(commentUpdateDto, book);
-    }
-
-    private void validateComments(Set<CommentUpdateDto> commentUpdateDtos) {
-        Set<Long> commentsIds = commentUpdateDtos.stream()
-                .map(CommentUpdateDto::getId)
-                .collect(Collectors.toCollection(HashSet::new));
-        List<Comment> foundComments = commentRepository.findAllById(commentsIds);
-        if (commentsIds.size() != foundComments.size()) {
-            throw new NotFoundException(
-                    "The number of requested comments does not match the number in the database");
-        }
+    private static Set<Comment> getFormedCommentsForUpdate(Set<CommentUpdateDto> commentUpdateDtos,
+                                                           Map<Long, Book> bookByBookIdMap) {
+        return commentUpdateDtos.stream()
+                .map(dto -> Comment.builder()
+                        .id(dto.getId())
+                        .text(dto.getText())
+                        .book(bookByBookIdMap.get(dto.getBookId()))
+                        .build())
+                .collect(Collectors.toSet());
     }
 
     @Override

@@ -31,7 +31,6 @@ import java.util.Set;
 @NoArgsConstructor
 @AllArgsConstructor
 @Table(name = "books")
-@SuppressWarnings("all")
 @NamedEntityGraph(name = "Book.author", attributeNodes = @NamedAttributeNode("author"))
 @NamedEntityGraph(name = "Book.all", attributeNodes = {@NamedAttributeNode("author"), @NamedAttributeNode("genres")})
 public class Book {

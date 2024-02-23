@@ -7,7 +7,6 @@ import ru.otus.spring.dto.update.GenreUpdateDto;
 import java.util.List;
 import java.util.Set;
 
-@SuppressWarnings("all")
 public interface GenreService {
 
     List<GenreDto> findAll();

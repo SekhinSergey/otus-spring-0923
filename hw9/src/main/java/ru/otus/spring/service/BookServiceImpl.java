@@ -17,23 +17,23 @@ import ru.otus.spring.repository.CommentRepository;
 import ru.otus.spring.repository.GenreRepository;
 
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
-import java.util.Objects;
-import java.util.Optional;
+import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
 
 import static org.apache.commons.lang3.StringUtils.SPACE;
+import static ru.otus.spring.constant.Constants.AUTHORS_SIZE_ERROR_MESSAGE;
+import static ru.otus.spring.constant.Constants.BOOKS_SIZE_ERROR_MESSAGE;
+import static ru.otus.spring.constant.Constants.GENRES_SIZE_ERROR_MESSAGE;
 import static ru.otus.spring.constant.Constants.NO_AUTHOR_BY_ID_ERROR_MESSAGE;
 import static ru.otus.spring.constant.Constants.NO_BOOK_BY_ID_ERROR_MESSAGE;
 
 @Service
 @RequiredArgsConstructor
 public class BookServiceImpl implements BookService {
-
-    private static final String GENRES_SIZE_ERROR_MESSAGE =
-            "The number of requested genres does not match the number in the database";
 
     private final BookRepository bookRepository;
 
@@ -46,7 +46,6 @@ public class BookServiceImpl implements BookService {
     private final BookMapper bookMapper;
 
     @Override
-    @SuppressWarnings("all")
     @Transactional(readOnly = true)
     public List<BookDto> findAll() {
         List<Book> books = bookRepository.findAll();
@@ -81,32 +80,110 @@ public class BookServiceImpl implements BookService {
     @Override
     @Transactional
     public BookCreateDto create(BookCreateDto bookCreateDto) {
-        return bookMapper.toCreateDto(save(createDtoToEntity(bookCreateDto)));
+        long id = bookCreateDto.getId();
+        if (bookRepository.findById(id).isPresent()) {
+            throw new NotFoundException("Book with id %d already exists".formatted(id));
+        }
+        long authorId = bookCreateDto.getAuthorId();
+        Author author = authorRepository.findById(authorId)
+                .orElseThrow(() -> new NotFoundException(NO_AUTHOR_BY_ID_ERROR_MESSAGE.formatted(authorId)));
+        Set<Long> genreIds = Arrays.stream(bookCreateDto.getGenreIds().split(SPACE))
+                .map(Long::parseLong)
+                .collect(Collectors.toSet());
+        Set<Genre> genres = new HashSet<>(genreRepository.findAllById(genreIds));
+        if (genreIds.size() != genres.size()) {
+            throw new NotFoundException(GENRES_SIZE_ERROR_MESSAGE);
+        }
+        return bookMapper.toCreateDto(bookRepository.save(bookMapper.createDtoToEntity(bookCreateDto, author, genres)));
     }
 
     @Override
     @Transactional
-    @SuppressWarnings("all")
     public BookUpdateDto update(BookUpdateDto bookUpdateDto) {
         long id = bookUpdateDto.getId();
-        bookRepository.findById(id)
+        Book book = bookRepository.findById(id)
                 .orElseThrow(() -> new NotFoundException(NO_BOOK_BY_ID_ERROR_MESSAGE.formatted(id)));
-        return bookMapper.toUpdateDto(save(updateDtoToEntity(bookUpdateDto)));
-    }
-
-    @SuppressWarnings("all")
-    private Book save(Book book) {
-        long authorId = book.getAuthor().getId();
-        authorRepository.findById(authorId)
-                .orElseThrow(() -> new NotFoundException(NO_AUTHOR_BY_ID_ERROR_MESSAGE.formatted(authorId)));
-        Set<Long> genresIds = book.getGenres().stream()
-                .map(Genre::getId)
-                .collect(Collectors.toCollection(HashSet::new));
-        var foundGenres = genreRepository.findAllById(genresIds);
-        if (genresIds.size() != foundGenres.size()) {
+        Long authorId = bookUpdateDto.getAuthorId();
+        if (!authorId.equals(book.getAuthor().getId())) {
+            Author author = authorRepository.findById(authorId)
+                    .orElseThrow(() -> new NotFoundException(NO_AUTHOR_BY_ID_ERROR_MESSAGE.formatted(authorId)));
+            book.setAuthor(author);
+        }
+        Set<Long> genreIds = Arrays.stream(bookUpdateDto.getGenreIds().split(SPACE))
+                .map(Long::parseLong)
+                .collect(Collectors.toSet());
+        Set<Genre> genres = new HashSet<>(genreRepository.findAllById(genreIds));
+        if (genreIds.size() != genres.size()) {
             throw new NotFoundException(GENRES_SIZE_ERROR_MESSAGE);
         }
-        return bookRepository.save(book);
+        book.setGenres(genres);
+        return bookMapper.toUpdateDto(bookRepository.save(book));
+    }
+
+    @Override
+    @Transactional
+    public List<BookUpdateDto> updateBatch(Set<BookUpdateDto> bookUpdateDtos) {
+        checkExistence(bookUpdateDtos);
+        Map<Long, Author> authorByAuthorIdMap = getAuthorByAuthorIdMap(bookUpdateDtos);
+        Map<Long, Set<Long>> genreIdsByIdMap = new HashMap<>();
+        Set<Long> genreIds = new HashSet<>();
+        bookUpdateDtos.forEach(dto -> {
+            Set<Long> bookGenreIds = Arrays.stream(dto.getGenreIds().split(SPACE))
+                    .map(Long::parseLong)
+                    .collect(Collectors.toSet());
+            genreIdsByIdMap.put(dto.getId(), bookGenreIds);
+            genreIds.addAll(bookGenreIds);
+        });
+        Map<Long, Genre> genreByGenreIdMap = getGenreByGenreIdMap(genreIds);
+        Set<Book> books = getFormedBooks(bookUpdateDtos, authorByAuthorIdMap, genreIdsByIdMap, genreByGenreIdMap);
+        return bookRepository.saveAll(books).stream()
+                .map(bookMapper::toUpdateDto)
+                .toList();
+    }
+
+    private void checkExistence(Set<BookUpdateDto> bookUpdateDtos) {
+        Set<Long> ids = bookUpdateDtos.stream()
+                .map(BookUpdateDto::getId)
+                .collect(Collectors.toSet());
+        if (ids.size() != bookRepository.findAllById(ids).size()) {
+            throw new NotFoundException(BOOKS_SIZE_ERROR_MESSAGE);
+        }
+    }
+
+    private Map<Long, Author> getAuthorByAuthorIdMap(Set<BookUpdateDto> bookUpdateDtos) {
+        Set<Long> authorIds = bookUpdateDtos.stream()
+                .map(BookUpdateDto::getAuthorId)
+                .collect(Collectors.toSet());
+        Map<Long, Author> authorByAuthorIdMap = authorRepository.findAllById(authorIds).stream()
+                .collect(Collectors.toMap(Author::getId, author -> author, (a, b) -> b));
+        if (authorIds.size() != authorByAuthorIdMap.size()) {
+            throw new NotFoundException(AUTHORS_SIZE_ERROR_MESSAGE);
+        }
+        return authorByAuthorIdMap;
+    }
+
+    private Map<Long, Genre> getGenreByGenreIdMap(Set<Long> genreIds) {
+        Map<Long, Genre> genreByGenreIdMap = genreRepository.findAllById(genreIds).stream()
+                .collect(Collectors.toMap(Genre::getId, genre -> genre, (a, b) -> b));
+        if (genreIds.size() != genreByGenreIdMap.size()) {
+            throw new NotFoundException(GENRES_SIZE_ERROR_MESSAGE);
+        }
+        return genreByGenreIdMap;
+    }
+
+    private static Set<Book> getFormedBooks(Set<BookUpdateDto> bookUpdateDtos,
+                                            Map<Long, Author> authorByAuthorIdMap,
+                                            Map<Long, Set<Long>> genreIdsByIdMap,
+                                            Map<Long, Genre> genreByGenreIdMap) {
+        return bookUpdateDtos.stream().map(dto -> Book.builder()
+                        .id(dto.getId())
+                        .title(dto.getTitle())
+                        .author(authorByAuthorIdMap.get(dto.getAuthorId()))
+                        .genres(genreIdsByIdMap.get(dto.getId()).stream()
+                                .map(genreByGenreIdMap::get)
+                                .collect(Collectors.toSet()))
+                        .build())
+                .collect(Collectors.toSet());
     }
 
     @Override
@@ -126,68 +203,6 @@ public class BookServiceImpl implements BookService {
     @Transactional(readOnly = true)
     public int countByGenreId(long genreId) {
         return bookRepository.countByGenresId(genreId);
-    }
-
-    @Override
-    @Transactional
-    public List<BookCreateDto> createBatch(Set<BookCreateDto> bookCreateDtos) {
-        Set<Book> books = bookCreateDtos.stream()
-                .map(this::createDtoToEntity)
-                .collect(Collectors.toSet());
-        return bookRepository.saveAll(books).stream()
-                .map(bookMapper::toCreateDto)
-                .toList();
-    }
-
-    private Book createDtoToEntity(BookCreateDto bookCreateDto) {
-        Long id = bookCreateDto.getId();
-        if (Objects.nonNull(id) && bookRepository.findById(id).isPresent()) {
-            throw new NotFoundException("Book with id %d already exists".formatted(id));
-        }
-        long authorId = bookCreateDto.getAuthorId();
-        Author author = authorRepository.findById(authorId)
-                .orElseThrow(() -> new NotFoundException(NO_AUTHOR_BY_ID_ERROR_MESSAGE.formatted(authorId)));
-        List<String> genreIds = Arrays.stream(bookCreateDto.getGenreIds()
-                        .split(SPACE))
-                        .toList();
-        Set<Genre> genres = genreIds.stream()
-                .map(genreId -> genreRepository.findById(Long.parseLong(genreId)))
-                .filter(Optional::isPresent)
-                .map(Optional::get)
-                .collect(Collectors.toSet());
-        if (genreIds.size() != genres.size()) {
-            throw new NotFoundException(GENRES_SIZE_ERROR_MESSAGE);
-        }
-        return bookMapper.createDtoToEntity(bookCreateDto, author, genres);
-    }
-
-    @Override
-    @Transactional
-    public List<BookUpdateDto> updateBatch(Set<BookUpdateDto> bookUpdateDtos) {
-        Set<Book> books = bookUpdateDtos.stream()
-                .map(this::updateDtoToEntity)
-                .collect(Collectors.toSet());
-        return bookRepository.saveAll(books).stream()
-                .map(bookMapper::toUpdateDto)
-                .toList();
-    }
-
-    private Book updateDtoToEntity(BookUpdateDto bookUpdateDto) {
-        long authorId = bookUpdateDto.getAuthorId();
-        Author author = authorRepository.findById(authorId)
-                .orElseThrow(() -> new NotFoundException(NO_AUTHOR_BY_ID_ERROR_MESSAGE.formatted(authorId)));
-        List<String> genreIds = Arrays.stream(bookUpdateDto.getGenreIds()
-                        .split(SPACE))
-                        .toList();
-        Set<Genre> genres = genreIds.stream()
-                .map(genreId -> genreRepository.findById(Long.parseLong(genreId)))
-                .filter(Optional::isPresent)
-                .map(Optional::get)
-                .collect(Collectors.toSet());
-        if (genreIds.size() != genres.size()) {
-            throw new NotFoundException(GENRES_SIZE_ERROR_MESSAGE);
-        }
-        return bookMapper.updateDtoToEntity(bookUpdateDto, author, genres);
     }
 
     @Override

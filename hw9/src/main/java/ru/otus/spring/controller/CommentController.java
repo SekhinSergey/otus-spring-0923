@@ -15,7 +15,6 @@ import ru.otus.spring.service.CommentService;
 
 @Controller
 @RequiredArgsConstructor
-@SuppressWarnings("all")
 public class CommentController {
 
     private final CommentService commentService;

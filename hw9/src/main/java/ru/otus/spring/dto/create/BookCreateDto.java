@@ -9,6 +9,7 @@ import lombok.Getter;
 @Builder
 public class BookCreateDto {
 
+    // Нельзя удалить, так как используется
     private Long id;
 
     @NotBlank(message = "field-value-should-not-be-blank")

@@ -20,7 +20,6 @@ public class CommentMapper {
 
     public CommentCreateDto toCreateDto(Comment comment) {
         return CommentCreateDto.builder()
-                .id(comment.getId())
                 .text(comment.getText())
                 .bookId(comment.getBook().getId())
                 .build();
@@ -28,7 +27,6 @@ public class CommentMapper {
 
     public Comment createDtoToEntity(CommentCreateDto commentCreateDto, Book book) {
         return Comment.builder()
-                .id(commentCreateDto.getId())
                 .text(commentCreateDto.getText())
                 .book(book)
                 .build();
@@ -39,14 +37,6 @@ public class CommentMapper {
                 .id(comment.getId())
                 .text(comment.getText())
                 .bookId(comment.getBook().getId())
-                .build();
-    }
-
-    public Comment updateDtoToEntity(CommentUpdateDto commentUpdateDto, Book book) {
-        return Comment.builder()
-                .id(commentUpdateDto.getId())
-                .text(commentUpdateDto.getText())
-                .book(book)
                 .build();
     }
 }

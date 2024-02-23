@@ -7,7 +7,6 @@ import ru.otus.spring.dto.update.BookUpdateDto;
 import java.util.List;
 import java.util.Set;
 
-@SuppressWarnings("all")
 public interface BookService {
 
     List<BookDto> findAll();
@@ -27,8 +26,6 @@ public interface BookService {
     int countByAuthorId(long authorId);
 
     int countByGenreId(long genreId);
-
-    List<BookCreateDto> createBatch(Set<BookCreateDto> bookCreateDtos);
 
     List<BookUpdateDto> updateBatch(Set<BookUpdateDto> bookUpdateDtos);
 
