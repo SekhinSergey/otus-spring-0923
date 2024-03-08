@@ -77,6 +77,7 @@ export default {
       this.book.author = book.author;
       this.book.genre = book.genre;
       this.isEditingMode = false;
+      this.getBooks();
     },
     addBook: function () {
       this.isAddingMode = true;

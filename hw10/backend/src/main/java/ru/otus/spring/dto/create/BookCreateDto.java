@@ -12,9 +12,6 @@ import java.util.Set;
 @Builder
 public class BookCreateDto {
 
-    // Нельзя удалять, как минимум, потому что нам надо вернуть JSON с ID
-    private Long id;
-
     @NotBlank(message = "Book title value should not be blank")
     private String title;
 

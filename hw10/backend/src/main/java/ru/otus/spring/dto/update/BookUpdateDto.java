@@ -5,6 +5,7 @@ import jakarta.validation.constraints.NotEmpty;
 import jakarta.validation.constraints.NotNull;
 import lombok.Builder;
 import lombok.Getter;
+import lombok.Setter;
 
 import java.util.Set;
 
@@ -12,6 +13,7 @@ import java.util.Set;
 @Builder
 public class BookUpdateDto {
 
+    @Setter
     @NotNull(message = "Book ID value should not be null")
     private Long id;
 

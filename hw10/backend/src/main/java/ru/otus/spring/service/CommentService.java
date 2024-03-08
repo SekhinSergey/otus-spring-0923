@@ -1,6 +1,6 @@
 package ru.otus.spring.service;
 
-import ru.otus.spring.dto.CommentDto;
+import ru.otus.spring.dto.response.CommentDto;
 import ru.otus.spring.dto.create.CommentCreateDto;
 import ru.otus.spring.dto.update.CommentUpdateDto;
 
@@ -23,13 +23,13 @@ public interface CommentService {
 
     int countByBookId(long bookId);
 
-    CommentCreateDto create(CommentCreateDto commentCreateDto);
+    CommentDto create(CommentCreateDto commentCreateDto);
 
-    CommentUpdateDto update(CommentUpdateDto commentUpdateDto);
+    CommentDto update(CommentUpdateDto commentUpdateDto);
 
-    List<CommentCreateDto> createBatch(Set<CommentCreateDto> commentCreateDtos);
+    List<CommentDto> createBatch(Set<CommentCreateDto> commentCreateDtos);
 
-    List<CommentUpdateDto> updateBatch(Set<CommentUpdateDto> commentUpdateDtos);
+    List<CommentDto> updateBatch(Set<CommentUpdateDto> commentUpdateDtos);
 
     void deleteAllByIds(Set<Long> ids);
 }

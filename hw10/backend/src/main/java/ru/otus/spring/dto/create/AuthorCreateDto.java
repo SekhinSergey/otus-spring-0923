@@ -8,8 +8,6 @@ import lombok.Getter;
 @Builder
 public class AuthorCreateDto {
 
-    private Long id;
-
     @NotBlank(message = "Author's full name value should not be blank")
     private String fullName;
 }

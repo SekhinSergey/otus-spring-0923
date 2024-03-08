@@ -3,7 +3,7 @@ package ru.otus.spring.service;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import ru.otus.spring.dto.CommentDto;
+import ru.otus.spring.dto.response.CommentDto;
 import ru.otus.spring.dto.create.CommentCreateDto;
 import ru.otus.spring.dto.update.CommentUpdateDto;
 import ru.otus.spring.exception.NotFoundException;
@@ -88,17 +88,17 @@ public class CommentServiceImpl implements CommentService {
 
     @Override
     @Transactional
-    public CommentCreateDto create(CommentCreateDto commentCreateDto) {
+    public CommentDto create(CommentCreateDto commentCreateDto) {
         long bookId = commentCreateDto.getBookId();
         Book book = bookRepository.findById(bookId)
                 .orElseThrow(() -> new NotFoundException(NO_BOOK_BY_ID_ERROR_MESSAGE.formatted(bookId)));
-        return commentMapper.toCreateDto(
+        return commentMapper.toDto(
                 commentRepository.save(commentMapper.createDtoToEntity(commentCreateDto, book)));
     }
 
     @Override
     @Transactional
-    public CommentUpdateDto update(CommentUpdateDto commentUpdateDto) {
+    public CommentDto update(CommentUpdateDto commentUpdateDto) {
         Long id = commentUpdateDto.getId();
         Comment comment = commentRepository.findById(id)
                 .orElseThrow(() -> new NotFoundException("Comment with id %d not found".formatted(id)));
@@ -107,16 +107,16 @@ public class CommentServiceImpl implements CommentService {
                 .orElseThrow(() -> new NotFoundException(NO_BOOK_BY_ID_ERROR_MESSAGE.formatted(bookId)));
         String text = commentUpdateDto.getText();
         if (text.equals(comment.getText())) {
-            return commentMapper.toUpdateDto(comment);
+            return commentMapper.toDto(comment);
         } else {
             comment.setText(text);
         }
-        return commentMapper.toUpdateDto(commentRepository.save(comment));
+        return commentMapper.toDto(commentRepository.save(comment));
     }
 
     @Override
     @Transactional
-    public List<CommentCreateDto> createBatch(Set<CommentCreateDto> commentCreateDtos) {
+    public List<CommentDto> createBatch(Set<CommentCreateDto> commentCreateDtos) {
         Set<Long> bookIds = commentCreateDtos.stream()
                 .map(CommentCreateDto::getBookId)
                 .collect(toSet());
@@ -132,13 +132,13 @@ public class CommentServiceImpl implements CommentService {
                         .build())
                 .collect(toSet());
         return commentRepository.saveAll(comments).stream()
-                .map(commentMapper::toCreateDto)
+                .map(commentMapper::toDto)
                 .toList();
     }
 
     @Override
     @Transactional
-    public List<CommentUpdateDto> updateBatch(Set<CommentUpdateDto> commentUpdateDtos) {
+    public List<CommentDto> updateBatch(Set<CommentUpdateDto> commentUpdateDtos) {
         Set<Long> commentIds = commentUpdateDtos.stream()
                 .map(CommentUpdateDto::getId)
                 .collect(toCollection(HashSet::new));
@@ -156,7 +156,7 @@ public class CommentServiceImpl implements CommentService {
         }
         Set<Comment> comments = getFormedCommentsForUpdate(commentUpdateDtos, bookByBookIdMap);
         return commentRepository.saveAll(comments).stream()
-                .map(commentMapper::toUpdateDto)
+                .map(commentMapper::toDto)
                 .toList();
     }
 

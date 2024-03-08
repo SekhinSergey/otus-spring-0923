@@ -8,8 +8,6 @@ import lombok.Getter;
 @Builder
 public class GenreCreateDto {
 
-    private Long id;
-
     @NotBlank(message = "Genre name value should not be blank")
     private String name;
 }

@@ -6,9 +6,7 @@ import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
-import ru.otus.spring.dto.BookDto;
-import ru.otus.spring.dto.create.BookCreateDto;
-import ru.otus.spring.dto.update.BookUpdateDto;
+import ru.otus.spring.dto.response.BookDto;
 import ru.otus.spring.model.Book;
 import ru.otus.spring.model.Genre;
 import ru.otus.spring.service.BookService;
@@ -16,7 +14,7 @@ import ru.otus.spring.service.BookService;
 import java.util.Set;
 
 import static java.util.stream.Collectors.toSet;
-import static org.hamcrest.Matchers.containsString;
+import static org.apache.commons.lang3.StringUtils.EMPTY;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.when;
@@ -64,7 +62,7 @@ class BookControllerTest {
     @Test
     void editTest() throws Exception {
         Book book = getDbBooks().get(0);
-        when(bookService.update(any())).thenReturn(BookUpdateDto.builder()
+        when(bookService.update(any())).thenReturn(BookDto.builder()
                 .id(book.getId())
                 .title("BookTitle_4")
                 .authorId(book.getAuthor().getId())
@@ -77,13 +75,13 @@ class BookControllerTest {
                 .perform(put("/api/library/book")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(json))
-                .andExpect(status().isOk())
+                .andExpect(status().isCreated())
                 .andExpect(content().json(json));
     }
 
     @Test
     void addTest() throws Exception {
-        when(bookService.create(any())).thenReturn(BookCreateDto.builder()
+        when(bookService.create(any())).thenReturn(BookDto.builder()
                 .id(4L)
                 .title("BookTitle_4")
                 .authorId(1L)
@@ -93,7 +91,7 @@ class BookControllerTest {
                 .perform(post("/api/library/book")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(getStringJsonByFilePath("src/test/resources/json/book/book_for_creation.json")))
-                .andExpect(status().isOk())
+                .andExpect(status().isCreated())
                 .andExpect(content().json(getStringJsonByFilePath("src/test/resources/json/book/created_book.json")));
     }
 
@@ -101,73 +99,42 @@ class BookControllerTest {
     void deleteTest() throws Exception {
         this.mockMvc
                 .perform(delete("/api/library/book?id=" + getDbBooks().get(0).getId()))
-                .andExpect(status().isOk())
-                .andExpect(content().string(containsString("Book with id 1 deleted")));
+                .andExpect(status().isNoContent())
+                .andExpect(content().string(EMPTY));
     }
 
     @Test
-    void noIdEditTest() throws Exception {
+    void noGenreIdsAllFieldsFailedEditTest() throws Exception {
+        this.mockMvc
+                .perform(put("/api/library/book")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(getStringJsonByFilePath("src/test/resources/json/empty.json")))
+                .andExpect(status().isBadRequest())
+                .andExpect(content().json(getStringJsonByFilePath(
+                        "src/test/resources/json/book/validation/response/no_genre_ids_all_fields_failed.json")));
+    }
+
+    @Test
+    void emptyGenreIdsAllFieldsFailedEditTest() throws Exception {
         this.mockMvc
                 .perform(put("/api/library/book")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(getStringJsonByFilePath(
-                                "src/test/resources/json/book/validation/no_id_book_for_update.json")))
+                                "src/test/resources/json/book/validation/request/empty_genre_ids.json")))
                 .andExpect(status().isBadRequest())
-                .andExpect(content().json("{\"id\":\"Book ID value should not be null\"}"));
+                .andExpect(content().json(getStringJsonByFilePath(
+                        "src/test/resources/json/book/validation/response/no_genre_ids_all_fields_failed.json")));
     }
 
     @Test
-    void noTitleEditTest() throws Exception {
+    void noSomeGenreIdAllFieldsFailedEditTest() throws Exception {
         this.mockMvc
                 .perform(put("/api/library/book")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(getStringJsonByFilePath(
-                                "src/test/resources/json/book/validation/no_title_book_for_update.json")))
+                                "src/test/resources/json/book/validation/request/no_some_genre_id.json")))
                 .andExpect(status().isBadRequest())
-                .andExpect(content().json("{\"title\":\"Book title value should not be blank\"}"));
-    }
-
-    @Test
-    void noAuthorIdEditTest() throws Exception {
-        this.mockMvc
-                .perform(put("/api/library/book")
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content(getStringJsonByFilePath(
-                                "src/test/resources/json/book/validation/no_author_id_book_for_update.json")))
-                .andExpect(status().isBadRequest())
-                .andExpect(content().json("{\"authorId\":\"Author ID value should not be null\"}"));
-    }
-
-    @Test
-    void noGenreIdsEditTest() throws Exception {
-        this.mockMvc
-                .perform(put("/api/library/book")
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content(getStringJsonByFilePath(
-                                "src/test/resources/json/book/validation/no_genre_ids_book_for_update.json")))
-                .andExpect(status().isBadRequest())
-                .andExpect(content().json("{\"genreIds\":\"Set of genre IDs value should not be empty\"}"));
-    }
-
-    @Test
-    void emptyGenreIdsEditTest() throws Exception {
-        this.mockMvc
-                .perform(put("/api/library/book")
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content(getStringJsonByFilePath(
-                                "src/test/resources/json/book/validation/empty_genre_ids_book_for_update.json")))
-                .andExpect(status().isBadRequest())
-                .andExpect(content().json("{\"genreIds\":\"Set of genre IDs value should not be empty\"}"));
-    }
-
-    @Test
-    void noSomeGenreIdEditTest() throws Exception {
-        this.mockMvc
-                .perform(put("/api/library/book")
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content(getStringJsonByFilePath(
-                                "src/test/resources/json/book/validation/no_some_genre_id_book_for_update.json")))
-                .andExpect(status().isBadRequest())
-                .andExpect(content().json("{\"genreIds[]\":\"Genre ID value should not be null\"}"));
+                .andExpect(content().json(getStringJsonByFilePath(
+                        "src/test/resources/json/book/validation/response/no_some_genre_id_all_fields_failed.json")));
     }
 }

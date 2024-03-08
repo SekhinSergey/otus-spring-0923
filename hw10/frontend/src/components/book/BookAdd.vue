@@ -9,13 +9,13 @@
             <div>
                 <label for="authorSelect">Choose author full name:</label>
                 <select id="authorSelect" class="form-control" v-model="authorId">
-                    <option v-for="author in associations.authors" :value="author.id">{{ author.fullName }}</option>
+                    <option v-for="author in authors" :value="author.id">{{ author.fullName }}</option>
                 </select>
             </div>
             <div>
                 <label for="genreSelect">Choose genre names:</label>
                 <select multiple id="genreSelect" class="form-control" v-model="genreIds">
-                    <option v-for="genre in associations.genres" :value="genre.id">{{ genre.name }}</option>
+                    <option v-for="genre in genres" :value="genre.id">{{ genre.name }}</option>
                 </select>
             </div>
             <button class="btn btn-primary" v-on:click="addBook()">Save</button>
@@ -29,20 +29,28 @@
         name: "BookCreate",
         data: function () {
             return {
-                associations: {},
+                authors: {},
+                genres: {},
                 title: '',
                 authorId: 0,
                 genreIds: []
             }
         },
         mounted: function () {
-            this.loadAssociations();
+            this.loadAuthors();
+            this.loadGenres();
         },
         methods: {
-            loadAssociations: function () {
-                apiService.getAssociations()
+            loadAuthors: function () {
+                apiService.getAuthors()
                     .then(response => {
-                        this.associations = response.data;
+                        this.authors = response.data;
+                    });
+            },
+            loadGenres: function () {
+                apiService.getGenres()
+                    .then(response => {
+                        this.genres = response.data;
                     });
             },
             addBook: function () {

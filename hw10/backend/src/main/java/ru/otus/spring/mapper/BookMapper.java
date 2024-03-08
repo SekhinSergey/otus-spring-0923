@@ -1,9 +1,8 @@
 package ru.otus.spring.mapper;
 
 import org.springframework.stereotype.Component;
-import ru.otus.spring.dto.BookDto;
+import ru.otus.spring.dto.response.BookDto;
 import ru.otus.spring.dto.create.BookCreateDto;
-import ru.otus.spring.dto.update.BookUpdateDto;
 import ru.otus.spring.model.Author;
 import ru.otus.spring.model.Book;
 import ru.otus.spring.model.Genre;
@@ -27,34 +26,11 @@ public class BookMapper {
                 .build();
     }
 
-    public BookCreateDto toCreateDto(Book book) {
-        return BookCreateDto.builder()
-                .id(book.getId())
-                .title(book.getTitle())
-                .authorId(book.getAuthor().getId())
-                .genreIds(book.getGenres().stream()
-                        .map(Genre::getId)
-                        .collect(toSet()))
-                .build();
-    }
-
     public Book createDtoToEntity(BookCreateDto bookCreateDto, Author author, Set<Genre> genres) {
         return Book.builder()
-                .id(bookCreateDto.getId())
                 .title(bookCreateDto.getTitle())
                 .author(author)
                 .genres(genres)
-                .build();
-    }
-
-    public BookUpdateDto toUpdateDto(Book book) {
-        return BookUpdateDto.builder()
-                .id(book.getId())
-                .title(book.getTitle())
-                .authorId(book.getAuthor().getId())
-                .genreIds(book.getGenres().stream()
-                        .map(Genre::getId)
-                        .collect(toSet()))
                 .build();
     }
 }

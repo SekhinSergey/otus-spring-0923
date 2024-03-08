@@ -1,4 +1,4 @@
-package ru.otus.spring.dto;
+package ru.otus.spring.dto.response;
 
 import lombok.Builder;
 

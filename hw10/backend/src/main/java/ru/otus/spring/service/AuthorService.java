@@ -1,6 +1,6 @@
 package ru.otus.spring.service;
 
-import ru.otus.spring.dto.AuthorDto;
+import ru.otus.spring.dto.response.AuthorDto;
 import ru.otus.spring.dto.create.AuthorCreateDto;
 import ru.otus.spring.dto.update.AuthorUpdateDto;
 
@@ -15,11 +15,11 @@ public interface AuthorService {
 
     List<AuthorDto> findAllByIds(Set<Long> ids);
 
-    AuthorCreateDto create(AuthorCreateDto authorCreateDto);
+    AuthorDto create(AuthorCreateDto authorCreateDto);
 
-    AuthorUpdateDto update(AuthorUpdateDto authorUpdateDto);
+    AuthorDto update(AuthorUpdateDto authorUpdateDto);
 
-    List<AuthorCreateDto> createBatch(Set<AuthorCreateDto> authorCreateDtos);
+    List<AuthorDto> createBatch(Set<AuthorCreateDto> authorCreateDtos);
 
-    List<AuthorUpdateDto> updateBatch(Set<AuthorUpdateDto> authorUpdateDtos);
+    List<AuthorDto> updateBatch(Set<AuthorUpdateDto> authorUpdateDtos);
 }

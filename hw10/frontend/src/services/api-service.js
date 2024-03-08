@@ -19,9 +19,6 @@ export default {
     deleteBook(bookId) {
         return apiClient.delete(`/book?id=${bookId}`);
     },
-    getAssociations() {
-        return apiClient.get('/associations');
-    },
     getCommentsByBookId(bookId) {
         return apiClient.get(`/comments?bookId=${bookId}`);
     },

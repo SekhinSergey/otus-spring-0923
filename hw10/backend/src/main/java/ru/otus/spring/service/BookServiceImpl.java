@@ -3,7 +3,7 @@ package ru.otus.spring.service;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import ru.otus.spring.dto.BookDto;
+import ru.otus.spring.dto.response.BookDto;
 import ru.otus.spring.dto.create.BookCreateDto;
 import ru.otus.spring.dto.update.BookUpdateDto;
 import ru.otus.spring.exception.NotFoundException;
@@ -22,7 +22,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import static java.util.Objects.nonNull;
 import static java.util.stream.Collectors.toMap;
 import static java.util.stream.Collectors.toSet;
 import static ru.otus.spring.constant.Constants.AUTHORS_SIZE_ERROR_MESSAGE;
@@ -72,11 +71,7 @@ public class BookServiceImpl implements BookService {
 
     @Override
     @Transactional
-    public BookCreateDto create(BookCreateDto bookCreateDto) {
-        Long id = bookCreateDto.getId();
-        if (nonNull(id) && bookRepository.findById(id).isPresent()) {
-            throw new NotFoundException("Book with id %d already exists".formatted(id));
-        }
+    public BookDto create(BookCreateDto bookCreateDto) {
         long authorId = bookCreateDto.getAuthorId();
         Author author = authorRepository.findById(authorId)
                 .orElseThrow(() -> new NotFoundException(NO_AUTHOR_BY_ID_ERROR_MESSAGE.formatted(authorId)));
@@ -85,12 +80,12 @@ public class BookServiceImpl implements BookService {
         if (genreIds.size() != genres.size()) {
             throw new NotFoundException(GENRES_SIZE_ERROR_MESSAGE);
         }
-        return bookMapper.toCreateDto(bookRepository.save(bookMapper.createDtoToEntity(bookCreateDto, author, genres)));
+        return bookMapper.toDto(bookRepository.save(bookMapper.createDtoToEntity(bookCreateDto, author, genres)));
     }
 
     @Override
     @Transactional
-    public BookUpdateDto update(BookUpdateDto bookUpdateDto) {
+    public BookDto update(BookUpdateDto bookUpdateDto) {
         long id = bookUpdateDto.getId();
         Book book = bookRepository.findById(id)
                 .orElseThrow(() -> new NotFoundException(NO_BOOK_BY_ID_ERROR_MESSAGE.formatted(id)));
@@ -110,12 +105,12 @@ public class BookServiceImpl implements BookService {
             throw new NotFoundException(GENRES_SIZE_ERROR_MESSAGE);
         }
         book.setGenres(genres);
-        return bookMapper.toUpdateDto(bookRepository.save(book));
+        return bookMapper.toDto(bookRepository.save(book));
     }
 
     @Override
     @Transactional
-    public List<BookUpdateDto> updateBatch(Set<BookUpdateDto> bookUpdateDtos) {
+    public List<BookDto> updateBatch(Set<BookUpdateDto> bookUpdateDtos) {
         checkExistence(bookUpdateDtos);
         Map<Long, Author> authorByAuthorIdMap = getAuthorByAuthorIdMap(bookUpdateDtos);
         Map<Long, Set<Long>> genreIdsByIdMap = new HashMap<>();
@@ -128,7 +123,7 @@ public class BookServiceImpl implements BookService {
         Map<Long, Genre> genreByGenreIdMap = getGenreByGenreIdMap(genreIds);
         Set<Book> books = getFormedBooks(bookUpdateDtos, authorByAuthorIdMap, genreIdsByIdMap, genreByGenreIdMap);
         return bookRepository.saveAll(books).stream()
-                .map(bookMapper::toUpdateDto)
+                .map(bookMapper::toDto)
                 .toList();
     }
 

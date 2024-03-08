@@ -1,6 +1,6 @@
 package ru.otus.spring.service;
 
-import ru.otus.spring.dto.BookDto;
+import ru.otus.spring.dto.response.BookDto;
 import ru.otus.spring.dto.create.BookCreateDto;
 import ru.otus.spring.dto.update.BookUpdateDto;
 
@@ -15,9 +15,9 @@ public interface BookService {
 
     List<BookDto> findAllByIds(Set<Long> ids);
 
-    BookCreateDto create(BookCreateDto bookCreateDto);
+    BookDto create(BookCreateDto bookCreateDto);
 
-    BookUpdateDto update(BookUpdateDto bookUpdateDto);
+    BookDto update(BookUpdateDto bookUpdateDto);
 
     void deleteById(long id);
 
@@ -25,7 +25,7 @@ public interface BookService {
 
     int countByGenreId(long genreId);
 
-    List<BookUpdateDto> updateBatch(Set<BookUpdateDto> bookUpdateDtos);
+    List<BookDto> updateBatch(Set<BookUpdateDto> bookUpdateDtos);
 
     void deleteAllByIds(Set<Long> ids);
 }

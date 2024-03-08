@@ -9,9 +9,6 @@ import lombok.Getter;
 @Builder
 public class CommentCreateDto {
 
-    // Нельзя удалять, как минимум, потому что нам надо вернуть JSON с ID
-    private Long id;
-
     @NotBlank(message = "Comment text value should not be blank")
     private String text;
 
