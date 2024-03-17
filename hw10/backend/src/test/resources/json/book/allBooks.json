@@ -1,0 +1,29 @@
+[
+  {
+    "id": 1,
+    "title": "BookTitle_1",
+    "authorId": 1,
+    "genreIds": [
+      1,
+      2
+    ]
+  },
+  {
+    "id": 2,
+    "title": "BookTitle_2",
+    "authorId": 2,
+    "genreIds": [
+      3,
+      4
+    ]
+  },
+  {
+    "id": 3,
+    "title": "BookTitle_3",
+    "authorId": 3,
+    "genreIds": [
+      5,
+      6
+    ]
+  }
+]

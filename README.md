@@ -25,3 +25,6 @@ HW8: каталог книг (Spring Data + Mongo)
 
 
 HW9: каталог книг (Spring MVC View)
+
+
+HW10: каталог книг (REST + Vue.js)

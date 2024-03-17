@@ -1,0 +1,8 @@
+{
+  "id": 4,
+  "title": "BookTitle_4",
+  "authorId": 1,
+  "genreIds": [
+    1
+  ]
+}

@@ -5,21 +5,13 @@
     <modelVersion>4.0.0</modelVersion>
 
     <groupId>ru.otus.spring</groupId>
-    <artifactId>otus-spring-0923</artifactId>
+    <artifactId>hw10</artifactId>
     <version>1.0.0</version>
 
     <packaging>pom</packaging>
 
     <modules>
-        <module>hw1</module>
-        <module>hw2</module>
-        <module>hw3</module>
-        <module>hw4</module>
-        <module>hw5</module>
-        <module>hw6</module>
-        <module>hw7</module>
-        <module>hw8</module>
-        <module>hw9</module>
-        <module>hw10</module>
+        <module>backend</module>
+        <module>frontend</module>
     </modules>
 </project>
