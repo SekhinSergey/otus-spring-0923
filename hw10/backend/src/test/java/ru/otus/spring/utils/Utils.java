@@ -20,6 +20,14 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 public class Utils {
 
+    public static final int FIRST_INDEX = 0;
+
+    public static final long NOT_EXISTENT_ID = 7;
+
+    public static final String NO_AUTHOR_BY_SPECIFIC_ID_ERROR_MESSAGE = "Author with id 7 not found";
+
+    public static final String NO_BOOK_BY_SPECIFIC_ID_ERROR_MESSAGE = "Book with id 7 not found";
+
     private static final String SIZE_ASSERTION_RULE = "java:S5838";
 
     public static List<Author> getDbAuthors() {

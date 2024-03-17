@@ -14,7 +14,6 @@ import java.util.Set;
 public class BookUpdateDto {
 
     @Setter
-    @NotNull(message = "Book ID value should not be null")
     private Long id;
 
     @NotBlank(message = "Book title value should not be blank")

@@ -16,6 +16,7 @@ import java.util.function.Function;
 
 import static java.util.stream.Collectors.toMap;
 import static org.assertj.core.api.Assertions.assertThat;
+import static ru.otus.spring.utils.Utils.FIRST_INDEX;
 import static ru.otus.spring.utils.Utils.assertThatActualAndExpectedBookAreEqual;
 import static ru.otus.spring.utils.Utils.getDbAuthors;
 import static ru.otus.spring.utils.Utils.getDbBooks;
@@ -24,7 +25,7 @@ import static ru.otus.spring.utils.Utils.getDbGenres;
 @DataJpaTest
 class BookRepositoryTest {
 
-    private static final String SIZE_ASSERTION_RULE = "java:S5838";
+    private static final int SINGLE_SIZE = 1;
 
     private List<Author> dbAuthors;
 
@@ -46,7 +47,6 @@ class BookRepositoryTest {
     }
 
     @Test
-    @SuppressWarnings(SIZE_ASSERTION_RULE)
     void shouldReturnCorrectBookList() {
         var actualBookList = bookRepository.findAll();
         var expectedBookList = dbBooks;
@@ -71,11 +71,11 @@ class BookRepositoryTest {
 
     @Test
     void shouldReturnCountByAuthorId() {
-        assertThat(bookRepository.countByAuthorId(dbAuthors.get(0).getId())).isEqualTo(1);
+        assertThat(bookRepository.countByAuthorId(dbAuthors.get(FIRST_INDEX).getId())).isEqualTo(SINGLE_SIZE);
     }
 
     @Test
     void shouldReturnCountByGenreId() {
-        assertThat(bookRepository.countByGenresId(dbGenres.get(0).getId())).isEqualTo(1);
+        assertThat(bookRepository.countByGenresId(dbGenres.get(FIRST_INDEX).getId())).isEqualTo(SINGLE_SIZE);
     }
 }

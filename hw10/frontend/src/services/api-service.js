@@ -10,8 +10,8 @@ export default {
     getBooks() {
         return apiClient.get('/books');
     },
-    updateBook(data) {
-        return apiClient.put('/book', data);
+    updateBook(id, data) {
+        return apiClient.put(`/book/${id}`, data);
     },
     addBook(data) {
         return apiClient.post('/book', data);
@@ -22,8 +22,8 @@ export default {
     getCommentsByBookId(bookId) {
         return apiClient.get(`/comments?bookId=${bookId}`);
     },
-    updateComment(data) {
-        return apiClient.put('/comment', data);
+    updateComment(id, data) {
+        return apiClient.put(`/comment/${id}`, data);
     },
     addComment(data) {
         return apiClient.post('/comment', data);

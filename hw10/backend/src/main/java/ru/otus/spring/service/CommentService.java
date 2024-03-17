@@ -25,7 +25,7 @@ public interface CommentService {
 
     CommentDto create(CommentCreateDto commentCreateDto);
 
-    CommentDto update(CommentUpdateDto commentUpdateDto);
+    CommentDto update(long id, CommentUpdateDto commentUpdateDto);
 
     List<CommentDto> createBatch(Set<CommentCreateDto> commentCreateDtos);
 

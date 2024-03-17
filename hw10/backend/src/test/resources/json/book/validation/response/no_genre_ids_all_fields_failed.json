@@ -1,10 +1,6 @@
 {
   "errors": [
     {
-      "field":"id",
-      "message":"Book ID value should not be null"
-    },
-    {
       "field":"genreIds",
       "message":"Set of genre IDs value should not be empty"
     },

@@ -20,6 +20,7 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Set;
 
 import static java.util.stream.Collectors.toMap;
@@ -85,16 +86,15 @@ public class BookServiceImpl implements BookService {
 
     @Override
     @Transactional
-    public BookDto update(BookUpdateDto bookUpdateDto) {
-        long id = bookUpdateDto.getId();
+    public BookDto update(long id, BookUpdateDto bookUpdateDto) {
         Book book = bookRepository.findById(id)
                 .orElseThrow(() -> new NotFoundException(NO_BOOK_BY_ID_ERROR_MESSAGE.formatted(id)));
         String title = bookUpdateDto.getTitle();
-        if (!title.equals(book.getTitle())) {
+        if (!Objects.equals(title, book.getTitle())) {
             book.setTitle(title);
         }
         Long authorId = bookUpdateDto.getAuthorId();
-        if (!authorId.equals(book.getAuthor().getId())) {
+        if (!Objects.equals(authorId, book.getAuthor().getId())) {
             Author author = authorRepository.findById(authorId)
                     .orElseThrow(() -> new NotFoundException(NO_AUTHOR_BY_ID_ERROR_MESSAGE.formatted(authorId)));
             book.setAuthor(author);

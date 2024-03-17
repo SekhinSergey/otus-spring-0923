@@ -5,10 +5,6 @@
       "message":"Book ID value should not be null"
     },
     {
-      "field":"id",
-      "message":"Comment ID value should not be null"
-    },
-    {
       "field":"text",
       "message":"Comment text value should not be blank"
     }

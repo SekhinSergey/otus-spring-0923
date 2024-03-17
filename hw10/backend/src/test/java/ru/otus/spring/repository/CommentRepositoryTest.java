@@ -11,6 +11,7 @@ import java.util.List;
 import java.util.Set;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static ru.otus.spring.utils.Utils.FIRST_INDEX;
 import static ru.otus.spring.utils.Utils.assertThatActualAndExpectedBookAreEqual;
 import static ru.otus.spring.utils.Utils.getDbBooks;
 import static ru.otus.spring.utils.Utils.getDbComments;
@@ -33,9 +34,9 @@ class CommentRepositoryTest {
 
     @Test
     void shouldFindAllExpectedCommentsByBookId() {
-        List<Comment> comments = commentRepository.findAllByBookId(getDbBooks().get(0).getId());
-        var actualComment = comments.get(0);
-        var expectedComment = testEntityManager.find(Comment.class, dbComments.get(0).getId());
+        List<Comment> comments = commentRepository.findAllByBookId(getDbBooks().get(FIRST_INDEX).getId());
+        var actualComment = comments.get(FIRST_INDEX);
+        var expectedComment = testEntityManager.find(Comment.class, dbComments.get(FIRST_INDEX).getId());
         assertThat(actualComment.getId()).isEqualTo(actualComment.getId());
         assertThat(actualComment.getText()).isEqualTo(expectedComment.getText());
         assertThatActualAndExpectedBookAreEqual(actualComment.getBook(), expectedComment.getBook());
@@ -43,15 +44,16 @@ class CommentRepositoryTest {
 
     @Test
     void shouldDeleteCommentsByBookIdCorrectly() {
-        Long bookId = getDbBooks().get(0).getId();
+        Long bookId = getDbBooks().get(FIRST_INDEX).getId();
         commentRepository.deleteAllByBookId(bookId);
         assertThat(commentRepository.findAllByBookId(bookId)).isEmpty();
     }
 
     @Test
     void shouldDeleteCommentsByBookIdsCorrectly() {
-        Long firstBookId = getDbBooks().get(0).getId();
-        Long secondBookId = getDbBooks().get(1).getId();
+        Long firstBookId = getDbBooks().get(FIRST_INDEX).getId();
+        int secondIndex = 1;
+        Long secondBookId = getDbBooks().get(secondIndex).getId();
         commentRepository.deleteAllByBookIdIn(Set.of(firstBookId, secondBookId));
         assertThat(commentRepository.findAllByBookId(firstBookId)).isEmpty();
         assertThat(commentRepository.findAllByBookId(secondBookId)).isEmpty();
@@ -59,6 +61,7 @@ class CommentRepositoryTest {
 
     @Test
     void shouldCountCommentsByBookIdCorrectly() {
-        assertThat(commentRepository.countByBookId(getDbBooks().get(0).getId())).isEqualTo(1);
+        int singleSize = 1;
+        assertThat(commentRepository.countByBookId(getDbBooks().get(FIRST_INDEX).getId())).isEqualTo(singleSize);
     }
 }

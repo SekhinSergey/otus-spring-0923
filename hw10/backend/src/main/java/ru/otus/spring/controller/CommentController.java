@@ -6,6 +6,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -31,12 +32,12 @@ public class CommentController {
         return commentService.findAllByBookId(bookId);
     }
 
-    // Надо добавить параметр, вместо валидации руками его проверять и сетить? Зачем выполнять столько лишних действий?
-    @PutMapping("/api/library/comment")
-    public ResponseEntity<CommentDto> edit(@Valid @RequestBody CommentUpdateDto commentUpdateDto) {
+    @PutMapping("/api/library/comment/{id}")
+    public ResponseEntity<CommentDto> edit(@PathVariable long id,
+                                           @Valid @RequestBody CommentUpdateDto commentUpdateDto) {
         return ResponseEntity
                 .status(HttpStatus.CREATED)
-                .body(commentService.update(commentUpdateDto));
+                .body(commentService.update(id, commentUpdateDto));
     }
 
     @PostMapping("/api/library/comment")

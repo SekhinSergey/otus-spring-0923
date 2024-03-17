@@ -68,7 +68,7 @@
                 bookToSave.title = this.bookTitle;
                 bookToSave.authorId = this.selectedAuthorId;
                 bookToSave.genreIds = this.selectedGenreIds;
-                apiService.updateBook(bookToSave)
+                apiService.updateBook(this.bookModel.id, bookToSave)
                     .then(response => {
                         this.$emit('bookSaved', response.data);
                     });

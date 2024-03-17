@@ -98,10 +98,10 @@ public class CommentServiceImpl implements CommentService {
 
     @Override
     @Transactional
-    public CommentDto update(CommentUpdateDto commentUpdateDto) {
-        Long id = commentUpdateDto.getId();
+    public CommentDto update(long id, CommentUpdateDto commentUpdateDto) {
         Comment comment = commentRepository.findById(id)
-                .orElseThrow(() -> new NotFoundException("Comment with id %d not found".formatted(id)));
+                .orElseThrow(() -> new NotFoundException(NO_COMMENT_BY_ID_ERROR_MESSAGE.formatted(id)));
+        commentUpdateDto.setId(id);
         long bookId = commentUpdateDto.getBookId();
         bookRepository.findById(bookId)
                 .orElseThrow(() -> new NotFoundException(NO_BOOK_BY_ID_ERROR_MESSAGE.formatted(bookId)));

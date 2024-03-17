@@ -12,7 +12,7 @@
     </parent>
 
     <groupId>ru.otus.spring</groupId>
-    <artifactId>hw10</artifactId>
+    <artifactId>backend</artifactId>
     <version>1.0.0</version>
 
     <properties>
@@ -70,7 +70,7 @@
     </dependencies>
 
     <build>
-        <finalName>hw10</finalName>
+        <finalName>backend</finalName>
         <plugins>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>

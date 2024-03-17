@@ -5,6 +5,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.MediaType;
+
 import org.springframework.test.web.servlet.MockMvc;
 import ru.otus.spring.dto.response.BookDto;
 import ru.otus.spring.model.Book;
@@ -16,6 +17,7 @@ import java.util.Set;
 import static java.util.stream.Collectors.toSet;
 import static org.apache.commons.lang3.StringUtils.EMPTY;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
@@ -24,11 +26,16 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+import static ru.otus.spring.utils.Utils.FIRST_INDEX;
+import static ru.otus.spring.utils.Utils.getDbAuthors;
 import static ru.otus.spring.utils.Utils.getDbBooks;
+import static ru.otus.spring.utils.Utils.getDbGenres;
 import static ru.otus.spring.utils.Utils.getStringJsonByFilePath;
 
 @WebMvcTest(BookController.class)
 class BookControllerTest {
+
+    private static final String NEW_TITLE = "BookTitle_4";
 
     @Autowired
     private MockMvc mockMvc;
@@ -61,10 +68,11 @@ class BookControllerTest {
 
     @Test
     void editTest() throws Exception {
-        Book book = getDbBooks().get(0);
-        when(bookService.update(any())).thenReturn(BookDto.builder()
-                .id(book.getId())
-                .title("BookTitle_4")
+        Book book = getDbBooks().get(FIRST_INDEX);
+        long id = book.getId();
+        when(bookService.update(anyLong(), any())).thenReturn(BookDto.builder()
+                .id(id)
+                .title(NEW_TITLE)
                 .authorId(book.getAuthor().getId())
                 .genreIds(book.getGenres().stream()
                         .map(Genre::getId)
@@ -72,7 +80,7 @@ class BookControllerTest {
                 .build());
         String json = getStringJsonByFilePath("src/test/resources/json/book/book_for_update.json");
         this.mockMvc
-                .perform(put("/api/library/book")
+                .perform(put("/api/library/book/{id}", id)
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(json))
                 .andExpect(status().isCreated())
@@ -81,11 +89,12 @@ class BookControllerTest {
 
     @Test
     void addTest() throws Exception {
+        long nextId = 4L;
         when(bookService.create(any())).thenReturn(BookDto.builder()
-                .id(4L)
-                .title("BookTitle_4")
-                .authorId(1L)
-                .genreIds(Set.of(1L))
+                .id(nextId)
+                .title(NEW_TITLE)
+                .authorId(getDbAuthors().get(FIRST_INDEX).getId())
+                .genreIds(Set.of(getDbGenres().get(FIRST_INDEX).getId()))
                 .build());
         this.mockMvc
                 .perform(post("/api/library/book")
@@ -98,7 +107,7 @@ class BookControllerTest {
     @Test
     void deleteTest() throws Exception {
         this.mockMvc
-                .perform(delete("/api/library/book?id=" + getDbBooks().get(0).getId()))
+                .perform(delete("/api/library/book?id=" + getDbBooks().get(FIRST_INDEX).getId()))
                 .andExpect(status().isNoContent())
                 .andExpect(content().string(EMPTY));
     }
@@ -106,7 +115,7 @@ class BookControllerTest {
     @Test
     void noGenreIdsAllFieldsFailedEditTest() throws Exception {
         this.mockMvc
-                .perform(put("/api/library/book")
+                .perform(put("/api/library/book/{id}", getDbBooks().get(FIRST_INDEX).getId())
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(getStringJsonByFilePath("src/test/resources/json/empty.json")))
                 .andExpect(status().isBadRequest())
@@ -117,7 +126,7 @@ class BookControllerTest {
     @Test
     void emptyGenreIdsAllFieldsFailedEditTest() throws Exception {
         this.mockMvc
-                .perform(put("/api/library/book")
+                .perform(put("/api/library/book/{id}", getDbBooks().get(FIRST_INDEX).getId())
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(getStringJsonByFilePath(
                                 "src/test/resources/json/book/validation/request/empty_genre_ids.json")))
@@ -129,7 +138,7 @@ class BookControllerTest {
     @Test
     void noSomeGenreIdAllFieldsFailedEditTest() throws Exception {
         this.mockMvc
-                .perform(put("/api/library/book")
+                .perform(put("/api/library/book/{id}", getDbBooks().get(FIRST_INDEX).getId())
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(getStringJsonByFilePath(
                                 "src/test/resources/json/book/validation/request/no_some_genre_id.json")))
