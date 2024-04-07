@@ -85,9 +85,9 @@ export default {
       this.editCommentMode = false;
     },
     deleteComment: function (id) {
-      apiService.deleteComment(id)
+      apiService.deleteComment(id.id)
           .then(() => {
-            this.updateModelAfterDelete(id);
+            this.updateModelAfterDelete(id.id);
           })
     },
     updateModelAfterDelete: function (id) {
