@@ -29,11 +29,12 @@ import ru.otus.spring.repository.GenreRepository;
 import java.util.Comparator;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 import static java.util.stream.Collectors.toSet;
-import static ru.otus.spring.constant.Constants.GENRES_SIZE_ERROR_MESSAGE;
-import static ru.otus.spring.constant.Constants.NO_AUTHOR_BY_ID_ERROR_MESSAGE;
-import static ru.otus.spring.constant.Constants.NO_BOOK_BY_ID_ERROR_MESSAGE;
+import static ru.otus.spring.utils.Messages.GENRES_SIZE_ERROR_MESSAGE;
+import static ru.otus.spring.utils.Messages.NO_AUTHOR_BY_ID_ERROR_MESSAGE;
+import static ru.otus.spring.utils.Messages.NO_BOOK_BY_ID_ERROR_MESSAGE;
 
 @RestController
 @RequiredArgsConstructor
@@ -55,62 +56,54 @@ public class BookController {
     }
 
     @PutMapping("/api/library/book/{id}")
-    public ResponseEntity<Mono<BookDto>> edit(@PathVariable String id,
+    public Mono<ResponseEntity<BookDto>> edit(@PathVariable String id,
                                               @Valid @RequestBody BookUpdateDto bookUpdateDto) {
-        Mono<String> dbId = bookRepository.findById(id)
+        return bookRepository.findById(id)
                 .switchIfEmpty(Mono.error(() -> new NotFoundException(NO_BOOK_BY_ID_ERROR_MESSAGE.formatted(id))))
-                .map(Book::getId);
-        Mono<List<Genre>> dbGenres = genreRepository.findAllById(bookUpdateDto.getGenreIds())
-                .collectList();
-        dbGenres.toFuture().thenApply(genres -> {
-            if (bookUpdateDto.getGenreIds().size() != genres.size()) {
-                throw new NotFoundException(GENRES_SIZE_ERROR_MESSAGE);
-            }
-            return genres;
-        });
-        String authorId = bookUpdateDto.getAuthorId();
-        return ResponseEntity
-                .status(HttpStatus.CREATED)
-                .body(Mono.zip(dbId, getAuthor(authorId), dbGenres)
-                        .flatMap(data -> Mono.just(Book.builder()
-                                .id(data.getT1())
-                                .title(bookUpdateDto.getTitle())
-                                .author(data.getT2())
-                                .genres(new HashSet<>(data.getT3()))
-                                .build()))
-                        .flatMap(bookRepository::save)
-                        .map(this::toDto));
-
+                .zipWith(getAuthor(bookUpdateDto.getAuthorId()))
+                .zipWith(genreRepository.findAllById(bookUpdateDto.getGenreIds()).collectList())
+                .flatMap(data -> Mono.just(Book.builder()
+                        .id(id)
+                        .title(bookUpdateDto.getTitle())
+                        .author(data.getT1().getT2())
+                        .genres(bookUpdateDto.getGenreIds().size() == new HashSet<>(data.getT2()).size()
+                                ? new HashSet<>(data.getT2())
+                                : Set.of())
+                        .build()))
+                .filter(book -> !book.getGenres().isEmpty())
+                .switchIfEmpty(Mono.error(() -> new NotFoundException(GENRES_SIZE_ERROR_MESSAGE)))
+                .flatMap(bookRepository::save)
+                .map(this::toDto)
+                .map(bookDto -> ResponseEntity.status(HttpStatus.CREATED).body(bookDto));
     }
 
     @PostMapping("/api/library/book")
-    public ResponseEntity<Mono<BookDto>> add(@Valid @RequestBody BookCreateDto bookCreateDto) {
+    public Mono<ResponseEntity<BookDto>> add(@Valid @RequestBody BookCreateDto bookCreateDto) {
         Mono<Integer> lastDbId = bookRepository.findFirstByOrderByIdDesc()
+                .switchIfEmpty(Mono.just(Book.builder()
+                        .id("0")
+                        .build()))
                 .map(Book::getId)
                 .map(Integer::parseInt);
-        Mono<List<Genre>> dbGenres = genreRepository.findAllById(bookCreateDto.getGenreIds())
-                .collectList();
-        dbGenres.toFuture().thenApply(genres -> {
-            if (bookCreateDto.getGenreIds().size() != genres.size()) {
-                throw new NotFoundException(GENRES_SIZE_ERROR_MESSAGE);
-            }
-            return genres;
-        });
-        String authorId = bookCreateDto.getAuthorId();
-        return ResponseEntity
-                .status(HttpStatus.CREATED)
-                .body(Mono.zip(lastDbId, getAuthor(authorId), dbGenres)
-                        .flatMap(data -> Mono.just(Book.builder()
-                                .id(String.valueOf(data.getT1() + 1))
-                                .title(bookCreateDto.getTitle())
-                                .author(data.getT2())
-                                .genres(new HashSet<>(data.getT3()))
-                                .build()))
-                        .flatMap(bookRepository::insert)
-                        .map(this::toDto));
+        Mono<List<Genre>> dbGenres = genreRepository.findAllById(bookCreateDto.getGenreIds()).collectList();
+        return Mono
+                .zip(lastDbId, getAuthor(bookCreateDto.getAuthorId()), dbGenres)
+                .flatMap(data -> Mono.just(Book.builder()
+                        .id(String.valueOf(data.getT1() + 1))
+                        .title(bookCreateDto.getTitle())
+                        .author(data.getT2())
+                        .genres(bookCreateDto.getGenreIds().size() == new HashSet<>(data.getT3()).size()
+                                ? new HashSet<>(data.getT3())
+                                : Set.of())
+                        .build()))
+                .filter(book -> !book.getGenres().isEmpty())
+                .switchIfEmpty(Mono.error(() -> new NotFoundException(GENRES_SIZE_ERROR_MESSAGE)))
+                .flatMap(bookRepository::save)
+                .map(this::toDto)
+                .map(bookDto -> ResponseEntity.status(HttpStatus.CREATED).body(bookDto));
     }
 
-    private Mono<Author> getAuthor(String authorId) {
+    public Mono<Author> getAuthor(String authorId) {
         return authorRepository.findById(authorId)
                 .switchIfEmpty(
                         Mono.error(() -> new NotFoundException(NO_AUTHOR_BY_ID_ERROR_MESSAGE.formatted(authorId))));
@@ -128,10 +121,11 @@ public class BookController {
     }
 
     @DeleteMapping("/api/library/book")
-    public ResponseEntity<Mono<Void>> delete(@RequestParam("id") String id) {
-        return ResponseEntity
-                .status(HttpStatus.NO_CONTENT)
-                .body(Mono.zip(commentRepository.deleteAllByBookId(id), bookRepository.deleteById(id))
-                        .flatMap(data -> Mono.empty()));
+    public Mono<ResponseEntity<BookDto>> delete(@RequestParam("id") String id) {
+        return bookRepository.findById(id)
+                .switchIfEmpty(Mono.error(() -> new NotFoundException(NO_BOOK_BY_ID_ERROR_MESSAGE.formatted(id))))
+                .zipWith(commentRepository.deleteAllByBookId(id))
+                .zipWith(bookRepository.deleteById(id))
+                .thenReturn(ResponseEntity.noContent().build());
     }
 }

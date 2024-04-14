@@ -4,12 +4,24 @@ import com.github.cloudyrock.mongock.ChangeLog;
 import com.github.cloudyrock.mongock.ChangeSet;
 import com.github.cloudyrock.mongock.driver.mongodb.springdata.v3.decorator.impl.MongockTemplate;
 import com.mongodb.client.MongoDatabase;
-import ru.otus.spring.model.Author;
-import ru.otus.spring.model.Book;
-import ru.otus.spring.model.Comment;
-import ru.otus.spring.model.Genre;
 
 import java.util.Set;
+
+import static ru.otus.spring.utils.EntityUtils.getFifthGenre;
+import static ru.otus.spring.utils.EntityUtils.getFirstAuthor;
+import static ru.otus.spring.utils.EntityUtils.getFirstBook;
+import static ru.otus.spring.utils.EntityUtils.getFirstComment;
+import static ru.otus.spring.utils.EntityUtils.getFirstGenre;
+import static ru.otus.spring.utils.EntityUtils.getFourthGenre;
+import static ru.otus.spring.utils.EntityUtils.getSecondAuthor;
+import static ru.otus.spring.utils.EntityUtils.getSecondBook;
+import static ru.otus.spring.utils.EntityUtils.getSecondComment;
+import static ru.otus.spring.utils.EntityUtils.getSecondGenre;
+import static ru.otus.spring.utils.EntityUtils.getSixthGenre;
+import static ru.otus.spring.utils.EntityUtils.getThirdAuthor;
+import static ru.otus.spring.utils.EntityUtils.getThirdBook;
+import static ru.otus.spring.utils.EntityUtils.getThirdComment;
+import static ru.otus.spring.utils.EntityUtils.getThirdGenre;
 
 @ChangeLog
 @SuppressWarnings("all")
@@ -22,27 +34,18 @@ public class Changelog {
 
     @ChangeSet(author = "SekhinSergey", id = "createData", order = "002", runAlways = true)
     public void createData(MongockTemplate mongoTemplate) {
-        Author firstAuthor = new Author("1", "Author_1");
-        Author secondAuthor = new Author("2", "Author_2");
-        Author thirdAuthor = new Author("3", "Author_3");
-        mongoTemplate.insertAll(Set.of(firstAuthor, secondAuthor, thirdAuthor));
-
-        Genre firstGenre = new Genre("1", "Genre_1");
-        Genre secondGenre = new Genre("2", "Genre_2");
-        Genre thirdGenre = new Genre("3", "Genre_3");
-        Genre fouthGenre = new Genre("4", "Genre_4");
-        Genre fifthGenre = new Genre("5", "Genre_5");
-        Genre sixthGenre = new Genre("6", "Genre_6");
-        mongoTemplate.insertAll(Set.of(firstGenre, secondGenre, thirdGenre, fouthGenre, fifthGenre, sixthGenre));
-
-        Book firstBook = new Book("1", "BookTitle_1", firstAuthor, Set.of(firstGenre, secondGenre));
-        Book secondBook = new Book("2", "BookTitle_2", secondAuthor, Set.of(thirdGenre, fouthGenre));
-        Book thirdBook = new Book("3", "BookTitle_3", thirdAuthor, Set.of(fifthGenre, sixthGenre));
-        mongoTemplate.insertAll(Set.of(firstBook, secondBook, thirdBook));
+        mongoTemplate.insertAll(Set.of(getFirstAuthor(), getSecondAuthor(), getThirdAuthor()));
 
         mongoTemplate.insertAll(Set.of(
-                new Comment("1", "Comment_1", firstBook),
-                new Comment("2", "Comment_2", secondBook),
-                new Comment("3", "Comment_3", thirdBook)));
+                getFirstGenre(),
+                getSecondGenre(),
+                getThirdGenre(),
+                getFourthGenre(),
+                getFifthGenre(),
+                getSixthGenre()));
+
+        mongoTemplate.insertAll(Set.of(getFirstBook(), getSecondBook(), getThirdBook()));
+
+        mongoTemplate.insertAll(Set.of(getFirstComment(), getSecondComment(), getThirdComment()));
     }
 }

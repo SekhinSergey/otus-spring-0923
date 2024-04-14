@@ -23,11 +23,8 @@
         <flapdoodle.version>4.12.2</flapdoodle.version>
         <mongock.version>4.3.8</mongock.version>
         <lombok.version>1.18.30</lombok.version>
-        <checkstyle-plugin.version>3.2.2</checkstyle-plugin.version>
+        <checkstyle-plugin.version>3.3.1</checkstyle-plugin.version>
         <checkstyle.version>10.11.0</checkstyle.version>
-        <checkstyle.config.url>
-            https://raw.githubusercontent.com/OtusTeam/Spring/master/checkstyle.xml
-        </checkstyle.config.url>
     </properties>
 
     <dependencies>
@@ -67,9 +64,9 @@
             <scope>test</scope>
         </dependency>
         <dependency>
-            <groupId>de.flapdoodle.embed</groupId>
-            <artifactId>de.flapdoodle.embed.mongo</artifactId>
-            <version>${flapdoodle.version}</version>
+            <groupId>io.projectreactor</groupId>
+            <artifactId>reactor-test</artifactId>
+            <scope>test</scope>
         </dependency>
 
         <!--otherDependencies-->
@@ -82,7 +79,10 @@
             <artifactId>lombok</artifactId>
             <scope>provided</scope>
         </dependency>
-
+        <dependency>
+            <groupId>org.apache.commons</groupId>
+            <artifactId>commons-lang3</artifactId>
+        </dependency>
     </dependencies>
 
     <build>
@@ -100,7 +100,7 @@
                     </dependency>
                 </dependencies>
                 <configuration>
-                    <configLocation>${checkstyle.config.url}</configLocation>
+                    <configLocation>checkstyle.xml</configLocation>
                 </configuration>
                 <executions>
                     <execution>

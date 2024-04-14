@@ -23,8 +23,10 @@ import ru.otus.spring.model.Comment;
 import ru.otus.spring.repository.BookRepository;
 import ru.otus.spring.repository.CommentRepository;
 
-import static ru.otus.spring.constant.Constants.NO_BOOK_BY_ID_ERROR_MESSAGE;
-import static ru.otus.spring.constant.Constants.NO_COMMENT_BY_ID_ERROR_MESSAGE;
+import java.util.Comparator;
+
+import static ru.otus.spring.utils.Messages.NO_BOOK_BY_ID_ERROR_MESSAGE;
+import static ru.otus.spring.utils.Messages.NO_COMMENT_BY_ID_ERROR_MESSAGE;
 
 @RestController
 @RequiredArgsConstructor
@@ -37,33 +39,34 @@ public class CommentController {
     @GetMapping("/api/library/comments")
     public Flux<CommentDto> getAllByBookId(@RequestParam("bookId") String bookId) {
         return commentRepository.findAllByBookId(bookId)
-                .map(this::toDto);
+                .map(this::toDto)
+                .sort(Comparator.comparing(CommentDto::id));
     }
 
     @PutMapping("/api/library/comment/{id}")
-    public ResponseEntity<Mono<CommentDto>> edit(@PathVariable String id,
-                                           @Valid @RequestBody CommentUpdateDto commentUpdateDto) {
-        Mono<String> dbId = commentRepository.findById(id)
+    public Mono<ResponseEntity<CommentDto>> edit(@PathVariable String id,
+                                                 @Valid @RequestBody CommentUpdateDto commentUpdateDto) {
+        return commentRepository.findById(id)
                 .switchIfEmpty(Mono.error(() -> new NotFoundException(NO_COMMENT_BY_ID_ERROR_MESSAGE.formatted(id))))
-                .map(Comment::getId);
-        String bookId = commentUpdateDto.getBookId();
-        Mono<Book> dbBook = bookRepository.findById(bookId)
-                .switchIfEmpty(Mono.error(() -> new NotFoundException(NO_BOOK_BY_ID_ERROR_MESSAGE.formatted(bookId))));
-        return ResponseEntity
-                .status(HttpStatus.CREATED)
-                .body(Mono.zip(dbId, dbBook)
-                        .flatMap(data -> Mono.just(Comment.builder()
-                                .id(data.getT1())
-                                .text(commentUpdateDto.getText())
-                                .book(data.getT2())
-                                .build()))
-                        .flatMap(commentRepository::save)
-                        .map(this::toDto));
+                .zipWith(bookRepository.findById(commentUpdateDto.getBookId())
+                        .switchIfEmpty(Mono.error(() -> new NotFoundException(
+                                NO_BOOK_BY_ID_ERROR_MESSAGE.formatted(commentUpdateDto.getBookId())))))
+                .flatMap(data -> Mono.just(Comment.builder()
+                        .id(id)
+                        .text(commentUpdateDto.getText())
+                        .book(data.getT2())
+                        .build()))
+                .flatMap(commentRepository::save)
+                .map(this::toDto)
+                .map(commentDto -> ResponseEntity.status(HttpStatus.CREATED).body(commentDto));
     }
 
     @PostMapping("/api/library/comment")
     public ResponseEntity<Mono<CommentDto>> add(@Valid @RequestBody CommentCreateDto commentCreateDto) {
         Mono<Integer> lastDbId = commentRepository.findFirstByOrderByIdDesc()
+                .switchIfEmpty(Mono.just(Comment.builder()
+                        .id("0")
+                        .build()))
                 .map(Comment::getId)
                 .map(Integer::parseInt);
         String bookId = commentCreateDto.getBookId();
@@ -77,7 +80,7 @@ public class CommentController {
                                 .text(commentCreateDto.getText())
                                 .book(data.getT2())
                                 .build()))
-                        .flatMap(commentRepository::insert)
+                        .flatMap(commentRepository::save)
                         .map(this::toDto));
     }
 
@@ -93,6 +96,11 @@ public class CommentController {
     public ResponseEntity<Mono<Void>> delete(@RequestParam("id") String id) {
         return ResponseEntity
                 .status(HttpStatus.NO_CONTENT)
-                .body(commentRepository.deleteById(id));
+                .body(Mono.zip(
+                                commentRepository.findById(id)
+                                        .switchIfEmpty(Mono.error(() ->
+                                                new NotFoundException(NO_COMMENT_BY_ID_ERROR_MESSAGE.formatted(id)))),
+                                commentRepository.deleteById(id))
+                        .flatMap(data -> Mono.empty()));
     }
 }

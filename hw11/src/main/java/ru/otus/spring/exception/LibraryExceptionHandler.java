@@ -35,7 +35,7 @@ public class LibraryExceptionHandler {
         return exception.getMessage();
     }
 
-    @ResponseStatus(HttpStatus.NOT_FOUND)
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
     @ExceptionHandler(Exception.class)
     public String handleException(Exception exception) {
         return exception.getMessage();

@@ -7,16 +7,21 @@ import lombok.Getter;
 
 import java.util.Set;
 
+import static ru.otus.spring.utils.Messages.NO_AUTHOR_ID_ERROR_MESSAGE;
+import static ru.otus.spring.utils.Messages.NO_BOOK_TITLE_ERROR_MESSAGE;
+import static ru.otus.spring.utils.Messages.NO_GENRE_IDS_ERROR_MESSAGE;
+import static ru.otus.spring.utils.Messages.NO_GENRE_ID_ERROR_MESSAGE;
+
 @Getter
 @Builder
 public class BookCreateDto {
 
-    @NotBlank(message = "Book title value should not be blank")
+    @NotBlank(message = NO_BOOK_TITLE_ERROR_MESSAGE)
     private String title;
 
-    @NotBlank(message = "Author ID value should not be null")
+    @NotBlank(message = NO_AUTHOR_ID_ERROR_MESSAGE)
     private String authorId;
 
-    @NotEmpty(message = "Set of genre IDs value value should not be empty")
-    private Set<@NotBlank(message = "Genre ID value should not be null") String> genreIds;
+    @NotEmpty(message = NO_GENRE_IDS_ERROR_MESSAGE)
+    private Set<@NotBlank(message = NO_GENRE_ID_ERROR_MESSAGE) String> genreIds;
 }

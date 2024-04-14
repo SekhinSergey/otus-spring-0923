@@ -19,26 +19,25 @@
 </template>
 
 <script>
-    import apiService from '../services/api-service'
-    export default {
-        name: "Authors",
-        data: function () {
-            return {
-                authors: null
-            }
-        },
-        mounted: function () {
-            this.getAuthors();
-        },
-        methods: {
-            getAuthors: function () {
-                apiService.getAuthors()
-                    .then(response => {
-                        this.authors = response.data;
-                    }).catch(error => {
-                        // Not used
+import apiService from '../services/api-service'
+
+export default {
+    name: "Authors",
+    data: function () {
+        return {
+            authors: null
+        }
+    },
+    mounted: function () {
+        this.getAuthors();
+    },
+    methods: {
+        getAuthors: function () {
+            apiService.getAuthors()
+                .then(response => {
+                    this.authors = response.data;
                 });
-            }
         }
     }
+}
 </script>
