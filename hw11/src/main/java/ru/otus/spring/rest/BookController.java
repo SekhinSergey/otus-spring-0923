@@ -121,7 +121,7 @@ public class BookController {
     }
 
     @DeleteMapping("/api/library/book")
-    public Mono<ResponseEntity<BookDto>> delete(@RequestParam("id") String id) {
+    public Mono<ResponseEntity<Void>> delete(@RequestParam("id") String id) {
         return bookRepository.findById(id)
                 .switchIfEmpty(Mono.error(() -> new NotFoundException(NO_BOOK_BY_ID_ERROR_MESSAGE.formatted(id))))
                 .zipWith(commentRepository.deleteAllByBookId(id))
