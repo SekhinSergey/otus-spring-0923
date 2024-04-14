@@ -18,48 +18,63 @@
                     <option v-for="genre in genres" :value="genre.id">{{ genre.name }}</option>
                 </select>
             </div>
-            <button class="btn btn-primary" v-on:click="addBook()">Save</button>
+            <div style="display: flex; gap: 12px; justify-content: center">
+                <button class="btn btn-primary" v-on:click="addBook()">Save</button>
+                <button class="btn btn-primary" v-on:click="$router.go(0)">Cancel</button>
+            </div>
         </div>
     </div>
 </template>
 
 <script>
-    import apiService from '@/services/api-service';
-    export default {
-        name: "BookCreate",
-        data: function () {
-            return {
-                authors: {},
-                genres: {},
-                title: '',
-                authorId: 0,
-                genreIds: []
-            }
+import apiService from '@/services/api-service';
+
+export default {
+    name: "BookCreate",
+    props: [
+        'bookModel'
+    ],
+    data: function () {
+        return {
+            authors: {},
+            genres: {},
+            title: '',
+            authorId: '',
+            genreIds: []
+        }
+    },
+    mounted: function () {
+        this.authorId = this.bookModel.authorId;
+        this.genreIds = this.bookModel.genreIds;
+        this.title = this.bookModel.title;
+        this.loadAuthors();
+        this.loadGenres();
+    },
+    methods: {
+        loadAuthors: function () {
+            apiService.getAuthors()
+                .then(response => {
+                    this.authors = response.data;
+                });
         },
-        mounted: function () {
-            this.loadAuthors();
-            this.loadGenres();
+        loadGenres: function () {
+            apiService.getGenres()
+                .then(response => {
+                    this.genres = response.data;
+                });
         },
-        methods: {
-            loadAuthors: function () {
-                apiService.getAuthors()
-                    .then(response => {
-                        this.authors = response.data;
-                    });
-            },
-            loadGenres: function () {
-                apiService.getGenres()
-                    .then(response => {
-                        this.genres = response.data;
-                    });
-            },
-            addBook: function () {
-                let {title, authorId, genreIds} = this;
-                apiService.addBook({title, authorId, genreIds})
-                    .then(response => {
-                        this.$emit('bookAdded', response.data);
-                    });
-            }
+        addBook: function () {
+            let {title, authorId, genreIds} = this;
+            apiService.addBook({title, authorId, genreIds})
+                .then(response => {
+                    this.$emit('bookAdded', response.data);
+                }).catch(error => {
+                    console.info(error.response.data.errors)
+                    let errors = [];
+                    error.response.data.errors.forEach(e => errors.push(e.message));
+                    alert(errors.join('\r\n'));
+            });
         }
     }
+}
 </script>

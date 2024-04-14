@@ -19,26 +19,25 @@
 </template>
 
 <script>
-    import apiService from '../services/api-service'
-    export default {
-        name: "Genres",
-        data: function () {
-            return {
-                genres: null
-            }
-        },
-        mounted: function () {
-            this.getGenres();
-        },
-        methods: {
-            getGenres: function () {
-                apiService.getGenres()
-                    .then(response => {
-                        this.genres = response.data;
-                    }).catch(error => {
-                        // Not used
+import apiService from '../services/api-service'
+
+export default {
+    name: "Genres",
+    data: function () {
+        return {
+            genres: null
+        }
+    },
+    mounted: function () {
+        this.getGenres();
+    },
+    methods: {
+        getGenres: function () {
+            apiService.getGenres()
+                .then(response => {
+                    this.genres = response.data;
                 });
-            }
         }
     }
+}
 </script>

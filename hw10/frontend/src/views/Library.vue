@@ -5,7 +5,7 @@
 </template>
 
 <script>
-    export default {
-        name: 'Library'
-    }
+export default {
+    name: 'Library'
+}
 </script>

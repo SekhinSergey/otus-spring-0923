@@ -10,35 +10,47 @@
                 <label for="holder-input">Text:</label>
                 <input id="holder-input" name="text" type="text" v-model="commentText"/>
             </div>
-            <button class="btn btn-primary" v-on:click="saveComment()">Save</button>
+            <div style="display: flex; gap: 12px; justify-content: center">
+                <button class="btn btn-primary" v-on:click="saveComment()">Save</button>
+                <button class="btn btn-primary" v-on:click="getCommentsByBookId()">Cancel</button>
+            </div>
         </div>
     </div>
 </template>
 
 <script>
-    import apiService from '../../services/api-service'
-    export default {
-        name: "CommentEdit",
-        props: [
-            'commentModel'
-        ],
-        data: function () {
-            return {
-                commentText: '',
-            }
+import apiService from '../../services/api-service'
+
+export default {
+    name: "CommentEdit",
+    props: [
+        'commentModel'
+    ],
+    data: function () {
+        return {
+            commentText: '',
+        }
+    },
+    mounted: function () {
+        this.commentText = this.commentModel.text;
+    },
+    methods: {
+        saveComment: function () {
+            let commentToSave = {...this.commentModel};
+            commentToSave.text = this.commentText;
+            apiService.updateComment(this.commentModel.id, commentToSave)
+                .then(response => {
+                    this.$emit('commentSaved', response.data);
+                }).catch(error => {
+                    alert("Comment text value should not be blank");
+            });
         },
-        mounted: function () {
-            this.commentText = this.commentModel.text;
-        },
-        methods: {
-            saveComment: function () {
-                let commentToSave = Object.assign({}, this.commentModel);
-                commentToSave.text = this.commentText;
-                apiService.updateComment(this.commentModel.id, commentToSave)
-                    .then(response => {
-                        this.$emit('commentSaved', response.data);
-                    });
-            }
+        getCommentsByBookId: function () {
+            apiService.getCommentsByBookId(this.bookId)
+                .then(response => {
+                    this.$emit('commentSaved', response.data);
+                });
         }
     }
+}
 </script>

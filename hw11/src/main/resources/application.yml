@@ -1,0 +1,9 @@
+spring:
+  data:
+    mongodb:
+      database: catalog
+mongock:
+  runner-type: "InitializingBean"
+  change-logs-scan-package: ru.otus.spring.mongock
+server:
+  port: 8081
