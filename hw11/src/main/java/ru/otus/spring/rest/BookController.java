@@ -59,7 +59,7 @@ public class BookController {
     public Mono<ResponseEntity<BookDto>> edit(@PathVariable String id,
                                               @Valid @RequestBody BookUpdateDto bookUpdateDto) {
         return bookRepository.findById(id)
-                .switchIfEmpty(Mono.error(() -> new NotFoundException(NO_BOOK_BY_ID_ERROR_MESSAGE.formatted(id))))
+                .switchIfEmpty(Mono.error(new NotFoundException(NO_BOOK_BY_ID_ERROR_MESSAGE.formatted(id))))
                 .zipWith(getAuthor(bookUpdateDto.getAuthorId()))
                 .zipWith(genreRepository.findAllById(bookUpdateDto.getGenreIds()).collectList())
                 .flatMap(data -> Mono.just(Book.builder()
@@ -71,7 +71,7 @@ public class BookController {
                                 : Set.of())
                         .build()))
                 .filter(book -> !book.getGenres().isEmpty())
-                .switchIfEmpty(Mono.error(() -> new NotFoundException(GENRES_SIZE_ERROR_MESSAGE)))
+                .switchIfEmpty(Mono.error(new NotFoundException(GENRES_SIZE_ERROR_MESSAGE)))
                 .flatMap(bookRepository::save)
                 .map(this::toDto)
                 .map(bookDto -> ResponseEntity.status(HttpStatus.CREATED).body(bookDto));
@@ -97,7 +97,7 @@ public class BookController {
                                 : Set.of())
                         .build()))
                 .filter(book -> !book.getGenres().isEmpty())
-                .switchIfEmpty(Mono.error(() -> new NotFoundException(GENRES_SIZE_ERROR_MESSAGE)))
+                .switchIfEmpty(Mono.error(new NotFoundException(GENRES_SIZE_ERROR_MESSAGE)))
                 .flatMap(bookRepository::save)
                 .map(this::toDto)
                 .map(bookDto -> ResponseEntity.status(HttpStatus.CREATED).body(bookDto));
@@ -105,8 +105,7 @@ public class BookController {
 
     public Mono<Author> getAuthor(String authorId) {
         return authorRepository.findById(authorId)
-                .switchIfEmpty(
-                        Mono.error(() -> new NotFoundException(NO_AUTHOR_BY_ID_ERROR_MESSAGE.formatted(authorId))));
+                .switchIfEmpty(Mono.error(new NotFoundException(NO_AUTHOR_BY_ID_ERROR_MESSAGE.formatted(authorId))));
     }
 
     private BookDto toDto(Book book) {
@@ -123,7 +122,7 @@ public class BookController {
     @DeleteMapping("/api/library/book")
     public Mono<ResponseEntity<Void>> delete(@RequestParam("id") String id) {
         return bookRepository.findById(id)
-                .switchIfEmpty(Mono.error(() -> new NotFoundException(NO_BOOK_BY_ID_ERROR_MESSAGE.formatted(id))))
+                .switchIfEmpty(Mono.error(new NotFoundException(NO_BOOK_BY_ID_ERROR_MESSAGE.formatted(id))))
                 .zipWith(commentRepository.deleteAllByBookId(id))
                 .zipWith(bookRepository.deleteById(id))
                 .thenReturn(ResponseEntity.noContent().build());

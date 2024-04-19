@@ -47,9 +47,9 @@ public class CommentController {
     public Mono<ResponseEntity<CommentDto>> edit(@PathVariable String id,
                                                  @Valid @RequestBody CommentUpdateDto commentUpdateDto) {
         return commentRepository.findById(id)
-                .switchIfEmpty(Mono.error(() -> new NotFoundException(NO_COMMENT_BY_ID_ERROR_MESSAGE.formatted(id))))
+                .switchIfEmpty(Mono.error(new NotFoundException(NO_COMMENT_BY_ID_ERROR_MESSAGE.formatted(id))))
                 .zipWith(bookRepository.findById(commentUpdateDto.getBookId())
-                        .switchIfEmpty(Mono.error(() -> new NotFoundException(
+                        .switchIfEmpty(Mono.error(new NotFoundException(
                                 NO_BOOK_BY_ID_ERROR_MESSAGE.formatted(commentUpdateDto.getBookId())))))
                 .flatMap(data -> Mono.just(Comment.builder()
                         .id(id)
@@ -71,7 +71,7 @@ public class CommentController {
                 .map(Integer::parseInt);
         String bookId = commentCreateDto.getBookId();
         Mono<Book> dbBook = bookRepository.findById(bookId)
-                .switchIfEmpty(Mono.error(() -> new NotFoundException(NO_BOOK_BY_ID_ERROR_MESSAGE.formatted(bookId))));
+                .switchIfEmpty(Mono.error(new NotFoundException(NO_BOOK_BY_ID_ERROR_MESSAGE.formatted(bookId))));
         return Mono
                 .zip(lastDbId, dbBook)
                 .flatMap(data -> Mono.just(Comment.builder()
@@ -95,7 +95,7 @@ public class CommentController {
     @DeleteMapping("/api/library/comment")
     public Mono<ResponseEntity<Void>> delete(@RequestParam("id") String id) {
         return commentRepository.findById(id)
-                .switchIfEmpty(Mono.error(() -> new NotFoundException(NO_COMMENT_BY_ID_ERROR_MESSAGE.formatted(id))))
+                .switchIfEmpty(Mono.error(new NotFoundException(NO_COMMENT_BY_ID_ERROR_MESSAGE.formatted(id))))
                 .zipWith(commentRepository.deleteById(id))
                 .thenReturn(ResponseEntity.noContent().build());
     }
