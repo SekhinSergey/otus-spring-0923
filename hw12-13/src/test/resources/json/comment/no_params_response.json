@@ -1,0 +1,16 @@
+{
+  "errors": [
+    {
+      "field": "bookId",
+      "message": "Book ID value should not be null"
+    },
+    {
+      "field": "text",
+      "message": "Comment text value should not be blank"
+    },
+    {
+      "field": "userId",
+      "message": "User ID value should not be null"
+    }
+  ]
+}

@@ -1,0 +1,16 @@
+{
+  "errors": [
+    {
+      "field": "genreIds",
+      "message": "Set of genre IDs value should not be empty"
+    },
+    {
+      "field": "title",
+      "message": "Book title value should not be blank"
+    },
+    {
+      "field": "authorId",
+      "message": "Author ID value should not be null"
+    }
+  ]
+}
