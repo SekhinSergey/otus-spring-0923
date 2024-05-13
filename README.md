@@ -31,3 +31,9 @@ HW10: каталог книг (REST + Vue.js)
 
 
 HW11: каталог книг (Spring WebFlux)
+
+
+HW12-13: каталог книг (Spring Security)
+Основано на
+
+https://github.com/atquil/spring-security/tree/JWT-oauth2
