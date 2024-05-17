@@ -1,0 +1,23 @@
+spring:
+  datasource:
+    url: jdbc:h2:mem:maindb
+  sql:
+    init:
+      mode: always
+      data-locations: classpath:data.sql
+      schema-locations: classpath:schema.sql
+  jpa:
+    generate-ddl: false
+    hibernate:
+      ddl-auto: none
+  data:
+    mongodb:
+      database: catalog
+  shell:
+    interactive:
+      enabled: false
+de:
+  flapdoodle:
+    mongodb:
+      embedded:
+        version: 4.13.1

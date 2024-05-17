@@ -34,6 +34,6 @@ HW11: каталог книг (Spring WebFlux)
 
 
 HW12-13: каталог книг (Spring Security)
-Основано на
+Основано на https://github.com/atquil/spring-security/tree/JWT-oauth2
 
-https://github.com/atquil/spring-security/tree/JWT-oauth2
+HW14: каталог книг (Spring Batch)
