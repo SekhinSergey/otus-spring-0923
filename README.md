@@ -37,3 +37,5 @@ HW12-13: каталог книг (Spring Security)
 Основано на https://github.com/atquil/spring-security/tree/JWT-oauth2
 
 HW14: каталог книг (Spring Batch)
+
+HW15: Spring Integration
